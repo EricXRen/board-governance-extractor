@@ -1,0 +1,56 @@
+llm:
+  default_provider: anthropic
+  default_model: claude-sonnet-4-6
+  temperature: 0
+  max_retries: 5
+  timeout_seconds: 120
+
+pdf:
+  cache_dir: "~/.gov_extract/cache"
+  max_pages_per_chunk: 15
+  governance_keywords:
+    - "board of directors"
+    - "directors' report"
+    - "our board"
+    - "committee report"
+    - "proxy statement"
+    - "governance"
+
+output:
+  default_dir: "./outputs"
+
+logging:
+  level: INFO
+  format: json
+  file: "gov_extract.log"
+
+evaluation:
+  field_metrics:
+    "biographical.full_name": exact_match
+    "biographical.post_nominals": fuzzy_match
+    "biographical.age": numeric_error
+    "biographical.age_band": fuzzy_match
+    "biographical.nationality": fuzzy_match
+    "biographical.qualifications": list_f1
+    "biographical.expertise_areas": list_f1
+    "biographical.career_summary": semantic_similarity
+    "biographical.other_directorships": list_f1
+    "board_role.designation": exact_match
+    "board_role.board_role": fuzzy_match
+    "board_role.independence_status": exact_match
+    "board_role.year_joined_board": numeric_error
+    "board_role.tenure_years": numeric_error
+    "board_role.committee_memberships": list_f1
+    "board_role.committee_chair_of": list_f1
+    "attendance.board_meetings_attended": numeric_error
+    "attendance.board_meetings_scheduled": numeric_error
+    "attendance.board_attendance_pct": numeric_error
+  thresholds:
+    fuzzy_match: 90.0
+    list_f1: 0.90
+    semantic_similarity: 0.80
+    numeric_error_tolerance: 0.05
+  regression_gate:
+    document_field_pass_rate: 0.90
+    director_perfect_match_rate: 0.50
+    hallucination_rate: 0.05

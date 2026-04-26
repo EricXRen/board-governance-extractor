@@ -1,0 +1,416 @@
+{
+  "$defs": {
+    "AttendanceDetails": {
+      "additionalProperties": false,
+      "description": "Board and committee meeting attendance.",
+      "properties": {
+        "board_meetings_attended": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Board Meetings Attended"
+        },
+        "board_meetings_scheduled": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Board Meetings Scheduled"
+        },
+        "board_attendance_pct": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Board Attendance Pct"
+        },
+        "committee_attendance": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CommitteeAttendance"
+          },
+          "title": "Committee Attendance",
+          "type": "array"
+        },
+        "attendance_notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Attendance Notes"
+        }
+      },
+      "title": "AttendanceDetails",
+      "type": "object"
+    },
+    "BiographicalDetails": {
+      "additionalProperties": false,
+      "description": "Biographical and professional background of a director.",
+      "properties": {
+        "full_name": {
+          "title": "Full Name",
+          "type": "string"
+        },
+        "post_nominals": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Post Nominals"
+        },
+        "age": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Age"
+        },
+        "age_band": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Age Band"
+        },
+        "nationality": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nationality"
+        },
+        "qualifications": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Qualifications",
+          "type": "array"
+        },
+        "expertise_areas": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Expertise Areas",
+          "type": "array"
+        },
+        "career_summary": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Career Summary"
+        },
+        "other_directorships": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Other Directorships",
+          "type": "array"
+        }
+      },
+      "required": [
+        "full_name"
+      ],
+      "title": "BiographicalDetails",
+      "type": "object"
+    },
+    "BoardRoleDetails": {
+      "additionalProperties": false,
+      "description": "Board role, independence, tenure, and committee information.",
+      "properties": {
+        "designation": {
+          "enum": [
+            "Executive Director",
+            "Non-Executive Director",
+            "Chair"
+          ],
+          "title": "Designation",
+          "type": "string"
+        },
+        "board_role": {
+          "title": "Board Role",
+          "type": "string"
+        },
+        "independence_status": {
+          "enum": [
+            "Independent",
+            "Not Independent",
+            "Chair (independent on appointment)",
+            "N/A (Executive)"
+          ],
+          "title": "Independence Status",
+          "type": "string"
+        },
+        "year_joined_board": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year Joined Board"
+        },
+        "date_joined_board": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Date Joined Board"
+        },
+        "tenure_years": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tenure Years"
+        },
+        "year_end_status": {
+          "title": "Year End Status",
+          "type": "string"
+        },
+        "committee_memberships": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Committee Memberships",
+          "type": "array"
+        },
+        "committee_chair_of": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Committee Chair Of",
+          "type": "array"
+        },
+        "special_roles": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Special Roles",
+          "type": "array"
+        }
+      },
+      "required": [
+        "designation",
+        "board_role",
+        "independence_status",
+        "year_end_status"
+      ],
+      "title": "BoardRoleDetails",
+      "type": "object"
+    },
+    "CommitteeAttendance": {
+      "additionalProperties": false,
+      "description": "Attendance record for a single committee.",
+      "properties": {
+        "committee_name": {
+          "title": "Committee Name",
+          "type": "string"
+        },
+        "meetings_attended": {
+          "title": "Meetings Attended",
+          "type": "integer"
+        },
+        "meetings_scheduled": {
+          "title": "Meetings Scheduled",
+          "type": "integer"
+        },
+        "attendance_pct": {
+          "title": "Attendance Pct",
+          "type": "number"
+        },
+        "is_chair": {
+          "default": false,
+          "title": "Is Chair",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "committee_name",
+        "meetings_attended",
+        "meetings_scheduled",
+        "attendance_pct"
+      ],
+      "title": "CommitteeAttendance",
+      "type": "object"
+    },
+    "CompanyMetadata": {
+      "additionalProperties": false,
+      "description": "Metadata about the filing and extraction run.",
+      "properties": {
+        "company_name": {
+          "title": "Company Name",
+          "type": "string"
+        },
+        "company_ticker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Company Ticker"
+        },
+        "filing_type": {
+          "title": "Filing Type",
+          "type": "string"
+        },
+        "fiscal_year_end": {
+          "title": "Fiscal Year End",
+          "type": "string"
+        },
+        "report_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Report Date"
+        },
+        "source_pdf_path": {
+          "title": "Source Pdf Path",
+          "type": "string"
+        },
+        "extraction_timestamp": {
+          "title": "Extraction Timestamp",
+          "type": "string"
+        },
+        "llm_provider": {
+          "title": "Llm Provider",
+          "type": "string"
+        },
+        "llm_model": {
+          "title": "Llm Model",
+          "type": "string"
+        }
+      },
+      "required": [
+        "company_name",
+        "filing_type",
+        "fiscal_year_end",
+        "source_pdf_path",
+        "extraction_timestamp",
+        "llm_provider",
+        "llm_model"
+      ],
+      "title": "CompanyMetadata",
+      "type": "object"
+    },
+    "Director": {
+      "additionalProperties": false,
+      "description": "Complete director record combining all sub-models.",
+      "properties": {
+        "biographical": {
+          "$ref": "#/$defs/BiographicalDetails"
+        },
+        "board_role": {
+          "$ref": "#/$defs/BoardRoleDetails"
+        },
+        "attendance": {
+          "$ref": "#/$defs/AttendanceDetails"
+        }
+      },
+      "required": [
+        "biographical",
+        "board_role",
+        "attendance"
+      ],
+      "title": "Director",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Complete extraction output: company metadata + all directors.",
+  "properties": {
+    "company": {
+      "$ref": "#/$defs/CompanyMetadata"
+    },
+    "directors": {
+      "items": {
+        "$ref": "#/$defs/Director"
+      },
+      "title": "Directors",
+      "type": "array"
+    }
+  },
+  "required": [
+    "company",
+    "directors"
+  ],
+  "title": "BoardGovernanceDocument",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0"
+}

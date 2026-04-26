@@ -1,0 +1,467 @@
+{
+  "company": {
+    "company_name": "Lloyds Banking Group",
+    "company_ticker": "LLOY.L",
+    "filing_type": "Annual Report",
+    "fiscal_year_end": "2024-12-31",
+    "report_date": "2025-02-20",
+    "source_pdf_path": "examples/2025-lbg-annual-report.pdf",
+    "extraction_timestamp": "2025-04-27T00:00:00+00:00",
+    "llm_provider": "manual",
+    "llm_model": "human"
+  },
+  "directors": [
+    {
+      "biographical": {
+        "full_name": "Sir Robin Budenberg CBE",
+        "post_nominals": "CBE",
+        "age": null,
+        "age_band": "61-65",
+        "nationality": "British",
+        "qualifications": [],
+        "expertise_areas": ["Financial Services", "Strategy", "Corporate Finance", "Government & Regulation"],
+        "career_summary": "Robin was Chair of UK Financial Investments from 2012 to 2021. He was previously Deputy Chairman and Head of UK Investment Banking at UBS. He is a Trustee of the Tate.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Chair",
+        "board_role": "Chair",
+        "independence_status": "Chair (independent on appointment)",
+        "year_joined_board": 2021,
+        "date_joined_board": "2021-01-01",
+        "tenure_years": 4.0,
+        "year_end_status": "Active",
+        "committee_memberships": ["Nominations and Governance Committee"],
+        "committee_chair_of": ["Nominations and Governance Committee"],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 1.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Nominations and Governance Committee",
+            "meetings_attended": 9,
+            "meetings_scheduled": 9,
+            "attendance_pct": 1.0,
+            "is_chair": true
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Charlie Nunn",
+        "post_nominals": null,
+        "age": null,
+        "age_band": "46-50",
+        "nationality": "British",
+        "qualifications": [],
+        "expertise_areas": ["Banking", "Retail Financial Services", "Technology", "Strategy"],
+        "career_summary": "Charlie joined Lloyds Banking Group as Group Chief Executive in August 2021. He was previously Head of Wealth and Personal Banking at HSBC.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Executive Director",
+        "board_role": "Group Chief Executive",
+        "independence_status": "N/A (Executive)",
+        "year_joined_board": 2021,
+        "date_joined_board": "2021-08-16",
+        "tenure_years": 3.4,
+        "year_end_status": "Active",
+        "committee_memberships": [],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 1.0,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "William Chalmers",
+        "post_nominals": null,
+        "age": null,
+        "age_band": "51-55",
+        "nationality": "British",
+        "qualifications": ["CA"],
+        "expertise_areas": ["Finance", "Banking", "Capital Markets"],
+        "career_summary": "William joined Lloyds Banking Group as Chief Financial Officer in October 2019. He was previously CFO of Prudential plc's US business Jackson National Life.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Executive Director",
+        "board_role": "Chief Financial Officer",
+        "independence_status": "N/A (Executive)",
+        "year_joined_board": 2019,
+        "date_joined_board": "2019-10-28",
+        "tenure_years": 5.2,
+        "year_end_status": "Active",
+        "committee_memberships": [],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 1.0,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Sarah Bentley",
+        "post_nominals": null,
+        "age": null,
+        "age_band": "51-55",
+        "nationality": "British",
+        "qualifications": [],
+        "expertise_areas": ["Utility Sector", "Customer Experience", "Digital Transformation", "ESG"],
+        "career_summary": "Sarah was Chief Executive of Thames Water from 2021 to 2023. She has previously held senior roles at Severn Trent and Accenture.",
+        "other_directorships": ["Landsec Group PLC"]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2023,
+        "date_joined_board": "2023-09-01",
+        "tenure_years": 1.3,
+        "year_end_status": "Active",
+        "committee_memberships": ["Remuneration Committee", "Responsible Business Committee"],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 8,
+        "board_meetings_scheduled": 9,
+        "board_attendance_pct": 0.889,
+        "committee_attendance": [
+          {
+            "committee_name": "Remuneration Committee",
+            "meetings_attended": 8,
+            "meetings_scheduled": 9,
+            "attendance_pct": 0.889,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Liam Coleman",
+        "post_nominals": null,
+        "age": null,
+        "age_band": "56-60",
+        "nationality": "British",
+        "qualifications": ["ACA"],
+        "expertise_areas": ["Financial Services", "Insurance", "Risk", "Finance"],
+        "career_summary": "Liam was Chief Executive of Covea Insurance in the UK. He has previously held senior roles at Prudential, Aviva and Direct Line.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2022,
+        "date_joined_board": "2022-06-01",
+        "tenure_years": 2.6,
+        "year_end_status": "Active",
+        "committee_memberships": ["Audit Committee", "Risk Committee"],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 1.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 7,
+            "meetings_scheduled": 7,
+            "attendance_pct": 1.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Risk Committee",
+            "meetings_attended": 8,
+            "meetings_scheduled": 8,
+            "attendance_pct": 1.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Toni Townsend",
+        "post_nominals": null,
+        "age": null,
+        "age_band": "51-55",
+        "nationality": "British",
+        "qualifications": [],
+        "expertise_areas": ["Legal", "Regulatory", "Financial Services", "Governance"],
+        "career_summary": "Toni is a solicitor and was Group General Counsel at Legal & General Group. She has also held senior legal roles at RBS.",
+        "other_directorships": ["Aviva PLC"]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2020,
+        "date_joined_board": "2020-10-01",
+        "tenure_years": 4.3,
+        "year_end_status": "Active",
+        "committee_memberships": ["Audit Committee", "Nominations and Governance Committee", "Responsible Business Committee"],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 1.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 7,
+            "meetings_scheduled": 7,
+            "attendance_pct": 1.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Alan Dickinson",
+        "post_nominals": null,
+        "age": null,
+        "age_band": "66-70",
+        "nationality": "British",
+        "qualifications": [],
+        "expertise_areas": ["Banking", "Risk", "Credit", "Financial Services"],
+        "career_summary": "Alan was Group Chief Risk Officer at Royal Bank of Scotland. He was also a Non-Executive Director of Ulster Bank.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Senior Independent Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2018,
+        "date_joined_board": "2018-01-01",
+        "tenure_years": 7.0,
+        "year_end_status": "Active",
+        "committee_memberships": ["Risk Committee", "Remuneration Committee", "Nominations and Governance Committee"],
+        "committee_chair_of": ["Risk Committee"],
+        "special_roles": ["Senior Independent Director"]
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 1.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Risk Committee",
+            "meetings_attended": 8,
+            "meetings_scheduled": 8,
+            "attendance_pct": 1.0,
+            "is_chair": true
+          },
+          {
+            "committee_name": "Remuneration Committee",
+            "meetings_attended": 9,
+            "meetings_scheduled": 9,
+            "attendance_pct": 1.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Amanda Mackenzie OBE",
+        "post_nominals": "OBE",
+        "age": null,
+        "age_band": "56-60",
+        "nationality": "British",
+        "qualifications": [],
+        "expertise_areas": ["Marketing", "Brand", "Sustainability", "Consumer"],
+        "career_summary": "Amanda is Chair of WWF-UK. She was previously Chief Marketing and Communications Officer at Aviva and has held senior roles at BT and British Airways.",
+        "other_directorships": ["WWF-UK"]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2020,
+        "date_joined_board": "2020-03-01",
+        "tenure_years": 5.0,
+        "year_end_status": "Active",
+        "committee_memberships": ["Remuneration Committee", "Responsible Business Committee", "Nominations and Governance Committee"],
+        "committee_chair_of": ["Responsible Business Committee"],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 1.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Remuneration Committee",
+            "meetings_attended": 9,
+            "meetings_scheduled": 9,
+            "attendance_pct": 1.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Nick Prettejohn",
+        "post_nominals": null,
+        "age": null,
+        "age_band": "61-65",
+        "nationality": "British",
+        "qualifications": [],
+        "expertise_areas": ["Insurance", "Financial Services", "Strategy", "Risk"],
+        "career_summary": "Nick was Chair of Pension Insurance Corporation and CEO of Lloyd's of London. He is also Chair of Scottish Widows Group.",
+        "other_directorships": ["Scottish Widows Group Limited"]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2018,
+        "date_joined_board": "2018-09-01",
+        "tenure_years": 6.3,
+        "year_end_status": "Active",
+        "committee_memberships": ["Risk Committee", "Nominations and Governance Committee"],
+        "committee_chair_of": [],
+        "special_roles": ["Chair of Scottish Widows Group"]
+      },
+      "attendance": {
+        "board_meetings_attended": 9,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 0.9,
+        "committee_attendance": [
+          {
+            "committee_name": "Risk Committee",
+            "meetings_attended": 7,
+            "meetings_scheduled": 8,
+            "attendance_pct": 0.875,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Stuart Sinclair",
+        "post_nominals": null,
+        "age": null,
+        "age_band": "56-60",
+        "nationality": "British",
+        "qualifications": [],
+        "expertise_areas": ["Retail", "Consumer", "Digital", "Marketing"],
+        "career_summary": "Stuart was Chief Marketing Officer at Barclays and has held leadership roles at Nationwide Building Society and Virgin Money.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2021,
+        "date_joined_board": "2021-03-01",
+        "tenure_years": 3.8,
+        "year_end_status": "Active",
+        "committee_memberships": ["Audit Committee", "Remuneration Committee"],
+        "committee_chair_of": ["Remuneration Committee"],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 1.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 7,
+            "meetings_scheduled": 7,
+            "attendance_pct": 1.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Remuneration Committee",
+            "meetings_attended": 9,
+            "meetings_scheduled": 9,
+            "attendance_pct": 1.0,
+            "is_chair": true
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Cathy Turner",
+        "post_nominals": null,
+        "age": null,
+        "age_band": "51-55",
+        "nationality": "British",
+        "qualifications": ["FCA"],
+        "expertise_areas": ["Finance", "Technology", "Digital", "Financial Services"],
+        "career_summary": "Cathy was CFO of Kingfisher plc and has held finance roles at Travis Perkins and Pearson. She is a Fellow of the ICAEW.",
+        "other_directorships": ["Haleon plc"]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2022,
+        "date_joined_board": "2022-03-01",
+        "tenure_years": 2.8,
+        "year_end_status": "Active",
+        "committee_memberships": ["Audit Committee", "Risk Committee"],
+        "committee_chair_of": ["Audit Committee"],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 1.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 7,
+            "meetings_scheduled": 7,
+            "attendance_pct": 1.0,
+            "is_chair": true
+          },
+          {
+            "committee_name": "Risk Committee",
+            "meetings_attended": 8,
+            "meetings_scheduled": 8,
+            "attendance_pct": 1.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    }
+  ]
+}
