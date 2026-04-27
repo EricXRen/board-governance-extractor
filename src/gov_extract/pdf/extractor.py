@@ -60,7 +60,7 @@ def extract_pages_bulk(pdf_path: Path) -> dict[int, str]:
         Dict mapping 1-indexed page number to extracted text.
     """
     from pdfminer.high_level import extract_pages as _extract_pages
-    from pdfminer.layout import LTAnon, LTChar, LTTextContainer
+    from pdfminer.layout import LTTextContainer
 
     pages: dict[int, str] = {}
     laparams = LAParams(line_margin=0.5, word_margin=0.1)
@@ -70,8 +70,6 @@ def extract_pages_bulk(pdf_path: Path) -> dict[int, str]:
         for element in page_layout:
             if isinstance(element, LTTextContainer):
                 text_parts.append(element.get_text())
-            elif isinstance(element, (LTChar, LTAnon)):
-                text_parts.append(str(element))
         pages[page_num] = "".join(text_parts)
 
     logger.info("pdf_extracted", path=str(pdf_path), pages=len(pages))

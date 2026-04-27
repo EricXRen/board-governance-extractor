@@ -1,6 +1,8 @@
 llm:
   default_provider: anthropic
   default_model: claude-sonnet-4-6
+  judge_provider: openai
+  judge_model: deepseek-v4-flash
   temperature: 0
   max_retries: 5
   timeout_seconds: 120
@@ -33,7 +35,7 @@ evaluation:
     "biographical.nationality": fuzzy_match
     "biographical.qualifications": list_f1
     "biographical.expertise_areas": list_f1
-    "biographical.career_summary": semantic_similarity
+    "biographical.career_summary": llm_semantic_similarity
     "biographical.other_directorships": list_f1
     "board_role.designation": exact_match
     "board_role.board_role": fuzzy_match

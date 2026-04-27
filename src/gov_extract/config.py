@@ -24,6 +24,8 @@ class LLMConfig(BaseSettings):
 
     default_provider: str = "anthropic"
     default_model: str = "claude-sonnet-4-6"
+    judge_provider: str = "openai"
+    judge_model: str = "gpt-4o-mini"
     temperature: int = 0
     max_retries: int = 5
     timeout_seconds: int = 120

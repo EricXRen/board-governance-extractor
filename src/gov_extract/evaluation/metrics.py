@@ -2,10 +2,24 @@
 
 from __future__ import annotations
 
+import json
+import os
 from dataclasses import dataclass
 from typing import Any
 
 _MODEL: Any = None  # Lazy singleton for sentence-transformers
+
+_LLM_JUDGE_PROMPT = """You are a semantic similarity judge. Compare the following two texts and return a JSON object with a single key "score" whose value is a float between 0.0 and 1.0 indicating semantic similarity.
+
+0.0 = completely different meaning
+0.5 = partially related
+1.0 = same meaning (even if worded differently)
+
+Return ONLY valid JSON. Example: {{"score": 0.85}}
+
+Text A: {pred}
+
+Text B: {gt}"""
 
 
 @dataclass
@@ -205,12 +219,133 @@ def semantic_similarity(pred: str | None, gt: str | None, threshold: float = 0.8
     return max(0.0, min(1.0, similarity))
 
 
+def llm_semantic_similarity(
+    pred: str | None,
+    gt: str | None,
+    threshold: float = 0.80,
+    judge_config: dict[str, str] | None = None,
+) -> float:
+    """Compute semantic similarity using an LLM as judge (firewall-safe alternative).
+
+    Provider and model are taken from judge_config (set via config.yaml).
+    Credentials are still read from environment variables.
+
+    Args:
+        pred: Predicted text.
+        gt: Ground-truth text.
+        threshold: Minimum similarity for a passing result (informational only here).
+        judge_config: Dict with "provider" and "model" keys from config.
+
+    Returns:
+        Similarity score in [0.0, 1.0]. Returns 1.0 if both are None.
+
+    Raises:
+        RuntimeError: If no LLM provider credentials are available.
+    """
+    if pred is None and gt is None:
+        return 1.0
+    if pred is None or gt is None:
+        return 0.0
+
+    prompt = _LLM_JUDGE_PROMPT.format(pred=pred, gt=gt)
+
+    cfg = judge_config or {}
+    provider = cfg.get("provider", "openai").lower()
+    judge_model = cfg.get("model", "gpt-4o-mini")
+
+    anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    openai_key = os.environ.get("OPENAI_API_KEY", "")
+    azure_endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT", "")
+    azure_key = os.environ.get("AZURE_OPENAI_API_KEY", "")
+
+    raw: str = ""
+
+    if provider == "anthropic" and anthropic_key:
+        try:
+            import anthropic
+
+            client = anthropic.Anthropic(api_key=anthropic_key)
+            message = client.messages.create(
+                model=judge_model,
+                max_tokens=64,
+                temperature=0,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            raw = message.content[0].text.strip()  # type: ignore[index]
+        except Exception as exc:
+            raise RuntimeError(f"LLM judge call failed (Anthropic): {exc}") from exc
+
+    elif provider in ("openai", "deepseek") and openai_key:
+        try:
+            import openai
+
+            base_url = os.environ.get("OPENAI_BASE_URL")
+            kwargs: dict[str, Any] = {"api_key": openai_key}
+            if base_url:
+                kwargs["base_url"] = base_url
+            client_oa = openai.OpenAI(**kwargs)
+            resp = client_oa.chat.completions.create(
+                model=judge_model,
+                max_tokens=64,
+                temperature=0,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            raw = (resp.choices[0].message.content or "").strip()
+        except Exception as exc:
+            raise RuntimeError(f"LLM judge call failed (OpenAI): {exc}") from exc
+
+    elif provider == "azure" and azure_endpoint and azure_key:
+        try:
+            import openai
+
+            api_version = os.environ.get("AZURE_OPENAI_API_VERSION", "2024-08-01-preview")
+            client_az = openai.AzureOpenAI(
+                azure_endpoint=azure_endpoint,
+                api_key=azure_key,
+                api_version=api_version,
+            )
+            resp = client_az.chat.completions.create(
+                model=judge_model,
+                max_tokens=64,
+                temperature=0,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            raw = (resp.choices[0].message.content or "").strip()
+        except Exception as exc:
+            raise RuntimeError(f"LLM judge call failed (Azure): {exc}") from exc
+
+    else:
+        raise RuntimeError(
+            f"llm_semantic_similarity: no credentials found for provider '{provider}'. "
+            "Set the matching API key env var (ANTHROPIC_API_KEY, OPENAI_API_KEY, or Azure vars). "
+            "To change the provider, update llm.judge_provider in config.yaml."
+        )
+
+    try:
+        # Strip markdown code fences if present
+        clean = raw.strip("`").strip()
+        if clean.startswith("json"):
+            clean = clean[4:].strip()
+        data = json.loads(clean)
+        score = float(data["score"])
+        return max(0.0, min(1.0, score))
+    except Exception:
+        # Fallback: scan for first float in the response
+        import re
+
+        m = re.search(r"0?\.\d+|1\.0|0\.0", raw)
+        if m:
+            return max(0.0, min(1.0, float(m.group())))
+        return 0.0
+
+
 def evaluate_field(
     field_path: str,
     pred: Any,
     gt: Any,
     metric_name: str,
     thresholds: dict[str, float],
+    judge_config: dict[str, str] | None = None,
 ) -> FieldResult:
     """Evaluate a single field and return a FieldResult.
 
@@ -219,8 +354,9 @@ def evaluate_field(
         pred: Predicted value (may be None or []).
         gt: Ground-truth value (may be None or []).
         metric_name: One of: exact_match, fuzzy_match, date_match,
-            numeric_error, list_f1, semantic_similarity.
+            numeric_error, list_f1, semantic_similarity, llm_semantic_similarity.
         thresholds: Dict of threshold values per metric name.
+        judge_config: Optional {"provider": ..., "model": ...} for llm_semantic_similarity.
 
     Returns:
         FieldResult with score, pass/fail, and failure mode.
@@ -297,6 +433,11 @@ def evaluate_field(
     elif metric_name == "semantic_similarity":
         threshold = thresholds.get("semantic_similarity", 0.80)
         score = semantic_similarity(pred, gt, threshold)
+        passed = score >= threshold
+
+    elif metric_name == "llm_semantic_similarity":
+        threshold = thresholds.get("semantic_similarity", 0.80)
+        score = llm_semantic_similarity(pred, gt, threshold, judge_config)
         passed = score >= threshold
 
     else:

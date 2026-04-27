@@ -210,8 +210,10 @@ def evaluate(
         "numeric_error_tolerance": cfg.evaluation.thresholds.numeric_error_tolerance,
     }
 
+    judge_config = {"provider": cfg.llm.judge_provider, "model": cfg.llm.judge_model}
+
     with console.status("Evaluating..."):
-        result = _evaluate(ext_doc, gt_doc, field_metrics, eval_thresholds, extracted, ground_truth)
+        result = _evaluate(ext_doc, gt_doc, field_metrics, eval_thresholds, extracted, ground_truth, judge_config)
 
     write_evaluation_report(result, resolved_output_dir)
 
@@ -279,8 +281,10 @@ def evaluate_corpus(
         gt_doc = validate_json_file(gt_file)
         pairs.append((ext_doc, gt_doc, str(ext_file), str(gt_file)))
 
+    judge_config = {"provider": cfg.llm.judge_provider, "model": cfg.llm.judge_model}
+
     with console.status(f"Evaluating {len(pairs)} document pairs..."):
-        corpus_result = _eval_corpus(pairs, field_metrics, eval_thresholds)
+        corpus_result = _eval_corpus(pairs, field_metrics, eval_thresholds, judge_config)
 
     write_evaluation_report(corpus_result, resolved_output_dir)
     rate = corpus_result.corpus_field_pass_rate

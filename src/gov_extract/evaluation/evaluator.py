@@ -139,6 +139,7 @@ def _evaluate_director_pair(
     gt: Director | None,
     field_metrics: dict[str, str],
     thresholds: dict[str, float],
+    judge_config: dict[str, str] | None = None,
 ) -> DirectorResult:
     """Evaluate all fields for a matched director pair.
 
@@ -147,6 +148,7 @@ def _evaluate_director_pair(
         gt: Ground-truth director (None if hallucination).
         field_metrics: Mapping of field_path → metric_name.
         thresholds: Metric thresholds.
+        judge_config: Optional {"provider": ..., "model": ...} for llm_semantic_similarity.
 
     Returns:
         DirectorResult with all field evaluations.
@@ -188,7 +190,7 @@ def _evaluate_director_pair(
         for fp, metric in field_metrics.items():
             pred_val = _get_field_value(extracted, fp)
             gt_val = _get_field_value(gt, fp)
-            fr = evaluate_field(fp, pred_val, gt_val, metric, thresholds)
+            fr = evaluate_field(fp, pred_val, gt_val, metric, thresholds, judge_config)
             field_results.append(fr)
 
     total = len(field_results)
@@ -214,6 +216,7 @@ def evaluate(
     thresholds: dict[str, float],
     extracted_path: str = "",
     gt_path: str = "",
+    judge_config: dict[str, str] | None = None,
 ) -> DocumentResult:
     """Run the full evaluation of an extracted document against ground truth.
 
@@ -224,6 +227,7 @@ def evaluate(
         thresholds: Metric thresholds from config.
         extracted_path: Path to the extracted JSON (for reporting).
         gt_path: Path to the ground-truth JSON (for reporting).
+        judge_config: Optional {"provider": ..., "model": ...} for llm_semantic_similarity.
 
     Returns:
         DocumentResult with all metrics.
@@ -232,7 +236,7 @@ def evaluate(
 
     director_results: list[DirectorResult] = []
     for ext, gt in pairs:
-        dr = _evaluate_director_pair(ext, gt, field_metrics, thresholds)
+        dr = _evaluate_director_pair(ext, gt, field_metrics, thresholds, judge_config)
         director_results.append(dr)
 
         if ext is None:
@@ -244,8 +248,20 @@ def evaluate(
     all_field_results = [fr for dr in director_results for fr in dr.field_results]
     total_fields = len(all_field_results)
     passed_fields = sum(1 for fr in all_field_results if fr.passed)
-    fn_fields = sum(1 for fr in all_field_results if fr.failure_mode == "false_negative")
-    hall_fields = sum(1 for fr in all_field_results if fr.failure_mode == "hallucination")
+    fn_fields = sum(
+        1
+        for fr in all_field_results
+        if fr.failure_mode == "false_negative"
+        and fr.ground_truth_value is not None
+        and fr.ground_truth_value != []
+    )
+    hall_fields = sum(
+        1
+        for fr in all_field_results
+        if fr.failure_mode == "hallucination"
+        and fr.predicted_value is not None
+        and fr.predicted_value != []
+    )
 
     doc_pass_rate = passed_fields / total_fields if total_fields > 0 else 1.0
 
@@ -339,6 +355,7 @@ def evaluate_corpus(
     document_pairs: list[tuple[BoardGovernanceDocument, BoardGovernanceDocument, str, str]],
     field_metrics: dict[str, str],
     thresholds: dict[str, float],
+    judge_config: dict[str, str] | None = None,
 ) -> CorpusResult:
     """Evaluate multiple (extracted, ground-truth) document pairs.
 
@@ -346,13 +363,14 @@ def evaluate_corpus(
         document_pairs: List of (extracted, gt, extracted_path, gt_path) tuples.
         field_metrics: Metric mapping from config.
         thresholds: Threshold mapping from config.
+        judge_config: Optional {"provider": ..., "model": ...} for llm_semantic_similarity.
 
     Returns:
         CorpusResult with pooled metrics.
     """
     doc_results: list[DocumentResult] = []
     for ext, gt, ext_path, gt_path in document_pairs:
-        dr = evaluate(ext, gt, field_metrics, thresholds, ext_path, gt_path)
+        dr = evaluate(ext, gt, field_metrics, thresholds, ext_path, gt_path, judge_config)
         doc_results.append(dr)
 
     if not doc_results:
