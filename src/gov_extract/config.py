@@ -27,6 +27,9 @@ class LLMConfig(BaseSettings):
     judge_provider: str = "openai"
     judge_model: str = "gpt-4o-mini"
     temperature: int = 0
+    reasoning_effort: str | None = None  # "low" | "medium" | "high"; auto-detected if None
+    extraction_method: str = "chunked"  # "chunked" | "single_pass"
+    extraction_rounds: int = 1           # 1 = direct structured output; 2 = markdown then structured
     max_retries: int = 5
     timeout_seconds: int = 120
 

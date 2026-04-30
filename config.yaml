@@ -4,6 +4,9 @@ llm:
   judge_provider: openai
   judge_model: deepseek-v4-flash
   temperature: 0
+  reasoning_effort: null       # "low" | "medium" | "high"; auto-detected from model name if null
+  extraction_method: chunked  # "chunked" | "single_pass"
+  extraction_rounds: 1        # 1 = direct structured output; 2 = markdown first, then structured
   max_retries: 5
   timeout_seconds: 120
 

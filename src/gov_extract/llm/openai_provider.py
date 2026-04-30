@@ -15,6 +15,23 @@ from tenacity import (
 
 logger = structlog.get_logger()
 
+# Model name prefixes that use reasoning_effort instead of temperature.
+# gpt-5 and later reasoning models dropped the temperature parameter.
+_REASONING_EFFORT_PREFIXES = ("o1", "o3", "o4", "gpt-5")
+
+
+def _model_uses_reasoning_effort(model: str) -> bool:
+    """Return True if the model uses reasoning_effort instead of temperature.
+
+    Args:
+        model: Model ID string, e.g. "gpt-5", "o3-mini", "gpt-4o".
+
+    Returns:
+        True for o1/o3/o4/gpt-5 series models; False otherwise.
+    """
+    lower = model.lower()
+    return any(lower == prefix or lower.startswith(prefix + "-") for prefix in _REASONING_EFFORT_PREFIXES)
+
 
 class OpenAIProvider:
     """LLM provider backed by OpenAI-compatible APIs (OpenAI, DeepSeek)."""
@@ -23,6 +40,7 @@ class OpenAIProvider:
         self,
         model: str,
         temperature: int = 0,
+        reasoning_effort: str | None = None,
         timeout: int = 120,
         base_url: str | None = None,
         api_key: str | None = None,
@@ -30,8 +48,11 @@ class OpenAIProvider:
         """Initialise the OpenAI client.
 
         Args:
-            model: Model ID, e.g. "gpt-4o".
-            temperature: Sampling temperature.
+            model: Model ID, e.g. "gpt-4o" or "gpt-5".
+            temperature: Sampling temperature. Ignored for reasoning-effort models.
+            reasoning_effort: Reasoning effort level ("low", "medium", "high").
+                If provided, overrides temperature for any model. If None, the
+                provider auto-detects based on the model name.
             timeout: Request timeout in seconds.
             base_url: Optional base URL override (e.g. for DeepSeek).
             api_key: API key. Falls back to OPENAI_API_KEY env var.
@@ -51,6 +72,10 @@ class OpenAIProvider:
         )
         self.model = model
         self.temperature = temperature
+        # Explicit reasoning_effort takes priority; otherwise auto-detect from model name.
+        self.reasoning_effort: str | None = reasoning_effort if reasoning_effort is not None else (
+            "medium" if _model_uses_reasoning_effort(model) else None
+        )
 
     @retry(
         wait=wait_exponential(multiplier=1, min=2, max=60),
@@ -81,12 +106,17 @@ class OpenAIProvider:
             {"role": "user", "content": user_prompt},
         ]
 
+        extra: dict = (
+            {"reasoning_effort": self.reasoning_effort}
+            if self.reasoning_effort is not None
+            else {"temperature": self.temperature}
+        )
         try:
             response = self._client.beta.chat.completions.parse(
                 model=self.model,
                 messages=messages,
                 response_format=response_model,
-                temperature=self.temperature,
+                **extra,
             )
             usage = response.usage
             logger.info(
@@ -113,6 +143,46 @@ class OpenAIProvider:
         retry=retry_if_exception_type(Exception),
         reraise=True,
     )
+    def extract_text(self, system_prompt: str, user_prompt: str) -> str:
+        """Extract free-form text (e.g. Markdown) with no structured-output constraints.
+
+        Args:
+            system_prompt: System instructions.
+            user_prompt: User message with text to extract from.
+
+        Returns:
+            Plain text response from the model.
+        """
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ]
+        extra: dict = (
+            {"reasoning_effort": self.reasoning_effort}
+            if self.reasoning_effort is not None
+            else {"temperature": self.temperature}
+        )
+        response = self._client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            **extra,
+        )
+        usage = response.usage
+        logger.info(
+            "llm_call",
+            provider="openai",
+            model=self.model,
+            input_tokens=usage.prompt_tokens if usage else 0,
+            output_tokens=usage.completion_tokens if usage else 0,
+        )
+        return response.choices[0].message.content or ""
+
+    @retry(
+        wait=wait_exponential(multiplier=1, min=2, max=60),
+        stop=stop_after_attempt(5),
+        retry=retry_if_exception_type(Exception),
+        reraise=True,
+    )
     def extract_raw_json(self, system_prompt: str, user_prompt: str) -> str:
         """Extract raw JSON string using JSON mode.
 
@@ -128,11 +198,16 @@ class OpenAIProvider:
             {"role": "user", "content": user_prompt},
         ]
 
+        extra: dict = (
+            {"reasoning_effort": self.reasoning_effort}
+            if self.reasoning_effort is not None
+            else {"temperature": self.temperature}
+        )
         response = self._client.chat.completions.create(
             model=self.model,
             messages=messages,
             response_format={"type": "json_object"},
-            temperature=self.temperature,
+            **extra,
         )
         usage = response.usage
         logger.info(

@@ -123,6 +123,10 @@ def extract(
 
     console.print(f"  Chunks: {len(chunks)}")
 
+    console.print(
+        f"  Extraction: method={cfg.llm.extraction_method}  rounds={cfg.llm.extraction_rounds}"
+    )
+
     with console.status(f"Running extraction with {resolved_provider}..."):
         llm_provider = _get_provider(cfg, resolved_provider, resolved_model)
         doc = run_extraction(
@@ -136,6 +140,8 @@ def extract(
             model_name=resolved_model,
             company_ticker=ticker,
             report_date=report_date,
+            extraction_method=cfg.llm.extraction_method,
+            extraction_rounds=cfg.llm.extraction_rounds,
         )
 
     console.print(f"  Directors extracted: [bold green]{len(doc.directors)}[/bold green]")

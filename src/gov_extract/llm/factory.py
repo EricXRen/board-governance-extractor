@@ -51,16 +51,24 @@ def get_provider(
 
     logger.info("provider_init", provider=resolved_provider, model=resolved_model)
 
-    if resolved_provider == "anthropic" or resolved_provider == "openai":
+    if resolved_provider == "anthropic":
         return cls(
             model=resolved_model,
             temperature=config.llm.temperature,
+            timeout=config.llm.timeout_seconds,
+        )  # type: ignore[return-value]
+    elif resolved_provider == "openai":
+        return cls(
+            model=resolved_model,
+            temperature=config.llm.temperature,
+            reasoning_effort=config.llm.reasoning_effort,
             timeout=config.llm.timeout_seconds,
         )  # type: ignore[return-value]
     elif resolved_provider == "azure_openai":
         return cls(
             deployment=resolved_model,
             temperature=config.llm.temperature,
+            reasoning_effort=config.llm.reasoning_effort,
             timeout=config.llm.timeout_seconds,
         )  # type: ignore[return-value]
     else:

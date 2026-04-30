@@ -18,16 +18,22 @@ class AzureOpenAIProvider(OpenAIProvider):
         self,
         deployment: str | None = None,
         temperature: int = 0,
+        reasoning_effort: str | None = None,
         timeout: int = 120,
     ) -> None:
         """Initialise the Azure OpenAI client.
 
         Args:
             deployment: Azure deployment name. Falls back to AZURE_OPENAI_DEPLOYMENT.
-            temperature: Sampling temperature.
+            temperature: Sampling temperature. Ignored for reasoning-effort deployments.
+            reasoning_effort: Reasoning effort level ("low", "medium", "high").
+                If provided, overrides temperature. If None, auto-detected from the
+                deployment name using the same heuristic as OpenAIProvider.
             timeout: Request timeout in seconds.
         """
         import openai
+
+        from gov_extract.llm.openai_provider import _model_uses_reasoning_effort
 
         endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT")
         api_key = os.environ.get("AZURE_OPENAI_API_KEY")
@@ -49,3 +55,6 @@ class AzureOpenAIProvider(OpenAIProvider):
         # For Azure, the deployment name is used as the model parameter
         self.model = resolved_deployment
         self.temperature = temperature
+        self.reasoning_effort: str | None = reasoning_effort if reasoning_effort is not None else (
+            "medium" if _model_uses_reasoning_effort(resolved_deployment) else None
+        )

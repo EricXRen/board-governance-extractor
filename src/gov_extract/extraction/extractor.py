@@ -10,7 +10,14 @@ import structlog
 from pydantic import RootModel
 
 from gov_extract.extraction.chunker import TextChunk
-from gov_extract.extraction.prompts import system_prompt, user_prompt
+from gov_extract.extraction.prompts import (
+    markdown_system_prompt,
+    markdown_user_prompt,
+    structured_from_markdown_system_prompt,
+    structured_from_markdown_user_prompt,
+    system_prompt,
+    user_prompt,
+)
 from gov_extract.llm.base import LLMProvider
 from gov_extract.models.director import Director
 from gov_extract.models.document import BoardGovernanceDocument
@@ -181,6 +188,142 @@ def _extract_chunk(
     return directors
 
 
+def _extract_chunk_markdown(
+    provider: LLMProvider,
+    chunk: TextChunk,
+    company_name: str,
+    filing_type: str,
+    fiscal_year_end: str,
+) -> str:
+    """Extract a text chunk to Markdown (round 1 of two-round extraction).
+
+    Args:
+        provider: Configured LLM provider.
+        chunk: Text chunk with page metadata.
+        company_name: Company name for the user prompt.
+        filing_type: Filing type for the user prompt.
+        fiscal_year_end: Fiscal year end date for the user prompt.
+
+    Returns:
+        Markdown string with all director information found in this chunk.
+    """
+    sys_prompt = markdown_system_prompt()
+    usr_prompt = markdown_user_prompt(
+        chunk.text,
+        company_name,
+        filing_type,
+        fiscal_year_end,
+        chunk.start_page,
+        chunk.end_page,
+    )
+    try:
+        markdown = provider.extract_text(sys_prompt, usr_prompt)
+    except Exception as e:
+        logger.error(
+            "markdown_extraction_failed",
+            start=chunk.start_page,
+            end=chunk.end_page,
+            error=str(e),
+        )
+        markdown = ""
+
+    logger.info(
+        "markdown_chunk_extracted",
+        start=chunk.start_page,
+        end=chunk.end_page,
+        markdown_chars=len(markdown),
+    )
+    return markdown
+
+
+def _structured_from_markdown(
+    provider: LLMProvider,
+    markdown_text: str,
+    company_name: str,
+    filing_type: str,
+    fiscal_year_end: str,
+) -> list[Director]:
+    """Convert combined Markdown to structured Director objects (round 2).
+
+    Args:
+        provider: Configured LLM provider.
+        markdown_text: Combined Markdown from all first-round extractions.
+        company_name: Company name for the user prompt.
+        filing_type: Filing type for the user prompt.
+        fiscal_year_end: Fiscal year end date for the user prompt.
+
+    Returns:
+        List of extracted Director objects.
+    """
+    sys_prompt = structured_from_markdown_system_prompt()
+    usr_prompt = structured_from_markdown_user_prompt(
+        markdown_text, company_name, filing_type, fiscal_year_end
+    )
+    try:
+        result = provider.extract(sys_prompt, usr_prompt, DirectorList)
+        directors = result.root if isinstance(result, DirectorList) else []
+    except Exception as e:
+        logger.warning("structured_from_markdown_failed_structured", error=str(e))
+        try:
+            raw = provider.extract_raw_json(sys_prompt, usr_prompt)
+            parsed = json.loads(raw)
+            if isinstance(parsed, list):
+                directors = [Director.model_validate(d) for d in parsed]
+            elif isinstance(parsed, dict) and "directors" in parsed:
+                directors = [Director.model_validate(d) for d in parsed["directors"]]
+            else:
+                directors = []
+        except Exception as e2:
+            logger.error("structured_from_markdown_failed", error=str(e2))
+            directors = []
+
+    logger.info("structured_from_markdown_complete", directors_found=len(directors))
+    return directors
+
+
+def _extract_single_pass(
+    provider: LLMProvider,
+    chunks: list[TextChunk],
+    company_name: str,
+    filing_type: str,
+    fiscal_year_end: str,
+) -> list[Director]:
+    """Extract all directors in one LLM call by concatenating all chunks.
+
+    This is the baseline approach: no chunking loop, no merge step. All
+    governance text is sent to the model at once. Suitable for comparing
+    extraction quality against the default chunked strategy.
+
+    Args:
+        provider: Configured LLM provider.
+        chunks: Text chunks to concatenate (produced by the chunker but not
+            split across multiple LLM calls).
+        company_name: Company name for the user prompt.
+        filing_type: Filing type for the user prompt.
+        fiscal_year_end: Fiscal year end date for the user prompt.
+
+    Returns:
+        List of extracted Director objects.
+    """
+    if not chunks:
+        return []
+
+    combined_text = "\n\n".join(c.text for c in chunks)
+    start_page = chunks[0].start_page
+    end_page = chunks[-1].end_page
+
+    combined_chunk = TextChunk(text=combined_text, start_page=start_page, end_page=end_page)
+
+    logger.info(
+        "single_pass_extraction",
+        start_page=start_page,
+        end_page=end_page,
+        total_chars=len(combined_text),
+    )
+
+    return _extract_chunk(provider, combined_chunk, company_name, filing_type, fiscal_year_end)
+
+
 def run_extraction(
     provider: LLMProvider,
     chunks: list[TextChunk],
@@ -192,8 +335,22 @@ def run_extraction(
     model_name: str,
     company_ticker: str | None = None,
     report_date: str | None = None,
+    extraction_method: str = "chunked",
+    extraction_rounds: int = 1,
 ) -> BoardGovernanceDocument:
     """Run the full extraction pipeline over all chunks.
+
+    The two axes are independent and combine freely:
+
+    ``extraction_method``:
+      - ``"chunked"`` — iterate over chunks, extract each, deduplicate and merge.
+      - ``"single_pass"`` — concatenate all chunks into one text, single LLM call.
+
+    ``extraction_rounds``:
+      - ``1`` — direct structured-output extraction (default).
+      - ``2`` — first extract to Markdown (no schema constraints), then convert
+        the combined Markdown to structured JSON in a second LLM call. Tends to
+        improve recall at the cost of an extra API call.
 
     Args:
         provider: Configured LLM provider.
@@ -206,28 +363,75 @@ def run_extraction(
         model_name: e.g. "claude-sonnet-4-6".
         company_ticker: Optional ticker symbol.
         report_date: Optional report publication date (ISO-8601).
+        extraction_method: ``"chunked"`` or ``"single_pass"``.
+        extraction_rounds: ``1`` (direct structured) or ``2`` (markdown then structured).
 
     Returns:
         Validated BoardGovernanceDocument.
+
+    Raises:
+        ValueError: If extraction_method or extraction_rounds is not recognised.
     """
+    if extraction_method not in ("chunked", "single_pass"):
+        raise ValueError(
+            f"Unknown extraction_method '{extraction_method}'. Use 'chunked' or 'single_pass'."
+        )
+    if extraction_rounds not in (1, 2):
+        raise ValueError(
+            f"Unknown extraction_rounds '{extraction_rounds}'. Use 1 or 2."
+        )
+
     logger.info(
         "extraction_started",
         company=company_name,
         num_chunks=len(chunks),
         provider=provider_name,
         model=model_name,
+        extraction_method=extraction_method,
+        extraction_rounds=extraction_rounds,
     )
 
-    all_director_lists: list[list[Director]] = []
-    for chunk in chunks:
-        directors = _extract_chunk(provider, chunk, company_name, filing_type, fiscal_year_end)
-        all_director_lists.append(directors)
+    # Determine which input chunks to use for each LLM call.
+    # single_pass: collapse everything into one synthetic chunk before any LLM call.
+    if extraction_method == "single_pass" and chunks:
+        combined_text = "\n\n".join(c.text for c in chunks)
+        effective_chunks = [TextChunk(combined_text, chunks[0].start_page, chunks[-1].end_page)]
+    else:
+        effective_chunks = chunks
 
-    merged_directors = _deduplicate_directors(all_director_lists)
+    if extraction_rounds == 2:
+        # Round 1: extract each (effective) chunk to Markdown.
+        markdown_parts = [
+            _extract_chunk_markdown(provider, chunk, company_name, filing_type, fiscal_year_end)
+            for chunk in effective_chunks
+        ]
+        combined_markdown = "\n\n---\n\n".join(p for p in markdown_parts if p)
+
+        logger.info(
+            "markdown_rounds_complete",
+            num_parts=len(markdown_parts),
+            total_markdown_chars=len(combined_markdown),
+        )
+
+        # Round 2: convert combined Markdown to structured Directors in one call.
+        merged_directors = _structured_from_markdown(
+            provider, combined_markdown, company_name, filing_type, fiscal_year_end
+        )
+    else:
+        # Single round: direct structured extraction.
+        all_director_lists: list[list[Director]] = []
+        for chunk in effective_chunks:
+            directors = _extract_chunk(provider, chunk, company_name, filing_type, fiscal_year_end)
+            all_director_lists.append(directors)
+        # single_pass has only one chunk so dedup is a no-op, but it's harmless.
+        merged_directors = _deduplicate_directors(all_director_lists)
+
     logger.info(
         "extraction_complete",
         company=company_name,
         total_directors=len(merged_directors),
+        extraction_method=extraction_method,
+        extraction_rounds=extraction_rounds,
     )
 
     metadata = CompanyMetadata(

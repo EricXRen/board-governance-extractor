@@ -113,6 +113,41 @@ class AnthropicProvider:
         retry=retry_if_exception_type(Exception),
         reraise=True,
     )
+    def extract_text(self, system_prompt: str, user_prompt: str) -> str:
+        """Extract free-form text (e.g. Markdown) with no structured-output constraints.
+
+        Args:
+            system_prompt: System instructions.
+            user_prompt: User message with text to extract from.
+
+        Returns:
+            Plain text response from the model.
+        """
+        response = self._client.messages.create(
+            model=self.model,
+            max_tokens=8192,
+            temperature=self.temperature,
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_prompt}],
+        )
+        logger.info(
+            "llm_call",
+            provider="anthropic",
+            model=self.model,
+            input_tokens=response.usage.input_tokens,
+            output_tokens=response.usage.output_tokens,
+        )
+        for block in response.content:
+            if hasattr(block, "text"):
+                return block.text
+        raise ValueError("No text content returned by Anthropic API")
+
+    @retry(
+        wait=wait_exponential(multiplier=1, min=2, max=60),
+        stop=stop_after_attempt(5),
+        retry=retry_if_exception_type(Exception),
+        reraise=True,
+    )
     def extract_raw_json(self, system_prompt: str, user_prompt: str) -> str:
         """Extract raw JSON string from the model.
 
