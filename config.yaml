@@ -1,12 +1,12 @@
 llm:
-  default_provider: anthropic
-  default_model: claude-sonnet-4-6
+  default_provider: openai # anthropic
+  default_model: deepseek-v4-flash # claude-sonnet-4-6
   judge_provider: openai
   judge_model: deepseek-v4-flash
   temperature: 0
-  reasoning_effort: null       # "low" | "medium" | "high"; auto-detected from model name if null
-  extraction_method: chunked  # "chunked" | "single_pass"
-  extraction_rounds: 1        # 1 = direct structured output; 2 = markdown first, then structured
+  reasoning_effort: "medium"       #"null" or "low" | "medium" | "high"; auto-detected from model name if null
+  chunking: false                 # true = chunk pages; false = single pass over all pages
+  extraction_rounds: 2        # 1 = direct structured output; 2 = markdown first, then structured
   max_retries: 5
   timeout_seconds: 120
 
@@ -15,6 +15,7 @@ pdf:
   max_pages_per_chunk: 15
   governance_keywords:
     - "board of directors"
+    - "board members"
     - "directors' report"
     - "our board"
     - "committee report"

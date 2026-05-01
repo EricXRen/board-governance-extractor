@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 import structlog
@@ -11,6 +12,8 @@ from pydantic import RootModel
 
 from gov_extract.extraction.chunker import TextChunk
 from gov_extract.extraction.prompts import (
+    board_summary_system_prompt,
+    board_summary_user_prompt,
     markdown_system_prompt,
     markdown_user_prompt,
     structured_from_markdown_system_prompt,
@@ -19,6 +22,7 @@ from gov_extract.extraction.prompts import (
     user_prompt,
 )
 from gov_extract.llm.base import LLMProvider
+from gov_extract.models.board_summary import BoardSummary
 from gov_extract.models.director import Director
 from gov_extract.models.document import BoardGovernanceDocument
 from gov_extract.models.metadata import CompanyMetadata
@@ -324,6 +328,132 @@ def _extract_single_pass(
     return _extract_chunk(provider, combined_chunk, company_name, filing_type, fiscal_year_end)
 
 
+def _extract_board_summary(
+    provider: LLMProvider,
+    text: str,
+    company_name: str,
+    filing_type: str,
+    fiscal_year_end: str,
+    is_markdown: bool = False,
+) -> BoardSummary:
+    """Extract board-level summary statistics from governance text or markdown.
+
+    This is always a single LLM call over the full governance text (not chunked),
+    since the metrics are aggregate and typically stated once in the filing.
+
+    Args:
+        provider: Configured LLM provider.
+        text: Full governance text or combined round-1 markdown.
+        company_name: Company name for the user prompt.
+        filing_type: Filing type for the user prompt.
+        fiscal_year_end: Fiscal year end date for the user prompt.
+        is_markdown: True when ``text`` is pre-extracted Markdown (round 2).
+
+    Returns:
+        BoardSummary with any fields explicitly stated in the text populated.
+    """
+    sys_prompt = board_summary_system_prompt()
+    usr_prompt = board_summary_user_prompt(
+        text, company_name, filing_type, fiscal_year_end, is_markdown=is_markdown
+    )
+    try:
+        result = provider.extract(sys_prompt, usr_prompt, BoardSummary)
+        summary = result if isinstance(result, BoardSummary) else BoardSummary()
+    except Exception as e:
+        logger.warning("board_summary_extraction_failed_structured", error=str(e))
+        try:
+            raw = provider.extract_raw_json(sys_prompt, usr_prompt)
+            summary = BoardSummary.model_validate_json(raw)
+        except Exception as e2:
+            logger.error("board_summary_extraction_failed", error=str(e2))
+            summary = BoardSummary()
+
+    logger.info("board_summary_extracted", company=company_name)
+    return summary
+
+
+def _compute_board_summary(summary: BoardSummary, directors: list[Director]) -> BoardSummary:
+    """Fill in BoardSummary fields that can be derived from the Director list.
+
+    Only fills fields that are currently ``None`` — stated values from the
+    filing are never overwritten.
+
+    Computable fields:
+    - ``board_size``: total number of directors
+    - ``num_executive_directors``: count with designation "Executive Director"
+    - ``num_non_executive_directors``: count with designation "Non-Executive Director"
+    - ``num_independent_directors``: count with independence_status "Independent"
+      or "Chair (independent on appointment)"
+    - ``pct_independent``: num_independent / board_size * 100
+    - ``avg_director_age``: mean age across directors with a known age
+    - ``avg_tenure_years``: mean tenure across directors with a known tenure
+    - ``ceo_chair_separated``: True if Chair and CEO are different directors
+
+    Not computable (no gender field on Director):
+    - ``pct_women`` — must come from the filing text.
+
+    Not computable:
+    - ``voting_standard`` — must come from the filing text.
+
+    Args:
+        summary: Partially-populated BoardSummary from LLM extraction.
+        directors: Extracted director list for the same document.
+
+    Returns:
+        Updated BoardSummary with computed fields filled where previously None.
+    """
+    if not directors:
+        return summary
+
+    data = summary.model_dump()
+
+    if data["board_size"] is None:
+        data["board_size"] = len(directors)
+
+    execs = [d for d in directors if d.board_role.designation == "Executive Director"]
+    neds = [d for d in directors if d.board_role.designation == "Non-Executive Director"]
+    independents = [
+        d for d in directors
+        if d.board_role.independence_status in (
+            "Independent", "Chair (independent on appointment)"
+        )
+    ]
+
+    if data["num_executive_directors"] is None:
+        data["num_executive_directors"] = len(execs)
+    if data["num_non_executive_directors"] is None:
+        data["num_non_executive_directors"] = len(neds)
+    if data["num_independent_directors"] is None:
+        data["num_independent_directors"] = len(independents)
+
+    total = data["board_size"] or len(directors)
+    if data["pct_independent"] is None and total > 0:
+        data["pct_independent"] = round(len(independents) / total * 100, 1)
+
+    ages = [d.biographical.age for d in directors if d.biographical.age is not None]
+    if data["avg_director_age"] is None and ages:
+        data["avg_director_age"] = round(sum(ages) / len(ages), 1)
+
+    tenures = [d.board_role.tenure_years for d in directors if d.board_role.tenure_years is not None]
+    if data["avg_tenure_years"] is None and tenures:
+        data["avg_tenure_years"] = round(sum(tenures) / len(tenures), 1)
+
+    if data["ceo_chair_separated"] is None:
+        chair_names = {
+            d.biographical.full_name for d in directors
+            if d.board_role.designation == "Chair"
+        }
+        ceo_names = {
+            d.biographical.full_name for d in directors
+            if "chief executive" in (d.board_role.board_role or "").lower()
+            or "ceo" in (d.board_role.board_role or "").lower()
+        }
+        if chair_names and ceo_names:
+            data["ceo_chair_separated"] = chair_names.isdisjoint(ceo_names)
+
+    return BoardSummary.model_validate(data)
+
+
 def run_extraction(
     provider: LLMProvider,
     chunks: list[TextChunk],
@@ -335,16 +465,17 @@ def run_extraction(
     model_name: str,
     company_ticker: str | None = None,
     report_date: str | None = None,
-    extraction_method: str = "chunked",
+    chunking: bool = True,
     extraction_rounds: int = 1,
+    markdown_output_path: Path | None = None,
 ) -> BoardGovernanceDocument:
     """Run the full extraction pipeline over all chunks.
 
     The two axes are independent and combine freely:
 
-    ``extraction_method``:
-      - ``"chunked"`` — iterate over chunks, extract each, deduplicate and merge.
-      - ``"single_pass"`` — concatenate all chunks into one text, single LLM call.
+    ``chunking``:
+      - ``True`` — iterate over chunks, extract each, deduplicate and merge.
+      - ``False`` — concatenate all chunks into one text, single LLM call.
 
     ``extraction_rounds``:
       - ``1`` — direct structured-output extraction (default).
@@ -363,19 +494,18 @@ def run_extraction(
         model_name: e.g. "claude-sonnet-4-6".
         company_ticker: Optional ticker symbol.
         report_date: Optional report publication date (ISO-8601).
-        extraction_method: ``"chunked"`` or ``"single_pass"``.
+        chunking: True = chunk pages and merge results; False = single pass over all pages.
         extraction_rounds: ``1`` (direct structured) or ``2`` (markdown then structured).
+        markdown_output_path: If provided and ``extraction_rounds == 2``, the
+            combined round-1 Markdown is written to this path before the
+            structured pass. Useful for debugging and prompt iteration.
 
     Returns:
         Validated BoardGovernanceDocument.
 
     Raises:
-        ValueError: If extraction_method or extraction_rounds is not recognised.
+        ValueError: If extraction_rounds is not recognised.
     """
-    if extraction_method not in ("chunked", "single_pass"):
-        raise ValueError(
-            f"Unknown extraction_method '{extraction_method}'. Use 'chunked' or 'single_pass'."
-        )
     if extraction_rounds not in (1, 2):
         raise ValueError(
             f"Unknown extraction_rounds '{extraction_rounds}'. Use 1 or 2."
@@ -387,17 +517,20 @@ def run_extraction(
         num_chunks=len(chunks),
         provider=provider_name,
         model=model_name,
-        extraction_method=extraction_method,
+        chunking=chunking,
         extraction_rounds=extraction_rounds,
     )
 
     # Determine which input chunks to use for each LLM call.
-    # single_pass: collapse everything into one synthetic chunk before any LLM call.
-    if extraction_method == "single_pass" and chunks:
+    # chunking=False: collapse everything into one synthetic chunk before any LLM call.
+    if not chunking and chunks:
         combined_text = "\n\n".join(c.text for c in chunks)
         effective_chunks = [TextChunk(combined_text, chunks[0].start_page, chunks[-1].end_page)]
     else:
         effective_chunks = chunks
+
+    summary_text: str = ""  # populated in each branch, used for board summary extraction
+    is_markdown_summary = False
 
     if extraction_rounds == 2:
         # Round 1: extract each (effective) chunk to Markdown.
@@ -413,10 +546,17 @@ def run_extraction(
             total_markdown_chars=len(combined_markdown),
         )
 
+        if markdown_output_path is not None:
+            markdown_output_path.parent.mkdir(parents=True, exist_ok=True)
+            markdown_output_path.write_text(combined_markdown, encoding="utf-8")
+            logger.info("markdown_saved", path=str(markdown_output_path))
+
         # Round 2: convert combined Markdown to structured Directors in one call.
         merged_directors = _structured_from_markdown(
             provider, combined_markdown, company_name, filing_type, fiscal_year_end
         )
+        summary_text = combined_markdown
+        is_markdown_summary = True
     else:
         # Single round: direct structured extraction.
         all_director_lists: list[list[Director]] = []
@@ -425,14 +565,22 @@ def run_extraction(
             all_director_lists.append(directors)
         # single_pass has only one chunk so dedup is a no-op, but it's harmless.
         merged_directors = _deduplicate_directors(all_director_lists)
+        summary_text = "\n\n".join(c.text for c in effective_chunks)
 
     logger.info(
         "extraction_complete",
         company=company_name,
         total_directors=len(merged_directors),
-        extraction_method=extraction_method,
+        chunking=chunking,
         extraction_rounds=extraction_rounds,
     )
+
+    # Extract and compute board-level summary.
+    board_summary = _extract_board_summary(
+        provider, summary_text, company_name, filing_type, fiscal_year_end,
+        is_markdown=is_markdown_summary,
+    )
+    board_summary = _compute_board_summary(board_summary, merged_directors)
 
     metadata = CompanyMetadata(
         company_name=company_name,
@@ -446,4 +594,4 @@ def run_extraction(
         llm_model=model_name,
     )
 
-    return BoardGovernanceDocument(company=metadata, directors=merged_directors)
+    return BoardGovernanceDocument(company=metadata, directors=merged_directors, board_summary=board_summary)

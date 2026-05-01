@@ -76,6 +76,12 @@ class OpenAIProvider:
         self.reasoning_effort: str | None = reasoning_effort if reasoning_effort is not None else (
             "medium" if _model_uses_reasoning_effort(model) else None
         )
+        self.reasoning_or_temperature: dict = (
+            {"reasoning_effort": self.reasoning_effort, "temperature": self.temperature}
+            if self.reasoning_effort is not None
+            else {"temperature": self.temperature}
+        )
+        
 
     @retry(
         wait=wait_exponential(multiplier=1, min=2, max=60),
@@ -106,17 +112,12 @@ class OpenAIProvider:
             {"role": "user", "content": user_prompt},
         ]
 
-        extra: dict = (
-            {"reasoning_effort": self.reasoning_effort}
-            if self.reasoning_effort is not None
-            else {"temperature": self.temperature}
-        )
         try:
             response = self._client.beta.chat.completions.parse(
                 model=self.model,
                 messages=messages,
                 response_format=response_model,
-                **extra,
+                **self.reasoning_or_temperature,
             )
             usage = response.usage
             logger.info(
@@ -157,15 +158,10 @@ class OpenAIProvider:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ]
-        extra: dict = (
-            {"reasoning_effort": self.reasoning_effort}
-            if self.reasoning_effort is not None
-            else {"temperature": self.temperature}
-        )
         response = self._client.chat.completions.create(
             model=self.model,
             messages=messages,
-            **extra,
+            **self.reasoning_or_temperature,
         )
         usage = response.usage
         logger.info(
@@ -198,16 +194,11 @@ class OpenAIProvider:
             {"role": "user", "content": user_prompt},
         ]
 
-        extra: dict = (
-            {"reasoning_effort": self.reasoning_effort}
-            if self.reasoning_effort is not None
-            else {"temperature": self.temperature}
-        )
         response = self._client.chat.completions.create(
             model=self.model,
             messages=messages,
             response_format={"type": "json_object"},
-            **extra,
+            **self.reasoning_or_temperature,
         )
         usage = response.usage
         logger.info(

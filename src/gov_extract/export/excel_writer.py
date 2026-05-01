@@ -9,6 +9,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
+from gov_extract.models.board_summary import BoardSummary
 from gov_extract.models.director import Director
 from gov_extract.models.document import BoardGovernanceDocument
 
@@ -126,6 +127,60 @@ def _add_footer(ws: object, row: int, col_count: int, text: str) -> None:
     cell = ws.cell(row=footer_row, column=1)  # type: ignore[union-attr]
     cell.value = text
     cell.font = Font(name=FONT_NAME, italic=True, size=8, color="888888")
+
+
+def _write_board_summary(wb: Workbook, doc: BoardGovernanceDocument) -> None:
+    """Write the Board Summary sheet — one row per metric."""
+    ws = wb.create_sheet("Board Summary")
+    _write_header(ws, ["Metric", "Value"])
+    ws.column_dimensions["A"].width = 35
+    ws.column_dimensions["B"].width = 20
+
+    summary: BoardSummary = doc.board_summary
+
+    def _pct(v: float | None) -> str:
+        return f"{v:.1f}%" if v is not None else "N/A"
+
+    def _yn(v: bool | None) -> str:
+        if v is None:
+            return "N/A"
+        return "Yes" if v else "No"
+
+    rows = [
+        ("CEO and Chair Separated", _yn(summary.ceo_chair_separated)),
+        ("Voting Standard for Directors", summary.voting_standard or "N/A"),
+        ("Board Size", summary.board_size if summary.board_size is not None else "N/A"),
+        (
+            "Executive Directors",
+            summary.num_executive_directors if summary.num_executive_directors is not None else "N/A",
+        ),
+        (
+            "Non-Executive Directors",
+            summary.num_non_executive_directors if summary.num_non_executive_directors is not None else "N/A",
+        ),
+        (
+            "Independent Directors",
+            summary.num_independent_directors if summary.num_independent_directors is not None else "N/A",
+        ),
+        ("% Women on Board", _pct(summary.pct_women)),
+        ("% Independent Directors", _pct(summary.pct_independent)),
+        ("Average Director Age", f"{summary.avg_director_age:.1f}" if summary.avg_director_age is not None else "N/A"),
+        ("Average Tenure (years)", f"{summary.avg_tenure_years:.1f}" if summary.avg_tenure_years is not None else "N/A"),
+        ("Notes", summary.notes or ""),
+    ]
+
+    for i, (metric, value) in enumerate(rows, 2):
+        ws.cell(row=i, column=1).value = metric
+        ws.cell(row=i, column=2).value = value
+        fill = _row_fill(ALT_BG) if i % 2 == 0 else PatternFill()
+        for col in (1, 2):
+            cell = ws.cell(row=i, column=col)
+            cell.fill = fill
+            cell.font = _cell_font()
+            cell.border = _thin_border()
+            cell.alignment = Alignment(vertical="center", wrap_text=True)
+
+    _add_footer(ws, len(rows) + 2, 2, _footer_text(doc))
 
 
 def _write_board_overview(wb: Workbook, doc: BoardGovernanceDocument) -> None:
@@ -323,6 +378,7 @@ def write_excel(doc: BoardGovernanceDocument, path: Path) -> Path:
     if "Sheet" in wb.sheetnames:
         del wb["Sheet"]
 
+    _write_board_summary(wb, doc)
     _write_board_overview(wb, doc)
     _write_biographical(wb, doc)
     _write_committee_memberships(wb, doc)

@@ -50,16 +50,19 @@ board-governance-extractor/
 ├── uv.lock
 ├── CLAUDE.md                          ← YOU ARE HERE
 ├── README.md
+├── REQUIREMENTS.md
+├── PROJECT_PLAN.md
 ├── .env.example
 ├── config.yaml
 ├── schemas/
 │   └── board_governance.schema.json   # JSON Schema Draft 2020-12
 ├── src/gov_extract/
-│   ├── cli.py                         # Typer app; three commands: extract, evaluate, validate
+│   ├── cli.py                         # Typer app; commands: extract, evaluate, validate, evaluate-corpus
 │   ├── config.py                      # Pydantic Settings v2
 │   ├── models/
 │   │   ├── document.py                # BoardGovernanceDocument (top-level model)
 │   │   ├── director.py                # Director + BiographicalDetails + BoardRoleDetails + AttendanceDetails
+│   │   ├── board_summary.py           # BoardSummary (aggregate board-level statistics)
 │   │   └── metadata.py                # CompanyMetadata
 │   ├── pdf/
 │   │   ├── loader.py                  # load_pdf(path_or_url) -> Path
@@ -68,16 +71,16 @@ board-governance-extractor/
 │   ├── llm/
 │   │   ├── base.py                    # LLMProvider Protocol
 │   │   ├── anthropic_provider.py
-│   │   ├── openai_provider.py         # Also covers DeepSeek
+│   │   ├── openai_provider.py         # Also covers DeepSeek; handles reasoning_effort
 │   │   ├── azure_provider.py          # Subclasses OpenAIProvider
 │   │   └── factory.py                 # get_provider(config) -> LLMProvider
 │   ├── extraction/
-│   │   ├── prompts.py                 # system_prompt(), user_prompt(chunk_text)
-│   │   ├── chunker.py                 # chunk_pages(pages, max_tokens) -> list[str]
-│   │   ├── extractor.py               # run_extraction(provider, chunks) -> BoardGovernanceDocument
+│   │   ├── prompts.py                 # All prompt templates (director + board summary + markdown rounds)
+│   │   ├── chunker.py                 # chunk_pages(pages, max_tokens) -> list[TextChunk]
+│   │   ├── extractor.py               # run_extraction(provider, chunks, ...) -> BoardGovernanceDocument
 │   │   └── validator.py               # validate_json(data) -> BoardGovernanceDocument
 │   ├── export/
-│   │   ├── excel_writer.py            # write_excel(doc, path)
+│   │   ├── excel_writer.py            # write_excel(doc, path) — five sheets
 │   │   └── json_writer.py             # write_json(doc, path)
 │   └── evaluation/
 │       ├── metrics.py                 # exact_match, fuzzy_match, date_match, numeric_error, list_f1, semantic_similarity
@@ -107,6 +110,7 @@ All models live in `src/gov_extract/models/`. They are **Pydantic v2** (`BaseMod
 class BoardGovernanceDocument(BaseModel):
     company: CompanyMetadata
     directors: list[Director]
+    board_summary: BoardSummary = Field(default_factory=BoardSummary)
 ```
 
 ### CompanyMetadata (`metadata.py`)
@@ -175,6 +179,27 @@ class Director(BaseModel):
     attendance: AttendanceDetails
 ```
 
+### BoardSummary (`board_summary.py`)
+
+Aggregate governance statistics for the full board. Fields are populated from two sources (priority order): (1) explicitly stated values extracted from the filing, (2) values computed from the Director list.
+
+```python
+class BoardSummary(BaseModel):
+    ceo_chair_separated: bool | None = None
+    voting_standard: Literal["Majority", "Plurality"] | None = None
+    board_size: int | None = None
+    num_executive_directors: int | None = None
+    num_non_executive_directors: int | None = None
+    num_independent_directors: int | None = None
+    pct_women: float | None = None        # 0–100; stated in filing only (no computation)
+    pct_independent: float | None = None  # 0–100
+    avg_director_age: float | None = None
+    avg_tenure_years: float | None = None
+    notes: str | None = None
+```
+
+`pct_women` and `voting_standard` can only come from the filing text. All other fields have computation fallbacks in `_compute_board_summary()` in `extractor.py`.
+
 **Important:** `full_name` is accessed via `director.biographical.full_name`. When merging partial extraction results across chunks, match directors by `biographical.full_name` using fuzzy matching (threshold 90).
 
 ---
@@ -197,11 +222,17 @@ class LLMProvider(Protocol):
         system_prompt: str,
         user_prompt: str,
     ) -> str: ...  # fallback; returns raw JSON string
+
+    def extract_text(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+    ) -> str: ...  # unconstrained free text; used by two-round markdown extraction
 ```
 
 ### Adding a New Provider
 
-1. Create `src/gov_extract/llm/my_provider.py` implementing the `LLMProvider` protocol.
+1. Create `src/gov_extract/llm/my_provider.py` implementing the `LLMProvider` protocol (all three methods).
 2. Register it in `llm/factory.py`:
    ```python
    "myprovider": MyProvider
@@ -226,17 +257,25 @@ def extract(self, ...): ...
 
 ### Provider-Specific Notes
 
-**Anthropic:** Use tool use (function calling) to enforce structured output. Define a tool with the Pydantic model's JSON schema as input schema. Temperature must be 0.
+**Anthropic:** Use tool use (function calling) to enforce structured output. Define a tool with the Pydantic model's JSON schema as input schema. Temperature must be 0. `extract_text()` uses a plain `messages.create` call with no tool use.
 
 **OpenAI / DeepSeek:**
 - For models supporting `response_format`: use `client.beta.chat.completions.parse(response_format=BoardGovernanceDocument)`.
 - For older deployments: use `response_format={"type": "json_object"}` and parse manually.
 - DeepSeek: set `base_url` from `OPENAI_BASE_URL` env var; API key from `OPENAI_API_KEY`.
+- `extract_text()` uses `chat.completions.create` with no `response_format`.
+
+**Reasoning models (OpenAI o1/o3/o4/gpt-5 series):**
+- These models use `reasoning_effort` (`"low"`, `"medium"`, `"high"`) instead of `temperature`.
+- Auto-detection: `_model_uses_reasoning_effort(model)` checks if the model name starts with `o1`, `o3`, `o4`, or `gpt-5`.
+- When detected, `reasoning_effort="medium"` is used by default; override via `config.yaml`.
+- When `reasoning_effort` is set (either auto-detected or explicit), it is passed to **all three** call methods (`extract`, `extract_raw_json`, `extract_text`); `temperature` is not sent.
+- The resolved parameters are cached as `self.reasoning_or_temperature: dict` at init time.
 
 **Azure OpenAI:**
 - Subclass `OpenAIProvider`. Override `__init__` to use `openai.AzureOpenAI(azure_endpoint=..., api_version=..., api_key=...)`.
 - The deployment name (not the model name) is passed as `model=` to the API.
-- Structured output availability depends on the deployment version; test with `validate` before `extract`.
+- Applies the same `reasoning_effort` auto-detection as `OpenAIProvider`, using the deployment name.
 - Required env vars: `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION`, `AZURE_OPENAI_DEPLOYMENT`.
 
 ---
@@ -245,48 +284,86 @@ def extract(self, ...): ...
 
 ```
 PDF path/URL
-    → pdf/loader.py         → local PDF path (cached)
-    → pdf/extractor.py      → dict[page_num, text]
-    → pdf/page_finder.py    → list[PageRange]  (governance pages only)
-    → extraction/chunker.py → list[str]  (text chunks ≤ max_tokens)
-    → extraction/extractor.py
-         for each chunk:
-             → llm/<provider>.extract(system_prompt, user_prompt, Director list model)
+    → pdf/loader.py          → local PDF path (cached)
+    → pdf/extractor.py       → dict[page_num, text]
+    → pdf/page_finder.py     → list[PageRange]  (governance pages only)
+    → extraction/chunker.py  → list[TextChunk]  (chunks ≤ max_tokens)
+    → extraction/extractor.run_extraction()
+         [dispatch by chunking + extraction_rounds]
+
+         extraction_rounds=1, chunking=True (default):
+             for each chunk → llm.extract(system_prompt, user_prompt, DirectorList)
              → partial list[Director]
-         → merge all partial Director lists (fuzzy dedup on full_name)
+             → _deduplicate_directors() (fuzzy merge on full_name)
+
+         extraction_rounds=1, chunking=False:
+             concatenate all chunks → single llm.extract() call
+
+         extraction_rounds=2, chunking=True:
+             for each chunk → llm.extract_text(markdown_system_prompt, ...)
+             → combine all markdown sections
+             → save combined markdown to {output_dir}/{Company}_{Year}_Board_Governance_round1.md
+             → single llm.extract(structured_from_markdown_system_prompt, combined_markdown)
+
+         extraction_rounds=2, chunking=False:
+             concatenate all chunks → single llm.extract_text() call → markdown
+             → save combined markdown
+             → single llm.extract(structured_from_markdown_system_prompt, markdown)
+
+         [board summary — always single pass, regardless of chunking]
+             full governance text (or combined markdown if rounds=2)
+             → llm.extract(board_summary_system_prompt, ..., BoardSummary)
+             → _compute_board_summary() fills any None fields from Director list
+
          → attach CompanyMetadata
     → extraction/validator.py → BoardGovernanceDocument (validated)
-    → export/excel_writer.py  → .xlsx
+    → export/excel_writer.py  → .xlsx  (five sheets)
     → export/json_writer.py   → .json
 ```
 
+### Prompt Functions (`extraction/prompts.py`)
+
+| Function | Used by | Returns |
+|----------|---------|---------|
+| `system_prompt()` | Round-1 structured extraction | Director JSON schema + instructions |
+| `user_prompt(chunk_text, ...)` | Round-1 structured extraction | Chunk text with company context |
+| `markdown_system_prompt()` | Two-round extraction, round 1 | Free-text markdown instructions |
+| `markdown_user_prompt(chunk_text, ...)` | Two-round extraction, round 1 | Chunk text with context |
+| `structured_from_markdown_system_prompt()` | Two-round extraction, round 2 | Director JSON schema + convert-from-markdown instructions |
+| `structured_from_markdown_user_prompt(markdown, ...)` | Two-round extraction, round 2 | Combined markdown with context |
+| `board_summary_system_prompt()` | Board summary extraction | BoardSummary JSON schema + instructions |
+| `board_summary_user_prompt(text, ..., is_markdown)` | Board summary extraction | Full governance text or markdown with context |
+
+### Key Extraction Functions (`extraction/extractor.py`)
+
+| Function | Purpose |
+|----------|---------|
+| `run_extraction(...)` | Main entry point; dispatches all four strategy combinations |
+| `_extract_chunk(provider, chunk, ...)` | Single structured extraction call for one chunk |
+| `_extract_chunk_markdown(provider, chunk, ...)` | Free-text markdown extraction for one chunk (round 1) |
+| `_structured_from_markdown(provider, markdown, ...)` | Convert combined markdown to Directors (round 2) |
+| `_extract_board_summary(provider, text, ...)` | Single LLM call for BoardSummary; always full-text |
+| `_compute_board_summary(summary, directors)` | Fill None fields from Director list |
+| `_deduplicate_directors(director_lists)` | Fuzzy-merge Directors across chunks |
+
 ### Prompt Guidelines
 
-**System prompt** must contain:
+**System prompts** must contain:
 - Role: "You are a governance data analyst extracting structured information from corporate filings."
 - Instruction: "Extract only what is explicitly stated. Return `null` for any field not present in the text. Do not infer, guess, or hallucinate values."
-- Format: "Return a JSON array of Director objects matching the provided schema exactly."
-- Schema: Embed the JSON schema of `list[Director]` as a code block.
+- Schema: Embed the relevant JSON schema as a code block.
 
-**User prompt** structure:
-```
-The following text is extracted from pages {start}–{end} of the {filing_type} for {company_name} (fiscal year ending {fiscal_year_end}).
-
-Extract all board directors mentioned. For each director extract all available fields.
-
---- BEGIN TEXT ---
-{chunk_text}
---- END TEXT ---
-```
+**Null over hallucination** is a correctness requirement, not a style preference. The prompt must explicitly instruct the LLM to return `null` for missing fields.
 
 ---
 
 ## Excel Output Format
 
-The `excel_writer.py` must produce exactly four sheets matching `examples/LBG_Board_Governance_2025.xlsx`:
+Five sheets in this order:
 
 | Sheet | Purpose |
 |-------|---------|
+| `Board Summary` | Two-column metric/value table of all `BoardSummary` fields |
 | `Board Overview` | Master table: all directors, all key fields |
 | `Biographical Details` | Name, age band, nationality, expertise, career, qualifications, external directorships |
 | `Committee Memberships` | Director × committee matrix — `C` (chair), `M` (member), `–` (not a member) |
@@ -294,14 +371,14 @@ The `excel_writer.py` must produce exactly four sheets matching `examples/LBG_Bo
 
 **Formatting constants** (match reference file exactly):
 ```python
-HDR_BG   = "1B3A6B"   # header row fill
-HDR_FG   = "FFFFFF"   # header row text
-EXEC_BG  = "FFF3CD"   # executive director row tint
-CHAIR_BG = "E8EAF6"   # board chair row tint
-ALT_BG   = "F2F7FC"   # alternating NED row tint
-ATT_GREEN = "C8E6C9"  # attendance 100%
-ATT_YELLOW= "FFF9C4"  # attendance 80–99%
-ATT_RED   = "FFCDD2"  # attendance <80%
+HDR_BG    = "1B3A6B"   # header row fill
+HDR_FG    = "FFFFFF"   # header row text
+EXEC_BG   = "FFF3CD"   # executive director row tint
+CHAIR_BG  = "E8EAF6"   # board chair row tint
+ALT_BG    = "F2F7FC"   # alternating NED row tint
+ATT_GREEN = "C8E6C9"   # attendance 100%
+ATT_YELLOW= "FFF9C4"   # attendance 80–99%
+ATT_RED   = "FFCDD2"   # attendance <80%
 FONT_NAME = "Arial"
 ```
 
@@ -312,8 +389,6 @@ FONT_NAME = "Arial"
 Evaluation operates at three levels: **field → director → document**, with optional **corpus-level** aggregation across multiple documents. Every evaluation run produces `evaluation_report.json`, `evaluation_report.xlsx`, and a rich stdout summary.
 
 ### FieldResult dataclass (`evaluation/metrics.py`)
-
-Every field comparison produces a `FieldResult`. Implement this as a `dataclass` — not a dict — so type-checking catches mistakes:
 
 ```python
 @dataclass
@@ -327,163 +402,78 @@ class FieldResult:
     failure_mode: str | None # "false_negative" | "hallucination" | "below_threshold" | None
 ```
 
-**failure_mode rules (apply before computing score):**
+**failure_mode rules:**
 - `"false_negative"` — predicted is `None`/`[]`, ground truth is non-null/non-empty. Score = 0.
 - `"hallucination"` — predicted is non-null/non-empty, ground truth is `None`/`[]`. Score = 0.
-- `"below_threshold"` — both are present, metric computed, but score < threshold. Score = computed value.
+- `"below_threshold"` — both present, score < threshold. Score = computed value.
 - `None` — pass.
-
-Never silently skip null predictions. A `false_negative` and a `hallucination` both score 0 but must be counted separately in the report — they indicate different failure modes in the extraction pipeline.
 
 ### Metric function signatures (`evaluation/metrics.py`)
 
 ```python
-# All functions return a score in [0.0, 1.0] unless noted.
-# Callers should check for None/empty before calling — the functions
-# themselves do not raise on None; they return 0.0 with appropriate failure_mode.
-
-def exact_match(pred: str | None, gt: str | None) -> float:
-    """Normalise (strip, lowercase) both strings. Return 1.0 if identical, else 0.0."""
-
-def fuzzy_match(pred: str | None, gt: str | None, threshold: float = 90.0) -> float:
-    """rapidfuzz.fuzz.token_sort_ratio. Return ratio/100 if ≥ threshold, else 0.0."""
-
-def date_match(pred: str | None, gt: str | None) -> dict[str, float]:
-    """Return {"exact": 0|1, "year_only": 0|1}. Parse ISO-8601 strings."""
-
-def numeric_error(
-    pred: float | None, gt: float | None, tolerance: float = 0.05
-) -> dict[str, float]:
-    """Return {"absolute_error": float, "relative_error": float, "pass": 0|1}.
-    relative_error = |pred - gt| / |gt| if gt != 0 else |pred|.
-    pass = 1 if relative_error <= tolerance."""
-
-def list_f1(pred: list, gt: list) -> dict[str, float]:
-    """Set-based (order-insensitive). Normalise each element (strip, lowercase).
-    Return {"precision": float, "recall": float, "f1": float}."""
-
-def semantic_similarity(
-    pred: str | None, gt: str | None, threshold: float = 0.80
-) -> float:
-    """Cosine similarity via sentence-transformers all-MiniLM-L6-v2.
-    Return similarity score in [0.0, 1.0]. Raise ImportError with clear message
-    if sentence-transformers is not installed (eval extra missing)."""
+def exact_match(pred: str | None, gt: str | None) -> float: ...
+def fuzzy_match(pred: str | None, gt: str | None, threshold: float = 90.0) -> float: ...
+def date_match(pred: str | None, gt: str | None) -> dict[str, float]: ...
+def numeric_error(pred: float | None, gt: float | None, tolerance: float = 0.05) -> dict[str, float]: ...
+def list_f1(pred: list, gt: list) -> dict[str, float]: ...
+def semantic_similarity(pred: str | None, gt: str | None, threshold: float = 0.80) -> float: ...
 ```
 
-**Sentence transformer model** is loaded lazily and cached as a module-level singleton (`_MODEL: SentenceTransformer | None = None`). Import only inside the function body, guarded by a try/except that raises a clear `RuntimeError` explaining how to install the `eval` extra.
+The sentence-transformer model is loaded lazily and cached as a module-level singleton. Import only inside the function body, guarded by a `try/except` that raises a clear `RuntimeError` explaining how to install the `eval` extra.
 
 ### Metric dispatch by field path
 
-Configured in `config.yaml` under `evaluation.field_metrics`:
+Configured in `config.yaml` under `evaluation.field_metrics`. See `config.yaml` for the full mapping. Key entries:
 
 ```yaml
 evaluation:
   field_metrics:
-    "biographical.full_name":           exact_match
-    "biographical.post_nominals":       fuzzy_match
-    "biographical.age":                 numeric_error
-    "biographical.age_band":            fuzzy_match
-    "biographical.nationality":         fuzzy_match
-    "biographical.qualifications":      list_f1
-    "biographical.expertise_areas":     list_f1
-    "biographical.career_summary":      semantic_similarity
-    "biographical.other_directorships": list_f1
-    "board_role.designation":           exact_match
-    "board_role.board_role":            fuzzy_match
-    "board_role.independence_status":   exact_match
-    "board_role.year_joined_board":     numeric_error
-    "board_role.tenure_years":          numeric_error
-    "board_role.committee_memberships": list_f1
-    "board_role.committee_chair_of":    list_f1
-    "attendance.board_meetings_attended":  numeric_error
-    "attendance.board_meetings_scheduled": numeric_error
-    "attendance.board_attendance_pct":     numeric_error
-  thresholds:
-    fuzzy_match: 90.0
-    list_f1: 0.90
-    semantic_similarity: 0.80
-    numeric_error_tolerance: 0.05      # 5% relative error
-  regression_gate:
-    document_field_pass_rate: 0.90     # exit 1 if below this
-    director_perfect_match_rate: 0.50  # exit 1 if below this
-    hallucination_rate: 0.05           # exit 1 if above this
+    "biographical.full_name":            exact_match
+    "biographical.career_summary":       llm_semantic_similarity
+    "board_role.committee_memberships":  list_f1
+    "attendance.board_attendance_pct":   numeric_error
 ```
 
-### Aggregate metrics — three levels (`evaluation/evaluator.py`)
-
-The evaluator builds results bottom-up: field → director → document.
-
-**Director-level** (computed from all `FieldResult` objects for one director):
+### Aggregate dataclasses (`evaluation/evaluator.py`)
 
 ```python
 @dataclass
 class DirectorResult:
     director_name: str
     field_results: list[FieldResult]
-    field_pass_rate: float       # passed_count / total_field_count
-    perfect_match: bool          # True only if ALL fields passed
-    false_negative_count: int    # fields where extraction missed a value
-    hallucination_count: int     # fields where extraction invented a value
-    matched: bool                # False if this director had no GT counterpart (FP)
-                                 # or no extraction counterpart (FN)
-```
+    field_pass_rate: float
+    perfect_match: bool
+    false_negative_count: int
+    hallucination_count: int
+    matched: bool
 
-`perfect_match` is strict. Use `field_pass_rate` as the primary per-director quality signal in reports and in prompts-improvement workflows — a director at 0.90 needs targeted improvement, not a complete re-extraction.
-
-**Document-level** (computed from all `DirectorResult` objects):
-
-```python
 @dataclass
 class DocumentResult:
     company_name: str
     extracted_path: str
     ground_truth_path: str
     director_results: list[DirectorResult]
+    document_field_pass_rate: float
+    document_perfect_match: bool
+    director_perfect_match_rate: float
+    per_field_pass_rate: dict[str, float]
+    per_field_type_pass_rate: dict[str, float]
+    false_negative_rate: float
+    hallucination_rate: float
 
-    # Headline metrics
-    document_field_pass_rate: float       # all (director × field) pairs
-    document_perfect_match: bool          # every director has perfect_match=True
-    director_perfect_match_rate: float    # fraction of directors with perfect_match
-
-    # Breakdown by field path and category
-    per_field_pass_rate: dict[str, float]       # {"biographical.full_name": 1.0, ...}
-    per_field_type_pass_rate: dict[str, float]  # {"biographical": 0.87, "board_role": 0.92, ...}
-
-    # Error type rates
-    false_negative_rate: float    # missed values / total expected values
-    hallucination_rate: float     # invented values / total extracted values
-```
-
-`per_field_pass_rate` is the key diagnostic for prompt engineering: low pass rate on `career_summary` → improve biography extraction prompt; low pass rate on `committee_memberships` → improve committee section chunking.
-
-**Corpus-level** (across multiple documents, `evaluate-corpus` command):
-
-```python
 @dataclass
 class CorpusResult:
     document_results: list[DocumentResult]
-    corpus_field_pass_rate: float              # mean document_field_pass_rate
-    corpus_document_perfect_match_rate: float  # fraction with document_perfect_match
-    corpus_per_field_pass_rate: dict[str, float]  # pooled across all documents
+    corpus_field_pass_rate: float
+    corpus_document_perfect_match_rate: float
+    corpus_per_field_pass_rate: dict[str, float]
     corpus_hallucination_rate: float
     corpus_false_negative_rate: float
 ```
 
-### Regression gate (`evaluation/evaluator.py`)
+### Director matching
 
-After computing `DocumentResult`, check each gate threshold from config. If `--fail-on-regression` is passed (or configured as default in CI), call `sys.exit(1)` with a structured error message listing which thresholds were breached. This makes the `evaluate` command a first-class CI step.
-
-### Report outputs (`evaluation/report.py`)
-
-| Output | Format | Content |
-|--------|--------|---------|
-| `evaluation_report.json` | JSON | Full nested `DocumentResult` (or `CorpusResult`). Machine-readable; diff between runs to track regressions. |
-| `evaluation_report.xlsx` | Excel | One row per (director × field). Columns: field_path, metric_used, predicted, ground_truth, score, passed, failure_mode. Red fill for `below_threshold`, amber fill for `hallucination`, yellow fill for `false_negative`. |
-| Stdout | `rich` table | Three panels: (1) headline document metrics, (2) per-field-type pass rates sorted ascending (worst first), (3) five worst-performing individual fields. |
-
-### Director matching (`evaluation/evaluator.py`)
-
-Match extracted directors to ground-truth directors using `rapidfuzz.fuzz.token_sort_ratio` on `biographical.full_name` (threshold 90). Use a greedy best-match assignment (not one-to-many). Unmatched extracted directors → all fields scored as `hallucination`. Unmatched ground-truth directors → all fields scored as `false_negative`. Log both cases at WARNING level.
+Match extracted directors to ground-truth directors using `rapidfuzz.fuzz.token_sort_ratio` on `biographical.full_name` (threshold 90). Greedy best-match assignment (not one-to-many). Log unmatched directors at WARNING level.
 
 ---
 
@@ -501,7 +491,12 @@ Secret keys (API keys, endpoints) are **never** in `config.yaml` — env vars on
 llm:
   default_provider: anthropic
   default_model: claude-sonnet-4-6
+  judge_provider: openai
+  judge_model: gpt-4o-mini
   temperature: 0
+  reasoning_effort: null       # null = auto-detect; "low" | "medium" | "high" to override
+  chunking: true               # true = chunk pages; false = single pass over all pages
+  extraction_rounds: 1         # 1 = direct structured; 2 = markdown then structured
   max_retries: 5
   timeout_seconds: 120
 
@@ -531,7 +526,7 @@ logging:
 
 ### Unit tests (`tests/unit/`)
 
-- `test_models.py` — valid/invalid Pydantic model construction; JSON schema round-trip.
+- `test_models.py` — valid/invalid Pydantic model construction; JSON schema round-trip; includes BoardSummary.
 - `test_page_finder.py` — keyword detection against `lbg_sample_pages.txt`; assert pp.65–99 selected.
 - `test_metrics.py` — parametrised tests for every metric function with known inputs/outputs.
 - `test_validator.py` — JSON schema validation of `lbg_ground_truth.json`; invalid fixture fails.
@@ -552,22 +547,6 @@ The integration test for full extraction must run `evaluate` against `lbg_ground
 - `hallucination_rate <= 0.05`
 - F1 for `board_role.committee_memberships` and attendance fields `>= 0.95`
 
-These thresholds are the regression gate for the LBG reference document.
-
-### Fixtures
-
-- `tests/fixtures/lbg_ground_truth.json` — manually authored from `LBG_Board_Governance_2025.xlsx`. Contains all 11 directors with all fields populated. This is the canonical regression fixture.
-- `tests/fixtures/lbg_sample_pages.txt` — plain text of LBG annual report pp.65–99 (governance section). Used for page_finder and prompt unit tests.
-
-### Unit tests for evaluation metrics (`tests/unit/test_metrics.py`)
-
-Parametrise with known inputs covering all edge cases:
-- Both values present → expected score
-- Predicted `None`, GT non-null → `failure_mode == "false_negative"`, `score == 0.0`
-- Predicted non-null, GT `None` → `failure_mode == "hallucination"`, `score == 0.0`
-- Both `None` → `passed == True`, `score == 1.0` (nothing to extract, nothing hallucinated)
-- List metrics: empty pred vs non-empty GT; extra items in pred vs GT; exact match
-
 ---
 
 ## Code Style
@@ -585,11 +564,12 @@ Parametrise with known inputs covering all edge cases:
 1. **Never use `pip install` directly.** All package management goes through `uv add` / `uv sync`.
 2. **Never hardcode API keys, endpoints, or credentials** anywhere in source files. Read exclusively from env vars / `.env`.
 3. **`extra="forbid"` on all Pydantic models.** This prevents silent field-name typos from being accepted.
-4. **Temperature must be 0** for all LLM calls to ensure reproducibility.
+4. **Temperature must be 0** for all LLM calls to ensure reproducibility. For reasoning models that use `reasoning_effort`, the `temperature` parameter must not be sent at all.
 5. **Null over hallucination.** The prompt must explicitly instruct the LLM to return `null` for missing fields; this is a correctness requirement, not a style preference.
 6. **The `sentence-transformers` dependency is optional** (`[eval]` extra). The core `extract` command must work without it; `evaluate` must fail gracefully with an informative error if the extra is not installed.
 7. **All file output paths are configurable.** Never write to a hardcoded path — always resolve from `config.output.default_dir` or the `--output-dir` CLI flag.
 8. **Log token usage.** Every LLM call must log `{"event": "llm_call", "provider": ..., "model": ..., "input_tokens": ..., "output_tokens": ...}` via `structlog`.
+9. **Board summary extraction is always single-pass.** Do not chunk the board summary LLM call regardless of the `chunking` setting. It sees the full governance text (rounds=1) or combined markdown (rounds=2).
 
 ---
 

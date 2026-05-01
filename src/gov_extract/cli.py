@@ -121,10 +121,14 @@ def extract(
     with console.status("Chunking pages..."):
         chunks = chunk_pages(gov_pages, max_tokens=cfg.pdf.max_pages_per_chunk * 600)
 
-    console.print(f"  Chunks: {len(chunks)}")
+    chunking_label = len(chunks) if cfg.llm.chunking else 1
+    console.print(f"  Extraction: chunks={chunking_label}  rounds={cfg.llm.extraction_rounds}")
 
-    console.print(
-        f"  Extraction: method={cfg.llm.extraction_method}  rounds={cfg.llm.extraction_rounds}"
+    safe_company = company.replace(" ", "")
+    markdown_out = (
+        resolved_output_dir / f"{safe_company}_{year}_Board_Governance_round1.md"
+        if cfg.llm.extraction_rounds == 2
+        else None
     )
 
     with console.status(f"Running extraction with {resolved_provider}..."):
@@ -140,8 +144,9 @@ def extract(
             model_name=resolved_model,
             company_ticker=ticker,
             report_date=report_date,
-            extraction_method=cfg.llm.extraction_method,
+            chunking=cfg.llm.chunking,
             extraction_rounds=cfg.llm.extraction_rounds,
+            markdown_output_path=markdown_out,
         )
 
     console.print(f"  Directors extracted: [bold green]{len(doc.directors)}[/bold green]")
@@ -153,8 +158,10 @@ def extract(
         write_json(doc, json_out)
 
     console.print("\n[bold green]Done![/bold green]")
-    console.print(f"  Excel: {xlsx_out}")
-    console.print(f"  JSON:  {json_out}")
+    console.print(f"  Excel:    {xlsx_out}")
+    console.print(f"  JSON:     {json_out}")
+    if markdown_out is not None:
+        console.print(f"  Markdown: {markdown_out}")
 
 
 @app.command()

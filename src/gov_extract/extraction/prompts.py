@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 
+from gov_extract.models.board_summary import BoardSummary
 from gov_extract.models.director import Director
 
 
@@ -190,3 +191,73 @@ Extract all board directors mentioned. For each director, extract all available 
 --- END TEXT ---
 
 Return a JSON array of Director objects. Include every director you can identify from this text."""
+
+
+def board_summary_system_prompt() -> str:
+    """Return the system prompt for board-level summary extraction.
+
+    Returns:
+        System prompt string with embedded BoardSummary JSON schema.
+    """
+    schema = json.dumps(BoardSummary.model_json_schema(), indent=2)
+    return f"""You are a governance data analyst extracting board-level summary statistics from corporate filings.
+
+Your task is to extract aggregate governance metrics for the full board — NOT per-director details.
+
+CRITICAL INSTRUCTIONS:
+- Extract ONLY what is explicitly stated in the text. Do NOT infer, guess, or hallucinate.
+- Return `null` for any field not present in the text.
+- For percentage fields (pct_women, pct_independent), return a number between 0 and 100.
+- For ceo_chair_separated: return true if the CEO and Chair are explicitly stated to be different people, false if the same person holds both roles, null if not stated.
+- For voting_standard: return "Majority" or "Plurality" only if the director election voting standard is explicitly stated.
+- The notes field may capture any other stated board governance policy (e.g. board tenure policy, retirement age, diversity targets).
+
+The BoardSummary schema is:
+```json
+{schema}
+```
+
+Output format: Return a single BoardSummary JSON object (not an array)."""
+
+
+def board_summary_user_prompt(
+    text: str,
+    company_name: str,
+    filing_type: str,
+    fiscal_year_end: str,
+    is_markdown: bool = False,
+) -> str:
+    """Return the user prompt for board summary extraction.
+
+    Args:
+        text: Governance text or markdown to extract from.
+        company_name: Name of the company.
+        filing_type: e.g. "Annual Report".
+        fiscal_year_end: ISO-8601 date string.
+        is_markdown: True when ``text`` is a pre-extracted Markdown summary
+            rather than raw filing text.
+
+    Returns:
+        Formatted user prompt string.
+    """
+    source_label = "Markdown summary extracted from" if is_markdown else "text extracted from"
+    return f"""The following is {source_label} the {filing_type} for {company_name} (fiscal year ending {fiscal_year_end}).
+
+Extract the board-level governance summary statistics.
+
+Look especially for:
+- Whether CEO and Board Chair roles are held by the same or different people
+- The voting standard used for director elections (majority vs plurality)
+- Total number of directors on the board
+- Number of executive, non-executive, and independent directors
+- Percentage of women on the board
+- Percentage of independent directors
+- Average director age
+- Average director tenure
+- Any stated board governance policies
+
+--- BEGIN TEXT ---
+{text}
+--- END TEXT ---
+
+Return a single BoardSummary JSON object."""

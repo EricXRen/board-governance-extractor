@@ -58,3 +58,8 @@ class AzureOpenAIProvider(OpenAIProvider):
         self.reasoning_effort: str | None = reasoning_effort if reasoning_effort is not None else (
             "medium" if _model_uses_reasoning_effort(resolved_deployment) else None
         )
+        self.reasoning_or_temperature: dict = (
+            {"reasoning_effort": self.reasoning_effort, "temperature": self.temperature}
+            if self.reasoning_effort is not None
+            else {"temperature": self.temperature}
+        )

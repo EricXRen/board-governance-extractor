@@ -28,9 +28,10 @@ Supports Anthropic Claude, OpenAI (including GPT-5 and reasoning models), DeepSe
 ## Features
 
 - Extracts per-director biographical details, board roles, committee memberships, and meeting attendance from any PDF with a text layer
-- Exports to a four-sheet Excel workbook and a validated JSON file
-- Supports Anthropic, OpenAI, DeepSeek, and Azure OpenAI via a pluggable provider layer
-- Four configurable extraction strategies combining input splitting and LLM pass count
+- Extracts board-level governance statistics: CEO/chair separation, voting standard, board size, % women, % independent, average age and tenure
+- Exports to a five-sheet Excel workbook and a validated JSON file
+- Supports Anthropic Claude, OpenAI (including reasoning models o1/o3/o4/gpt-5), DeepSeek, and Azure OpenAI via a pluggable provider layer
+- Four configurable extraction strategies combining page chunking (`chunking: true/false`) and LLM pass count (`extraction_rounds: 1/2`)
 - Offline evaluation harness with field-level metrics, regression gating, and Excel/JSON reports
 
 ---
@@ -236,14 +237,14 @@ uv run gov-extract evaluate-corpus \
 
 Two independent config options control how extraction is performed:
 
-### `extraction_method`
+### `chunking`
 
-Controls how the governance page text is split before being sent to the LLM.
+Controls whether governance page text is split into chunks before being sent to the LLM.
 
 | Value | Behaviour |
 |-------|-----------|
-| `chunked` (default) | Pages are split into overlapping chunks (≤ `max_pages_per_chunk`). Each chunk is extracted independently; results are merged by fuzzy director-name matching. Handles documents of any size. |
-| `single_pass` | All governance pages are concatenated into a single text and sent to the LLM in one call. Simpler, but may exceed context limits on very long documents. |
+| `true` (default) | Pages are split into overlapping chunks (≤ `max_pages_per_chunk`). Each chunk is extracted independently; results are merged by fuzzy director-name matching. Handles documents of any size. |
+| `false` | All governance pages are concatenated into a single text and sent to the LLM in one call. Simpler baseline; may exceed context limits on very long documents. |
 
 ### `extraction_rounds`
 
@@ -258,19 +259,19 @@ Controls the number of LLM passes per input unit.
 
 These two settings are fully orthogonal, giving four strategies:
 
-| `extraction_method` | `extraction_rounds` | Description |
-|---------------------|---------------------|-------------|
-| `chunked` | `1` | Default. Per-chunk structured output, results merged. |
-| `chunked` | `2` | Per-chunk Markdown extraction, combined, then one structured pass. |
-| `single_pass` | `1` | All text in one structured call (baseline). |
-| `single_pass` | `2` | All text to one Markdown call, then one structured call. |
+| `chunking` | `extraction_rounds` | Description |
+|------------|---------------------|-------------|
+| `true` | `1` | Default. Per-chunk structured output, results merged. |
+| `true` | `2` | Per-chunk Markdown extraction, combined, then one structured pass. |
+| `false` | `1` | All text in one structured call (baseline). |
+| `false` | `2` | All text to one Markdown call, then one structured call. |
 
 Configure in `config.yaml`:
 
 ```yaml
 llm:
-  extraction_method: chunked   # "chunked" | "single_pass"
-  extraction_rounds: 1         # 1 | 2
+  chunking: true       # true = chunk pages; false = single pass
+  extraction_rounds: 1 # 1 | 2
 ```
 
 ---
@@ -288,7 +289,7 @@ llm:
   temperature: 0                     # must be 0 for reproducibility
   reasoning_effort: null             # null = auto-detect; or "low" | "medium" | "high"
                                      # applies to OpenAI o1/o3/o4/gpt-5 series
-  extraction_method: chunked         # "chunked" | "single_pass"
+  chunking: true                     # true = chunk pages; false = single pass
   extraction_rounds: 1               # 1 (direct structured) | 2 (markdown then structured)
   max_retries: 5
   timeout_seconds: 120
@@ -347,10 +348,11 @@ For non-reasoning models (e.g. `gpt-4o`), `reasoning_effort` is ignored and `tem
 
 ### Excel Workbook
 
-Four sheets matching the reference layout in `examples/LBG_Board_Governance_2025.xlsx`:
+Five sheets — the first is a high-level summary, the rest cover per-director detail:
 
 | Sheet | Contents |
 |-------|----------|
+| Board Summary | Aggregate governance metrics: CEO/chair separation, voting standard, board size, avg age/tenure, % women, % independent |
 | Board Overview | All directors, all key fields — master reference |
 | Biographical Details | Name, age, nationality, qualifications, expertise, career summary, external directorships |
 | Committee Memberships | Director × committee matrix: `C` (chair), `M` (member), `–` (not a member) |
@@ -368,20 +370,28 @@ Validates against `schemas/board_governance.schema.json` (JSON Schema Draft 2020
     "fiscal_year_end": "2024-12-31",
     "llm_provider": "anthropic",
     "llm_model": "claude-sonnet-4-6",
-    "extraction_timestamp": "2025-04-30T10:00:00+00:00",
-    ...
+    "extraction_timestamp": "2025-04-30T10:00:00+00:00"
   },
   "directors": [
     {
-      "biographical": {
-        "full_name": "Sir Robin Budenberg CBE",
-        "designation": "Chair",
-        ...
-      },
+      "biographical": { "full_name": "Sir Robin Budenberg CBE", ... },
       "board_role": { ... },
       "attendance": { ... }
     }
-  ]
+  ],
+  "board_summary": {
+    "ceo_chair_separated": true,
+    "voting_standard": "Majority",
+    "board_size": 11,
+    "num_executive_directors": 2,
+    "num_non_executive_directors": 9,
+    "num_independent_directors": 9,
+    "pct_women": 45.5,
+    "pct_independent": 81.8,
+    "avg_director_age": 58.3,
+    "avg_tenure_years": 4.7,
+    "notes": null
+  }
 }
 ```
 
