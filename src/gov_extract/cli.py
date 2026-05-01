@@ -146,6 +146,7 @@ def extract(
             report_date=report_date,
             chunking=cfg.llm.chunking,
             extraction_rounds=cfg.llm.extraction_rounds,
+            max_chunk_workers=cfg.llm.max_chunk_workers,
             markdown_output_path=markdown_out,
         )
 

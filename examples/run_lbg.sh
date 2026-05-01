@@ -35,7 +35,9 @@ uv run gov-extract extract \
 uv run gov-extract evaluate \
     --extracted outputs/LloydsBankingGroup_2025_Board_Governance-c1_r1.json \
     --ground-truth outputs/LloydsBankingGroup_2025_Board_Governance-c23_r2.json \
-    --output-dir ./outputs
+    --output-dir ./outputs \
+    --page-hint 60
+
 
 #   Optional flags:
 #   - --fail-on-regression — exit with code 1 if any gate threshold is breached (useful in CI)

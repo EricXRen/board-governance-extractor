@@ -5,8 +5,9 @@ llm:
   judge_model: deepseek-v4-flash
   temperature: 0
   reasoning_effort: "medium"       #"null" or "low" | "medium" | "high"; auto-detected from model name if null
-  chunking: false                 # true = chunk pages; false = single pass over all pages
-  extraction_rounds: 2        # 1 = direct structured output; 2 = markdown first, then structured
+  chunking: true                # true = chunk pages; false = single pass over all pages
+  extraction_rounds: 1           # 1 = direct structured output; 2 = markdown first, then structured
+  max_chunk_workers: 5           # parallel threads per extraction run (tune to your API rate limit)
   max_retries: 5
   timeout_seconds: 120
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -454,6 +455,49 @@ def _compute_board_summary(summary: BoardSummary, directors: list[Director]) -> 
     return BoardSummary.model_validate(data)
 
 
+def _run_parallel(
+    fn: Any,
+    chunks: list[TextChunk],
+    provider: LLMProvider,
+    company_name: str,
+    filing_type: str,
+    fiscal_year_end: str,
+    max_workers: int = 5,
+) -> list[Any]:
+    """Run ``fn(provider, chunk, company_name, filing_type, fiscal_year_end)`` for every
+    chunk in parallel using a thread pool, returning results in chunk order.
+
+    Falls back to a plain sequential loop when there is only one chunk (avoids
+    thread-pool overhead for single_pass mode).
+
+    Args:
+        fn: ``_extract_chunk`` or ``_extract_chunk_markdown``.
+        chunks: Ordered list of text chunks to process.
+        provider: Configured LLM provider (thread-safe: each call is independent).
+        company_name: Forwarded to ``fn``.
+        filing_type: Forwarded to ``fn``.
+        fiscal_year_end: Forwarded to ``fn``.
+        max_workers: Maximum number of concurrent threads.
+
+    Returns:
+        List of results in the same order as ``chunks``.
+    """
+    if len(chunks) <= 1:
+        return [fn(provider, c, company_name, filing_type, fiscal_year_end) for c in chunks]
+
+    results: list[Any] = [None] * len(chunks)
+    with ThreadPoolExecutor(max_workers=min(max_workers, len(chunks))) as executor:
+        futures = {
+            executor.submit(fn, provider, chunk, company_name, filing_type, fiscal_year_end): idx
+            for idx, chunk in enumerate(chunks)
+        }
+        for future in as_completed(futures):
+            idx = futures[future]
+            results[idx] = future.result()  # re-raises any exception from the worker
+
+    return results
+
+
 def run_extraction(
     provider: LLMProvider,
     chunks: list[TextChunk],
@@ -467,6 +511,7 @@ def run_extraction(
     report_date: str | None = None,
     chunking: bool = True,
     extraction_rounds: int = 1,
+    max_chunk_workers: int = 5,
     markdown_output_path: Path | None = None,
 ) -> BoardGovernanceDocument:
     """Run the full extraction pipeline over all chunks.
@@ -496,6 +541,9 @@ def run_extraction(
         report_date: Optional report publication date (ISO-8601).
         chunking: True = chunk pages and merge results; False = single pass over all pages.
         extraction_rounds: ``1`` (direct structured) or ``2`` (markdown then structured).
+        max_chunk_workers: Maximum parallel threads for chunk LLM calls. Only
+            applies when ``chunking=True`` and there is more than one chunk.
+            Tune this down if you hit provider rate limits.
         markdown_output_path: If provided and ``extraction_rounds == 2``, the
             combined round-1 Markdown is written to this path before the
             structured pass. Useful for debugging and prompt iteration.
@@ -533,11 +581,16 @@ def run_extraction(
     is_markdown_summary = False
 
     if extraction_rounds == 2:
-        # Round 1: extract each (effective) chunk to Markdown.
-        markdown_parts = [
-            _extract_chunk_markdown(provider, chunk, company_name, filing_type, fiscal_year_end)
-            for chunk in effective_chunks
-        ]
+        # Round 1: extract each (effective) chunk to Markdown — parallel when chunking=True.
+        markdown_parts = _run_parallel(
+            _extract_chunk_markdown,
+            effective_chunks,
+            provider,
+            company_name,
+            filing_type,
+            fiscal_year_end,
+            max_workers=max_chunk_workers,
+        )
         combined_markdown = "\n\n---\n\n".join(p for p in markdown_parts if p)
 
         logger.info(
@@ -558,12 +611,17 @@ def run_extraction(
         summary_text = combined_markdown
         is_markdown_summary = True
     else:
-        # Single round: direct structured extraction.
-        all_director_lists: list[list[Director]] = []
-        for chunk in effective_chunks:
-            directors = _extract_chunk(provider, chunk, company_name, filing_type, fiscal_year_end)
-            all_director_lists.append(directors)
-        # single_pass has only one chunk so dedup is a no-op, but it's harmless.
+        # Single round: direct structured extraction — parallel when chunking=True.
+        all_director_lists = _run_parallel(
+            _extract_chunk,
+            effective_chunks,
+            provider,
+            company_name,
+            filing_type,
+            fiscal_year_end,
+            max_workers=max_chunk_workers,
+        )
+        # single_pass produces one chunk so dedup is a no-op, but it's harmless.
         merged_directors = _deduplicate_directors(all_director_lists)
         summary_text = "\n\n".join(c.text for c in effective_chunks)
 
