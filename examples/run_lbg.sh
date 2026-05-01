@@ -33,10 +33,13 @@ uv run gov-extract extract \
 
 
 uv run gov-extract evaluate \
-    --extracted outputs/AstraZeneca_2025_Board_Governance_c1-r1.json \
-    --ground-truth outputs/AstraZeneca_2025_Board_Governance_c27-r1.json \
+    --extracted outputs/LloydsBankingGroup_2025_Board_Governance-c1_r1.json \
+    --ground-truth outputs/LloydsBankingGroup_2025_Board_Governance-c23_r2.json \
     --output-dir ./outputs
 
 #   Optional flags:
 #   - --fail-on-regression — exit with code 1 if any gate threshold is breached (useful in CI)
 #   - --config path/to/config.yaml — use a custom config
+
+# To generate the evaluation schema (if you want to customize it or add more fields), edit src/gov_extract/models/generate_schema.py and then run:
+uv run src/gov_extract/models/generate_schema.py

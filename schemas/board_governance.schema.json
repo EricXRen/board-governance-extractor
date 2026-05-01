@@ -264,6 +264,150 @@
       "title": "BoardRoleDetails",
       "type": "object"
     },
+    "BoardSummary": {
+      "additionalProperties": false,
+      "description": "Aggregate governance statistics for the full board.\n\nFields are populated from two sources (priority order):\n1. Explicitly stated values extracted from the filing text.\n2. Values computed from the extracted Director list (where derivable).\n\n``pct_women`` and ``voting_standard`` can only come from the filing text;\nall other fields have a computation fallback.",
+      "properties": {
+        "ceo_chair_separated": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ceo Chair Separated"
+        },
+        "voting_standard": {
+          "anyOf": [
+            {
+              "enum": [
+                "Majority",
+                "Plurality"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Voting Standard"
+        },
+        "board_size": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Board Size"
+        },
+        "num_executive_directors": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Num Executive Directors"
+        },
+        "num_non_executive_directors": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Num Non Executive Directors"
+        },
+        "num_independent_directors": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Num Independent Directors"
+        },
+        "pct_women": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pct Women"
+        },
+        "pct_independent": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pct Independent"
+        },
+        "avg_director_age": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Avg Director Age"
+        },
+        "avg_tenure_years": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Avg Tenure Years"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "title": "BoardSummary",
+      "type": "object"
+    },
     "CommitteeAttendance": {
       "additionalProperties": false,
       "description": "Attendance record for a single committee.",
@@ -392,7 +536,7 @@
     }
   },
   "additionalProperties": false,
-  "description": "Complete extraction output: company metadata + all directors.",
+  "description": "Complete extraction output: company metadata, all directors, board summary.",
   "properties": {
     "company": {
       "$ref": "#/$defs/CompanyMetadata"
@@ -403,6 +547,9 @@
       },
       "title": "Directors",
       "type": "array"
+    },
+    "board_summary": {
+      "$ref": "#/$defs/BoardSummary"
     }
   },
   "required": [
