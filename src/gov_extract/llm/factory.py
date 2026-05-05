@@ -11,7 +11,8 @@ logger = structlog.get_logger()
 
 _PROVIDERS = {
     "anthropic": "gov_extract.llm.anthropic_provider.AnthropicProvider",
-    "openai": "gov_extract.llm.openai_provider.OpenAIProvider",
+    "openai":    "gov_extract.llm.openai_provider.OpenAIProvider",
+    "deepseek":  "gov_extract.llm.openai_provider.OpenAIProvider",
     "azure_openai": "gov_extract.llm.azure_provider.AzureOpenAIProvider",
 }
 

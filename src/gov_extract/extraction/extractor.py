@@ -171,8 +171,16 @@ def _extract_chunk(
             parsed = json.loads(raw)
             if isinstance(parsed, list):
                 directors = [Director.model_validate(d) for d in parsed]
-            elif isinstance(parsed, dict) and "directors" in parsed:
-                directors = [Director.model_validate(d) for d in parsed["directors"]]
+            elif isinstance(parsed, dict):
+                for key in ("directors", "root", "items", "data", "results"):
+                    if key in parsed and isinstance(parsed[key], list):
+                        directors = [Director.model_validate(d) for d in parsed[key]]
+                        break
+                else:
+                    try:
+                        directors = [Director.model_validate(parsed)]
+                    except Exception:
+                        directors = []
             else:
                 directors = []
         except Exception as e2:
@@ -274,8 +282,16 @@ def _structured_from_markdown(
             parsed = json.loads(raw)
             if isinstance(parsed, list):
                 directors = [Director.model_validate(d) for d in parsed]
-            elif isinstance(parsed, dict) and "directors" in parsed:
-                directors = [Director.model_validate(d) for d in parsed["directors"]]
+            elif isinstance(parsed, dict):
+                for key in ("directors", "root", "items", "data", "results"):
+                    if key in parsed and isinstance(parsed[key], list):
+                        directors = [Director.model_validate(d) for d in parsed[key]]
+                        break
+                else:
+                    try:
+                        directors = [Director.model_validate(parsed)]
+                    except Exception:
+                        directors = []
             else:
                 directors = []
         except Exception as e2:

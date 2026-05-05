@@ -17,9 +17,17 @@ uv run gov-extract extract \
   --input data/2025-lbg-annual-report.pdf \
   --company "Lloyds Banking Group" \
   --year 2025 \
+  --page-hint 60 \
   --provider openai \
   --model deepseek-v4-flash \
   --output-dir ./outputs
+
+uv run gov-extract extract \
+  --input data/2025-lbg-annual-report.pdf \
+  --company "Lloyds Banking Group" \
+  --year 2025 --page-hint 60
+ 
+ 
 
 
 uv run gov-extract extract \
@@ -28,6 +36,7 @@ uv run gov-extract extract \
   --year 2025 \
   --output-dir ./outputs
 
+
   # uv run gov-extract extract --input <pdf> --company "..." --year 2025 \
   #   --provider azure_openai --model gpt-4o --output-dir ./outputs
 
@@ -35,8 +44,7 @@ uv run gov-extract extract \
 uv run gov-extract evaluate \
     --extracted outputs/LloydsBankingGroup_2025_Board_Governance-c1_r1.json \
     --ground-truth outputs/LloydsBankingGroup_2025_Board_Governance-c23_r2.json \
-    --output-dir ./outputs \
-    --page-hint 60
+    --output-dir ./outputs
 
 
 #   Optional flags:

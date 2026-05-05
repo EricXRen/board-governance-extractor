@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 
 import structlog
@@ -77,7 +78,7 @@ class OpenAIProvider:
             "medium" if _model_uses_reasoning_effort(model) else None
         )
         self.reasoning_or_temperature: dict = (
-            {"reasoning_effort": self.reasoning_effort, "temperature": self.temperature}
+            {"reasoning_effort": self.reasoning_effort}
             if self.reasoning_effort is not None
             else {"temperature": self.temperature}
         )
@@ -136,7 +137,26 @@ class OpenAIProvider:
 
         # Fallback: JSON object mode
         raw = self.extract_raw_json(system_prompt, user_prompt)
-        return response_model.model_validate_json(raw)
+        try:
+            return response_model.model_validate_json(raw)
+        except Exception:
+            # json_object mode always returns a dict; RootModel[list[...]] expects
+            # an array. Azure OpenAI doesn't support root-level array schemas, so
+            # the model may wrap the list under a key or return a single object.
+            parsed = json.loads(raw)
+            if isinstance(parsed, dict):
+                for key in ("root", "directors", "items", "data", "results"):
+                    if key in parsed:
+                        try:
+                            return response_model.model_validate(parsed[key])
+                        except Exception:
+                            continue
+                # Last resort: treat the single dict as a one-element list.
+                try:
+                    return response_model.model_validate([parsed])
+                except Exception:
+                    pass
+            raise
 
     @retry(
         wait=wait_exponential(multiplier=1, min=2, max=60),
