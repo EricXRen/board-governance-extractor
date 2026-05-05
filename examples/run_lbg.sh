@@ -25,7 +25,9 @@ uv run gov-extract extract \
 uv run gov-extract extract \
   --input data/2025-lbg-annual-report.pdf \
   --company "Lloyds Banking Group" \
-  --year 2025 --page-hint 60
+  --year 2025 \
+  --output-dir ./outputs
+  
  
  
 

@@ -58,7 +58,7 @@ def get_provider(
             temperature=config.llm.temperature,
             timeout=config.llm.timeout_seconds,
         )  # type: ignore[return-value]
-    elif resolved_provider == "openai":
+    elif resolved_provider in ["openai", "deepseek"]:
         return cls(
             model=resolved_model,
             temperature=config.llm.temperature,
