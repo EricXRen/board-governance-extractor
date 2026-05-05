@@ -78,7 +78,7 @@ class OpenAIProvider:
             "medium" if _model_uses_reasoning_effort(model) else None
         )
         self.reasoning_or_temperature: dict = (
-            {"reasoning_effort": self.reasoning_effort}
+            {"reasoning_effort": self.reasoning_effort, "temperature": 1}   
             if self.reasoning_effort is not None
             else {"temperature": self.temperature}
         )
@@ -145,17 +145,24 @@ class OpenAIProvider:
             # the model may wrap the list under a key or return a single object.
             parsed = json.loads(raw)
             if isinstance(parsed, dict):
+                # Empty dict → no results; map to an empty list for list-typed models.
+                if not parsed:
+                    try:
+                        return response_model.model_validate([])
+                    except Exception:
+                        pass
                 for key in ("root", "directors", "items", "data", "results"):
                     if key in parsed:
                         try:
                             return response_model.model_validate(parsed[key])
                         except Exception:
                             continue
-                # Last resort: treat the single dict as a one-element list.
-                try:
-                    return response_model.model_validate([parsed])
-                except Exception:
-                    pass
+                # Non-empty dict with no known key: treat as a single-item list.
+                if parsed:
+                    try:
+                        return response_model.model_validate([parsed])
+                    except Exception:
+                        pass
             raise
 
     @retry(

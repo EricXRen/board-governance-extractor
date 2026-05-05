@@ -10,7 +10,7 @@ requires-python = ">=3.11"
 dependencies = [
     "anthropic>=0.40",
     "openai>=2.32.0",
-    "pydantic>=2.9",
+    "pydantic>=2.13",
     "pydantic-settings>=2.5",
     "typer>=0.13",
     "pdfminer.six>=20231228",

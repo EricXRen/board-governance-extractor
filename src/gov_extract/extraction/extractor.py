@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import structlog
-from pydantic import RootModel
+from pydantic import BaseModel
 
 from gov_extract.extraction.chunker import TextChunk
 from gov_extract.extraction.prompts import (
@@ -34,10 +34,15 @@ logger = structlog.get_logger()
 _MERGE_THRESHOLD = 85
 
 
-class DirectorList(RootModel[list[Director]]):
-    """Root model wrapping a list of directors for structured output."""
+class DirectorList(BaseModel):
+    """Wrapper model for a list of directors.
 
-    root: list[Director]
+    Using a named field instead of RootModel so the JSON schema is an object
+    (``{"directors": [...]}``) rather than a root-level array. Azure OpenAI
+    structured output and JSON-object mode both require a top-level object.
+    """
+
+    directors: list[Director]
 
 
 def _fuzzy_ratio(a: str, b: str) -> float:
@@ -158,7 +163,7 @@ def _extract_chunk(
 
     try:
         result = provider.extract(sys_prompt, usr_prompt, DirectorList)
-        directors = result.root if isinstance(result, DirectorList) else []
+        directors = result.directors if isinstance(result, DirectorList) else []
     except Exception as e:
         logger.warning(
             "chunk_extraction_failed_structured",
@@ -274,7 +279,7 @@ def _structured_from_markdown(
     )
     try:
         result = provider.extract(sys_prompt, usr_prompt, DirectorList)
-        directors = result.root if isinstance(result, DirectorList) else []
+        directors = result.directors if isinstance(result, DirectorList) else []
     except Exception as e:
         logger.warning("structured_from_markdown_failed_structured", error=str(e))
         try:

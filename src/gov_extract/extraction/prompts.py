@@ -25,15 +25,14 @@ CRITICAL INSTRUCTIONS:
 - Do not invent committee names, dates, attendance figures, or biographical details.
 - If a field is ambiguous or unclear, return null rather than guessing.
 - For lists (expertise_areas, qualifications, etc.), return an empty list [] if nothing is stated.
-- Return a JSON array of Director objects. If no directors are found, return [].
+- Return a JSON object `{{"directors": [...]}}` containing all Director objects. If no directors are found, return `{{"directors": []}}`.
 
 The Director object schema is:
 ```json
 {schema}
 ```
 
-Output format: Return a JSON array of Director objects matching the schema exactly.
-Wrap your response in a JSON code block if using raw JSON mode."""
+Output format: Return a JSON object `{{"directors": [...]}}` where each element matches the Director schema exactly."""
 
 
 def markdown_system_prompt() -> str:
@@ -123,14 +122,14 @@ CRITICAL INSTRUCTIONS:
 - Convert ONLY what is present in the Markdown. Do NOT infer, guess, or hallucinate.
 - Return `null` for any field not mentioned in the Markdown.
 - For lists (expertise_areas, qualifications, etc.), return [] if nothing is stated.
-- Return a JSON array of Director objects. If no directors are present, return [].
+- Return a JSON object `{{"directors": [...]}}` containing all Director objects. If no directors are present, return `{{"directors": []}}`.
 
 The Director object schema is:
 ```json
 {schema}
 ```
 
-Output format: Return a JSON array of Director objects matching the schema exactly."""
+Output format: Return a JSON object `{{"directors": [...]}}` where each element matches the Director schema exactly."""
 
 
 def structured_from_markdown_user_prompt(
@@ -152,13 +151,13 @@ def structured_from_markdown_user_prompt(
     """
     return f"""The following Markdown was extracted from the {filing_type} for {company_name} (fiscal year ending {fiscal_year_end}).
 
-Convert this into a JSON array of Director objects matching the provided schema.
+Convert this into a JSON object `{"directors": [...]}` matching the provided schema.
 
 --- BEGIN MARKDOWN ---
 {markdown_text}
 --- END MARKDOWN ---
 
-Return a JSON array of Director objects. Include every director present in the Markdown."""
+Return a JSON object `{"directors": [...]}` containing every director present in the Markdown."""
 
 
 def user_prompt(
@@ -190,7 +189,7 @@ Extract all board directors mentioned. For each director, extract all available 
 {chunk_text}
 --- END TEXT ---
 
-Return a JSON array of Director objects. Include every director you can identify from this text."""
+Return a JSON object `{{"directors": [...]}}` containing every director you can identify from this text."""
 
 
 def board_summary_system_prompt() -> str:
