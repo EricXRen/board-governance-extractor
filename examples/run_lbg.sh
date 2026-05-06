@@ -44,8 +44,8 @@ uv run gov-extract extract \
 
 
 uv run gov-extract evaluate \
-    --extracted outputs/LloydsBankingGroup_2025_Board_Governance-c1_r1.json \
-    --ground-truth outputs/LloydsBankingGroup_2025_Board_Governance-c23_r2.json \
+    --extracted outputs/LloydsBankingGroup_2025_Board_Governance_deepseek.json \
+    --ground-truth outputs/LloydsBankingGroup_2025_Board_Governance_openai.json \
     --output-dir ./outputs
 
 

@@ -1,0 +1,760 @@
+{
+  "company": {
+    "company_name": "Lloyds Banking Group",
+    "company_ticker": null,
+    "filing_type": "Annual Report",
+    "fiscal_year_end": "2025-12-31",
+    "report_date": null,
+    "source_pdf_path": "/home/cop98/dev/board-governance-extractor/data/2025-lbg-annual-report.pdf",
+    "extraction_timestamp": "2026-05-06T13:27:21.169960+00:00",
+    "llm_provider": "openai",
+    "llm_model": "gpt-5.4-mini"
+  },
+  "directors": [
+    {
+      "biographical": {
+        "full_name": "Sir Robin Budenberg",
+        "post_nominals": "CBE",
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [
+          "chartered accountant"
+        ],
+        "expertise_areas": [
+          "financial services and investment banking",
+          "governance and strategic advisory",
+          "regulatory, public policy and stakeholder management"
+        ],
+        "career_summary": "Robin was Chair of The Crown Estate for nine years until July 2025. He spent 25 years advising UK companies and the UK Government while working for S.G. Warburg/UBS Investment Bank and was formerly Chief Executive and Chairman of UK Financial Investments (UKFI), managing the Government’s investments in UK banks following the 2008 financial crisis. He qualified as a chartered accountant.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Chair",
+        "board_role": "Chair",
+        "independence_status": "Chair (independent on appointment)",
+        "year_joined_board": 2020,
+        "date_joined_board": "October 2020",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Nomination and Governance Committee (Chair)",
+          "Responsible Business Committee (Member)",
+          "Remuneration Committee (Member)"
+        ],
+        "committee_chair_of": [
+          "Nomination and Governance Committee"
+        ],
+        "special_roles": [
+          "On behalf of the Board"
+        ]
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Nomination and Governance Committee",
+            "meetings_attended": 5,
+            "meetings_scheduled": 5,
+            "attendance_pct": 100.0,
+            "is_chair": true
+          },
+          {
+            "committee_name": "Responsible Business Committee",
+            "meetings_attended": 4,
+            "meetings_scheduled": 4,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Remuneration Committee",
+            "meetings_attended": 6,
+            "meetings_scheduled": 6,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Charlie Nunn",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "financial services experience including in chief executive and other leadership roles",
+          "strategic planning and implementation",
+          "digital transformation"
+        ],
+        "career_summary": "Charlie has over 25 years’ experience in the financial services sector. Prior to joining the Group, Charlie held a range of leadership positions at HSBC, including Global Chief Executive, Wealth and Personal Banking, and Group Head of Wealth Management and Digital, as well as Global Chief Operating Officer of Retail Banking and Wealth Management. Charlie began his career at Accenture, where he worked for 13 years in the US, France, Switzerland and the UK before being made a Partner. He then moved to McKinsey & Co. as a Senior Partner, leading on projects for five years.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Executive Director",
+        "board_role": "Group Chief Executive",
+        "independence_status": "N/A (Executive)",
+        "year_joined_board": 2021,
+        "date_joined_board": "August 2021",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "William Chalmers",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "board-level strategic and financial leadership",
+          "strategic planning and development",
+          "mergers and acquisitions",
+          "equity and debt capital structuring",
+          "risk management"
+        ],
+        "career_summary": "William joined the Board in August 2019, when he was appointed Chief Financial Officer and was Interim Group Chief Executive from May 2021 to August 2021. William has worked in financial services for over 25 years and previously held a number of senior roles at Morgan Stanley, including Co-Head of the Global Financial Institutions Group and Head of EMEA Financial Institutions Group. Before joining Morgan Stanley, William worked for J. P. Morgan, again in the Financial Institutions Group.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Executive Director",
+        "board_role": "Chief Financial Officer",
+        "independence_status": "N/A (Executive)",
+        "year_joined_board": 2019,
+        "date_joined_board": "August 2019",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Cathy Turner",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "significant executive and non-executive financial services experience",
+          "knowledge of complex remuneration matters",
+          "communications expertise with a broad range of stakeholders including investors, regulators, government, media and unions"
+        ],
+        "career_summary": null,
+        "other_directorships": [
+          "Non-Executive Director of Rentokil Initial plc",
+          "Partner on a part-time basis at Manchester Square Partners LLP"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Senior Independent Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2022,
+        "date_joined_board": "November 2022",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Nomination and Governance Committee (Member)",
+          "Audit Committee (Member)",
+          "Board Risk Committee (Member)",
+          "Remuneration Committee (Chair)"
+        ],
+        "committee_chair_of": [
+          "Remuneration Committee"
+        ],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Nomination and Governance Committee",
+            "meetings_attended": 5,
+            "meetings_scheduled": 5,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 7,
+            "meetings_scheduled": 7,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Board Risk Committee",
+            "meetings_attended": 9,
+            "meetings_scheduled": 9,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Remuneration Committee",
+            "meetings_attended": 6,
+            "meetings_scheduled": 6,
+            "attendance_pct": 100.0,
+            "is_chair": true
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Nathan Bostock",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [
+          "chartered accountant"
+        ],
+        "expertise_areas": [
+          "financial, risk and regulatory expertise",
+          "large-scale customer and corporate facing businesses",
+          "executive experience in the financial services industry"
+        ],
+        "career_summary": "Nathan was Chief Executive Officer of Santander UK plc from 2014 until 2022 and then Head of Investment Platforms at Banco Santander S.A. until his retirement from Santander in 2023. Prior to joining Santander in 2014, Nathan was an executive director and Group Chief Financial Officer of RBS and previously held the post of Chief Risk Officer at RBS. Before joining RBS, Nathan held various senior positions at Santander UK plc between 2004 and 2009, including Executive Director, Finance Director and commercial Chief Executive Officer roles in Financial Markets and Corporate Banking and in Cards and Insurance. He is qualified as a chartered accountant.",
+        "other_directorships": [
+          "Non-executive director and chair designate of Jupiter Fund Management plc with effect from 1 March 2026",
+          "Chair of Jupiter Fund Management plc with effect from 1 April 2026"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Chair of Lloyds Bank Corporate Markets plc and Lloyds Bank GmbH",
+        "independence_status": "Independent",
+        "year_joined_board": 2024,
+        "date_joined_board": "August 2024",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Audit Committee (Member)",
+          "Board Risk Committee (Member)"
+        ],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 9,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 90.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 7,
+            "meetings_scheduled": 7,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Board Risk Committee",
+            "meetings_attended": 8,
+            "meetings_scheduled": 9,
+            "attendance_pct": 88.88888888888889,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": "Nathan Bostock was unable to attend one meeting due to a commitment scheduled prior to joining the Board."
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Sarah Legg",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [
+          "Fellow of the Chartered Institute of Management Accountants",
+          "Fellow of the Association of Corporate Treasurers"
+        ],
+        "expertise_areas": [
+          "financial markets",
+          "treasury",
+          "risk management",
+          "international accounting standards"
+        ],
+        "career_summary": "Sarah has spent her entire executive career in financial services with almost 30 years at HSBC. She was the Group Financial Controller, a Group General Manager and CFO for HSBC’s Asia Pacific region. She also spent eight years as a Non-Executive Director of Hang Seng Bank Limited.",
+        "other_directorships": [
+          "Non-Executive Director of Severn Trent plc",
+          "Non-Executive Director of Man Group plc",
+          "Trustee of the Lloyds Bank Foundation for England and Wales"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Chair, Audit Committee",
+        "independence_status": "Independent",
+        "year_joined_board": 2019,
+        "date_joined_board": "December 2019",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Audit Committee (Chair)",
+          "Board Risk Committee (Member)"
+        ],
+        "committee_chair_of": [
+          "Audit Committee"
+        ],
+        "special_roles": [
+          "Member having recent and relevant financial experience for the purposes of the UK Corporate Governance Code",
+          "Audit Committee financial expert for SEC purposes"
+        ]
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 7,
+            "meetings_scheduled": 7,
+            "attendance_pct": 100.0,
+            "is_chair": true
+          },
+          {
+            "committee_name": "Board Risk Committee",
+            "meetings_attended": 9,
+            "meetings_scheduled": 9,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Amanda Mackenzie",
+        "post_nominals": "LVO OBE",
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "ESG matters including responsible business and sustainability",
+          "customer engagement",
+          "digital technology",
+          "marketing and brand"
+        ],
+        "career_summary": "Amanda was Chief Executive of Business in the Community, of which King Charles III is the Royal Founding Patron and which promotes responsible business and corporate responsibility. Prior to that role, she was a member of Aviva’s Group Executive for seven years as Chief Marketing and Communications Officer and was seconded to help launch the United Nations Sustainable Development Goals. She is also a former Director of British Airways AirMiles, BT, Hewlett Packard Inc and British Gas.",
+        "other_directorships": [
+          "Non-Executive Director of The British Land Company plc",
+          "Chair of The Queen’s Reading Room",
+          "Chair and partner of Otherwise Partners LLP"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Chair, Responsible Business Committee",
+        "independence_status": "Independent",
+        "year_joined_board": 2018,
+        "date_joined_board": "October 2018",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Remuneration Committee (Member)",
+          "Nomination and Governance Committee (Member)",
+          "Audit Committee (Member)",
+          "Responsible Business Committee (Chair)"
+        ],
+        "committee_chair_of": [
+          "Responsible Business Committee"
+        ],
+        "special_roles": [
+          "Board’s Consumer Duty Champion",
+          "helps ensure that sustainability is discussed and considered by the Board"
+        ]
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Responsible Business Committee",
+            "meetings_attended": 4,
+            "meetings_scheduled": 4,
+            "attendance_pct": 100.0,
+            "is_chair": true
+          },
+          {
+            "committee_name": "Remuneration Committee",
+            "meetings_attended": 6,
+            "meetings_scheduled": 6,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Nomination and Governance Committee",
+            "meetings_attended": 5,
+            "meetings_scheduled": 5,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 7,
+            "meetings_scheduled": 7,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Harmeen Mehta",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "digital, AI-driven, complex transformation",
+          "building and running technology-led businesses",
+          "creating new ventures",
+          "international and financial services knowledge"
+        ],
+        "career_summary": "Harmeen was appointed Chief Digital and Innovation Officer at Equinix in April 2025. Prior to that role, she was Chief Digital and Innovation Officer at BT and spent seven years as Global Chief Information Officer and Head of Cyber Security and Cloud Business at Bharti Airtel, leading its cloud and security businesses. Earlier in her career, Harmeen held CIO positions at BBVA, HSBC and Bank of America Merrill Lynch.",
+        "other_directorships": [
+          "Chief Digital and Innovation Officer at Equinix",
+          "Non-Executive Director, UK Parliament, Information & Digital Board"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Independent non-executive director",
+        "independence_status": "Independent",
+        "year_joined_board": 2021,
+        "date_joined_board": "November 2021",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Chris Vogelzang",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "retail and commercial banking",
+          "technology’s role in financial services",
+          "driving transformation within organisations"
+        ],
+        "career_summary": "Appointed as a non-executive director and as a member of the Responsible Business Committee with effect from 16 June 2025 to supplement the Board’s existing retail and commercial banking experience.",
+        "other_directorships": [
+          "Non-Executive Director of Wolters Kluwer N.V."
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Independent non-executive director",
+        "independence_status": "Independent",
+        "year_joined_board": 2025,
+        "date_joined_board": "16 June 2025",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Responsible Business Committee (Member, with effect from 16 June 2025)",
+          "Board Risk Committee (Member, with effect from 1 April 2026)"
+        ],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 5,
+        "board_meetings_scheduled": 5,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [],
+        "attendance_notes": "Board changes during the year: 16 June 2025 — Chris Vogelzang joined the Board as a non-executive director."
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Catherine Woods",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "international financial institutions",
+          "risk and transformation oversight",
+          "culture and corporate governance"
+        ],
+        "career_summary": "Catherine is a former Deputy Chair and Senior Independent Director of AIB Group plc where she also chaired the Board Audit Committee. In her executive career with J.P. Morgan Securities, she was Vice President, European Financial Institutions, Mergers and Acquisitions, and Vice President Equity Research Department, forming the European Banks Team.",
+        "other_directorships": [
+          "Deputy Chair of BlackRock Asset Management Ireland Limited"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Chair, Board Risk Committee",
+        "independence_status": "Independent",
+        "year_joined_board": 2020,
+        "date_joined_board": "March 2020",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Board Risk Committee (Chair)",
+          "Audit Committee (Member)"
+        ],
+        "committee_chair_of": [
+          "Board Risk Committee"
+        ],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 10,
+        "board_meetings_scheduled": 10,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Board Risk Committee",
+            "meetings_attended": 9,
+            "meetings_scheduled": 9,
+            "attendance_pct": 100.0,
+            "is_chair": true
+          },
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 7,
+            "meetings_scheduled": 7,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Scott Wheway",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [],
+        "career_summary": "The Board is grateful for the contribution Scott made to the Group and for the leadership and commercial acumen he brought to the Board and in his role as Chair of Scottish Widows Group.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "non-executive director of the Board",
+        "independence_status": "Not Independent",
+        "year_joined_board": null,
+        "date_joined_board": null,
+        "tenure_years": null,
+        "year_end_status": "Retired",
+        "committee_memberships": [
+          "Nomination and Governance Committee (Member)",
+          "Board Risk Committee (Member)"
+        ],
+        "committee_chair_of": [],
+        "special_roles": [
+          "Chair of Scottish Widows Group"
+        ]
+      },
+      "attendance": {
+        "board_meetings_attended": 8,
+        "board_meetings_scheduled": 8,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Board Risk Committee",
+            "meetings_attended": 6,
+            "meetings_scheduled": 7,
+            "attendance_pct": 85.71428571428571,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": "Retired from the Board with effect from 31 October 2025; stepped down from the Committee on 31 October 2025. Scott Wheway was unable to attend one meeting due to scheduling conflicts."
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Nigel Hinshelwood",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "financial services sector in the UK and worldwide",
+          "large-scale transformation",
+          "operations",
+          "technology"
+        ],
+        "career_summary": "Nigel was a partner at Ernst & Young and also held various roles at HSBC, including Deputy CEO of HSBC Bank plc, Head of HSBC Insurance Holdings, Chief Operating Officer for EMEA and Global Head of Operations.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Senior Independent Director of the Ring-Fenced Banks",
+        "independence_status": "Independent",
+        "year_joined_board": 2019,
+        "date_joined_board": "January 2019",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [],
+        "committee_chair_of": [],
+        "special_roles": [
+          "Ring-Fenced Bank-only director",
+          "independent of the management and the rest of the Group",
+          "acts exclusively in the best interests of the Ring-Fenced Banks",
+          "attends Nomination and Governance Committee meetings as an observer to provide insight on the Ring-Fenced Banks when required",
+          "attends Audit Committee meetings as an observer to provide insight on the Ring-Fenced Banks when required",
+          "attends Remuneration Committee meetings as an observer to provide insight on the Ring-Fenced Banks when required"
+        ]
+      },
+      "attendance": {
+        "board_meetings_attended": null,
+        "board_meetings_scheduled": null,
+        "board_attendance_pct": null,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Sarah Bentley",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "digital and digital transformation",
+          "customer and marketing"
+        ],
+        "career_summary": "Sarah was formerly Chief Executive Officer and Executive Director of Thames Water Utilities Limited. Prior to those roles, Sarah was Chief Customer Officer at Severn Trent plc and a member of its Executive Committee and the Managing Partner for Accenture’s Digital business unit in the UK & Ireland.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-executive director of the Ring-Fenced Banks",
+        "independence_status": "Independent",
+        "year_joined_board": 2019,
+        "date_joined_board": "January 2019",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [],
+        "committee_chair_of": [],
+        "special_roles": [
+          "Ring-Fenced Bank-only director",
+          "independent of the management and the rest of the Group",
+          "acts exclusively in the best interests of the Ring-Fenced Banks",
+          "attends Nomination and Governance Committee meetings as an observer to provide insight on the Ring-Fenced Banks when required",
+          "attends Remuneration Committee meetings as an observer to provide insight on the Ring-Fenced Banks when required"
+        ]
+      },
+      "attendance": {
+        "board_meetings_attended": null,
+        "board_meetings_scheduled": null,
+        "board_attendance_pct": null,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Brendan Gilligan",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "core strategic finance and controllership roles in the financial services industry",
+          "serving on the boards of regulated financial services businesses in the UK, France, Switzerland and Poland"
+        ],
+        "career_summary": "Brendan worked in commercial and consumer banking services and financing with Woodchester Investments plc and, after its acquisition by General Electric Company, with GE Capital.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Independent non-executive director of the Ring-Fenced Banks",
+        "independence_status": "Independent",
+        "year_joined_board": 2019,
+        "date_joined_board": "January 2019",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [],
+        "committee_chair_of": [],
+        "special_roles": [
+          "Ring-Fenced Bank-only director",
+          "independent of the management and the rest of the Group",
+          "acts exclusively in the best interests of the Ring-Fenced Banks",
+          "attends Audit Committee meetings as an observer to provide insight on the Ring-Fenced Banks when required"
+        ]
+      },
+      "attendance": {
+        "board_meetings_attended": null,
+        "board_meetings_scheduled": null,
+        "board_attendance_pct": null,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    }
+  ],
+  "board_summary": {
+    "ceo_chair_separated": true,
+    "voting_standard": null,
+    "board_size": 10,
+    "num_executive_directors": 2,
+    "num_non_executive_directors": 8,
+    "num_independent_directors": 7,
+    "pct_women": null,
+    "pct_independent": 70.0,
+    "avg_director_age": null,
+    "avg_tenure_years": null,
+    "notes": "Scott Wheway retired from the Board on 31 October 2025. Executive directors’ shareholding policy applies for two years post-employment."
+  }
+}
