@@ -38,9 +38,9 @@ def _row_fill(color: str) -> PatternFill:
 def _att_fill(pct: float | None) -> PatternFill:
     if pct is None:
         return PatternFill()
-    if pct >= 1.0:
+    if pct >= 100.0:
         return _row_fill(ATT_GREEN)
-    if pct >= 0.8:
+    if pct >= 80.0:
         return _row_fill(ATT_YELLOW)
     return _row_fill(ATT_RED)
 
@@ -108,7 +108,7 @@ def _autofit_columns(ws: object, min_width: int = 10, max_width: int = 40) -> No
 def _format_pct(pct: float | None) -> str:
     if pct is None:
         return "N/A"
-    return f"{pct:.0%}"
+    return f"{pct:.0f}%"
 
 
 def _footer_text(doc: BoardGovernanceDocument) -> str:

@@ -78,7 +78,7 @@ class OpenAIProvider:
             "medium" if _model_uses_reasoning_effort(model) else None
         )
         self.reasoning_or_temperature: dict = (
-            {"reasoning_effort": self.reasoning_effort, "temperature": 1}   
+            {"reasoning_effort": self.reasoning_effort, "temperature": 1}
             if self.reasoning_effort is not None
             else {"temperature": self.temperature}
         )

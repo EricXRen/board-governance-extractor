@@ -151,13 +151,13 @@ def structured_from_markdown_user_prompt(
     """
     return f"""The following Markdown was extracted from the {filing_type} for {company_name} (fiscal year ending {fiscal_year_end}).
 
-Convert this into a JSON object `{"directors": [...]}` matching the provided schema.
+Convert this into a JSON object `{{"directors": [...]}}` matching the provided schema.
 
 --- BEGIN MARKDOWN ---
 {markdown_text}
 --- END MARKDOWN ---
 
-Return a JSON object `{"directors": [...]}` containing every director present in the Markdown."""
+Return a JSON object `{{"directors": [...]}}` containing every director present in the Markdown."""
 
 
 def user_prompt(
