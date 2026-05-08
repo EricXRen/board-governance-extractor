@@ -1,0 +1,795 @@
+{
+  "company": {
+    "company_name": "AstraZeneca",
+    "company_ticker": null,
+    "filing_type": "Annual Report",
+    "fiscal_year_end": "2025-12-31",
+    "report_date": null,
+    "source_pdf_path": "/home/cop98/dev/board-governance-extractor/data/AstraZeneca_AR_2025.pdf | /home/cop98/dev/board-governance-extractor/data/AstraZeneca_ProxyNotice_2025.pdf",
+    "extraction_timestamp": "2026-05-08T22:37:17.533051+00:00",
+    "llm_provider": "deepseek",
+    "llm_model": "deepseek-v4-flash"
+  },
+  "directors": [
+    {
+      "biographical": {
+        "full_name": "Michel Demaré",
+        "post_nominals": null,
+        "age": 68,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [],
+        "career_summary": "Previously Vice-Chairman of UBS Group AG, Chairman of Syngenta, CFO of ABB Ltd, and earlier roles at Baxter International and Dow Chemical.",
+        "other_directorships": [
+          "Vodafone Group plc (Non-Executive Director)",
+          "Louis Dreyfus Int’l Holding BV (Non-Executive Director)",
+          "IMD Business School (Chairman)"
+        ]
+      },
+      "board_role": {
+        "designation": "Chair",
+        "board_role": "Non-Executive Chair",
+        "independence_status": "Chair (independent on appointment)",
+        "year_joined_board": 2019,
+        "date_joined_board": "2019-09-01",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Remuneration Committee",
+          "Nomination and Governance Committee"
+        ],
+        "committee_chair_of": [
+          "Nomination and Governance Committee"
+        ],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 9,
+        "board_meetings_scheduled": 9,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Pascal Soriot",
+        "post_nominals": null,
+        "age": 65,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [
+          "Doctor of Veterinary Medicine",
+          "MBA from HEC Paris"
+        ],
+        "expertise_areas": [
+          "Science",
+          "Medicine",
+          "Strategic management"
+        ],
+        "career_summary": "Previously COO of Roche's pharmaceuticals division and CEO of Genentech. Holds a Doctor of Veterinary Medicine and MBA from HEC Paris. Received a knighthood for services to life sciences and leadership in COVID-19 response.",
+        "other_directorships": [
+          "Sustainable Markets Initiative Limited (Board member)",
+          "Agilent Technologies Inc. (Board member)"
+        ]
+      },
+      "board_role": {
+        "designation": "Executive Director",
+        "board_role": "Chief Executive Officer",
+        "independence_status": "N/A (Executive)",
+        "year_joined_board": 2012,
+        "date_joined_board": "2012-10-01",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 9,
+        "board_meetings_scheduled": 9,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Aradhana Sarin",
+        "post_nominals": null,
+        "age": 50,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [
+          "Medical degree from University of Delhi",
+          "MBA from Stanford Business School"
+        ],
+        "expertise_areas": [
+          "Finance",
+          "Healthcare"
+        ],
+        "career_summary": "Previously CFO of Alexion, with experience at Citi, UBS, and JP Morgan. Trained as a medical doctor.",
+        "other_directorships": [
+          "American Red Cross (Board of Governors)",
+          "Anheuser-Busch InBev (Independent Director and Audit Committee member)"
+        ]
+      },
+      "board_role": {
+        "designation": "Executive Director",
+        "board_role": "Chief Financial Officer",
+        "independence_status": "N/A (Executive)",
+        "year_joined_board": 2021,
+        "date_joined_board": "2021-08-01",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 9,
+        "board_meetings_scheduled": 9,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Philip Broadley",
+        "post_nominals": "FCA",
+        "age": 64,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [
+          "BA in Philosophy, Politics and Economics from Oxford University",
+          "MSc in Behavioural Science from LSE",
+          "Fellow of the Institute of Chartered Accountants in England and Wales"
+        ],
+        "expertise_areas": [
+          "Finance",
+          "Accounting"
+        ],
+        "career_summary": "Previously Group Finance Director of Prudential and Old Mutual. Served as Chairman of the 100 Group of Finance Directors.",
+        "other_directorships": [
+          "Lancashire Holdings Limited (Non-Executive Chair)"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Senior Independent Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2017,
+        "date_joined_board": "2017-04-27",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Audit Committee",
+          "Remuneration Committee",
+          "Nomination and Governance Committee"
+        ],
+        "committee_chair_of": [
+          "Audit Committee"
+        ],
+        "special_roles": [
+          "Senior Independent Non-Executive Director"
+        ]
+      },
+      "attendance": {
+        "board_meetings_attended": 9,
+        "board_meetings_scheduled": 9,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 6,
+            "meetings_scheduled": 6,
+            "attendance_pct": 100.0,
+            "is_chair": true
+          },
+          {
+            "committee_name": "Remuneration Committee",
+            "meetings_attended": 4,
+            "meetings_scheduled": 4,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Euan Ashley",
+        "post_nominals": null,
+        "age": 53,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [
+          "MBChB (Medicine) from Glasgow University",
+          "DPhil in cardiovascular cellular biology and molecular genetics from Oxford University"
+        ],
+        "expertise_areas": [
+          "Cardiovascular medicine",
+          "Genetics",
+          "AI in healthcare"
+        ],
+        "career_summary": "Professor of Medicine at Stanford University, Chair of Department of Medicine. Research focuses on genetic mechanisms of cardiovascular disease.",
+        "other_directorships": [
+          "DexCom, Inc. (Board member)"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2020,
+        "date_joined_board": "2020-10-01",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Science Committee",
+          "Nomination and Governance Committee"
+        ],
+        "committee_chair_of": [
+          "Science Committee"
+        ],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 9,
+        "board_meetings_scheduled": 9,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Nomination and Governance Committee",
+            "meetings_attended": 6,
+            "meetings_scheduled": 6,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Birgit Conix",
+        "post_nominals": null,
+        "age": 59,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [
+          "MBA from University of Chicago Booth School of Business",
+          "MSc in Business Economics from Tilburg University"
+        ],
+        "expertise_areas": [
+          "Finance",
+          "CFO experience"
+        ],
+        "career_summary": "Previously Group CFO of Sonova and TUI, CFO of Telenet Group, and senior positions at Johnson & Johnson.",
+        "other_directorships": [
+          "ASML (Supervisory Board member, Chair of ESG Committee)",
+          "Ricola (Board member, Chair of Audit Committee)"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2025,
+        "date_joined_board": "2025-02-01",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Audit Committee"
+        ],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 7,
+        "board_meetings_scheduled": 8,
+        "board_attendance_pct": 87.5,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Rene Haas",
+        "post_nominals": "CBE",
+        "age": 62,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [
+          "Bachelor of Science in Electrical and Electronics Engineering from Clarkson University"
+        ],
+        "expertise_areas": [
+          "Technology",
+          "Semiconductors",
+          "AI"
+        ],
+        "career_summary": "CEO of Arm. Previously President of Arm's IP Product Groups, and roles at NVIDIA, Scintera Networks, Tensilica.",
+        "other_directorships": [
+          "Arm China (Board member)",
+          "SoftBank Group (Board member)"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2025,
+        "date_joined_board": "2025-01-01",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Sustainability Committee",
+          "Nomination and Governance Committee",
+          "Remuneration Committee",
+          "Science Committee"
+        ],
+        "committee_chair_of": [
+          "Sustainability Committee"
+        ],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 8,
+        "board_meetings_scheduled": 8,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Remuneration Committee",
+            "meetings_attended": 4,
+            "meetings_scheduled": 4,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Nomination and Governance Committee",
+            "meetings_attended": 4,
+            "meetings_scheduled": 4,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Science Committee",
+            "meetings_attended": 6,
+            "meetings_scheduled": 6,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Karen Knudsen",
+        "post_nominals": null,
+        "age": 55,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "Oncology",
+          "Cancer research"
+        ],
+        "career_summary": "CEO of American Cancer Society, formerly Professor at Thomas Jefferson University.",
+        "other_directorships": [
+          "Parker Institute for Cancer Immunotherapy (CEO)",
+          "Exai Bio (Independent Director)",
+          "Research America (Board Member)",
+          "ArteraAI (Board Advisor)"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2025,
+        "date_joined_board": "2025-04-11",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Science Committee",
+          "Sustainability Committee"
+        ],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 6,
+        "board_meetings_scheduled": 6,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Science Committee",
+            "meetings_attended": 2,
+            "meetings_scheduled": 2,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Sustainability Committee",
+            "meetings_attended": 2,
+            "meetings_scheduled": 2,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Diana Layfield",
+        "post_nominals": null,
+        "age": 54,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [
+          "BA from Oxford University",
+          "MA in International Economics and Public Administration from Harvard University"
+        ],
+        "expertise_areas": [
+          "Technology",
+          "Life sciences",
+          "Finance"
+        ],
+        "career_summary": "Senior leadership roles at Google, Standard Chartered Bank, McKinsey.",
+        "other_directorships": [
+          "British International Investment plc (Chair)",
+          "London School of Hygiene & Tropical Medicine (Council Member)"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2020,
+        "date_joined_board": "2020-11-01",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Science Committee",
+          "Remuneration Committee"
+        ],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 9,
+        "board_meetings_scheduled": 9,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Anna Manz",
+        "post_nominals": null,
+        "age": 52,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "Finance",
+          "CFO experience"
+        ],
+        "career_summary": "Previously CFO of London Stock Exchange Group and Johnson Matthey, senior finance roles at Diageo.",
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2023,
+        "date_joined_board": "2023-09-01",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Audit Committee"
+        ],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 8,
+        "board_meetings_scheduled": 9,
+        "board_attendance_pct": 88.9,
+        "committee_attendance": [
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 4,
+            "meetings_scheduled": 4,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Sheri McCoy",
+        "post_nominals": null,
+        "age": 66,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [
+          "BSc in Textile Chemistry from University of Massachusetts Dartmouth",
+          "MSc in Chemical Engineering from Princeton University",
+          "MBA from Rutgers University"
+        ],
+        "expertise_areas": [
+          "Pharmaceuticals",
+          "R&D",
+          "Business management"
+        ],
+        "career_summary": "Former CEO of Avon Products, 30-year career at Johnson & Johnson, latterly Vice-Chairman.",
+        "other_directorships": [
+          "Stryker (Board)",
+          "Kimberly-Clark (Board)",
+          "Galderma (Board)",
+          "Sail Biomedicines (Board)",
+          "Parexel (Chair)",
+          "Dechra (Chair)"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2017,
+        "date_joined_board": "2017-10-01",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Remuneration Committee",
+          "Audit Committee",
+          "Nomination and Governance Committee",
+          "Sustainability Committee"
+        ],
+        "committee_chair_of": [
+          "Remuneration Committee"
+        ],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 9,
+        "board_meetings_scheduled": 9,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 6,
+            "meetings_scheduled": 6,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          },
+          {
+            "committee_name": "Remuneration Committee",
+            "meetings_attended": 4,
+            "meetings_scheduled": 4,
+            "attendance_pct": 100.0,
+            "is_chair": true
+          },
+          {
+            "committee_name": "Sustainability Committee",
+            "meetings_attended": 2,
+            "meetings_scheduled": 2,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Tony Mok",
+        "post_nominals": null,
+        "age": 64,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "Oncology",
+          "Lung cancer research"
+        ],
+        "career_summary": "Li Shu Fan Medical Foundation endowed Professor and Chairman of Department of Clinical Oncology at Chinese University of Hong Kong.",
+        "other_directorships": [
+          "HUTCHMED (China) Limited (Non-Executive Director)",
+          "Prenetics Global Limited (Scientific Advisory Board)",
+          "Insighta (Board)"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2019,
+        "date_joined_board": "2019-01-01",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Science Committee"
+        ],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 9,
+        "board_meetings_scheduled": 9,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Science Committee",
+            "meetings_attended": 6,
+            "meetings_scheduled": 6,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Marcus Wallenberg",
+        "post_nominals": null,
+        "age": 68,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [
+          "International business",
+          "Banking"
+        ],
+        "career_summary": "Extensive business experience across industries including pharmaceuticals.",
+        "other_directorships": [
+          "Skandinaviska Enskilda Banken AB (Chair)",
+          "Saab AB (Chair)",
+          "Wallenberg Investments AB (Chair)",
+          "FAM AB (Chair)",
+          "Investor AB (Vice-Chair)",
+          "EQT AB (Vice-Chair)",
+          "Royal Swedish Academy of Engineering Sciences (Chair)",
+          "Knut and Alice Wallenberg Foundation (Board member)"
+        ]
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Not Independent",
+        "year_joined_board": 1999,
+        "date_joined_board": "1999-04-05",
+        "tenure_years": null,
+        "year_end_status": "Active",
+        "committee_memberships": [
+          "Science Committee",
+          "Sustainability Committee"
+        ],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 8,
+        "board_meetings_scheduled": 9,
+        "board_attendance_pct": 88.9,
+        "committee_attendance": [
+          {
+            "committee_name": "Science Committee",
+            "meetings_attended": 4,
+            "meetings_scheduled": 4,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Deborah DiSanzo",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [],
+        "career_summary": null,
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2017,
+        "date_joined_board": "2017-12-01",
+        "tenure_years": null,
+        "year_end_status": "Retired",
+        "committee_memberships": [
+          "Audit Committee"
+        ],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 3,
+        "board_meetings_scheduled": 3,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Audit Committee",
+            "meetings_attended": 3,
+            "meetings_scheduled": 3,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    },
+    {
+      "biographical": {
+        "full_name": "Andreas Rummelt",
+        "post_nominals": null,
+        "age": null,
+        "age_band": null,
+        "nationality": null,
+        "qualifications": [],
+        "expertise_areas": [],
+        "career_summary": null,
+        "other_directorships": []
+      },
+      "board_role": {
+        "designation": "Non-Executive Director",
+        "board_role": "Non-Executive Director",
+        "independence_status": "Independent",
+        "year_joined_board": 2021,
+        "date_joined_board": "2021-08-01",
+        "tenure_years": null,
+        "year_end_status": "Retired",
+        "committee_memberships": [
+          "Sustainability Committee"
+        ],
+        "committee_chair_of": [],
+        "special_roles": []
+      },
+      "attendance": {
+        "board_meetings_attended": 3,
+        "board_meetings_scheduled": 3,
+        "board_attendance_pct": 100.0,
+        "committee_attendance": [
+          {
+            "committee_name": "Sustainability Committee",
+            "meetings_attended": 3,
+            "meetings_scheduled": 3,
+            "attendance_pct": 100.0,
+            "is_chair": false
+          }
+        ],
+        "attendance_notes": null
+      }
+    }
+  ],
+  "board_summary": {
+    "ceo_chair_separated": true,
+    "voting_standard": null,
+    "board_size": 14,
+    "num_executive_directors": 2,
+    "num_non_executive_directors": 12,
+    "num_independent_directors": 11,
+    "pct_women": 50.0,
+    "pct_independent": 85.7,
+    "avg_director_age": 60.0,
+    "avg_tenure_years": null,
+    "notes": "The Board has an Inclusion and Diversity Policy. Women constitute 50% of the Board. 29% of the Board identify as from an ethnic minority. The Board met the FCA's diversity policy targets. All Non-Executive Directors except Marcus Wallenberg are considered independent. Tenure range noted: 0-3 years (2), 3-6 years (4), 6 years+ (6) for Non-Executive Directors."
+  }
+}
