@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 
 import structlog
@@ -20,6 +21,21 @@ app = typer.Typer(
 )
 console = Console()
 logger = structlog.get_logger()
+
+
+def _resolve_inputs(inputs: list[str]) -> list[str]:
+    """Expand input paths: a directory → all PDFs inside; other paths/URLs passed through."""
+    resolved: list[str] = []
+    for inp in inputs:
+        p = Path(inp)
+        if p.is_dir():
+            pdfs = sorted(p.glob("*.pdf"))
+            if not pdfs:
+                console.print(f"[yellow]Warning: no PDF files found in {p}[/yellow]")
+            resolved.extend(str(pdf) for pdf in pdfs)
+        else:
+            resolved.append(inp)
+    return resolved
 
 
 def _setup_logging(config_path: Path | None = None) -> None:
@@ -52,7 +68,14 @@ def _setup_logging(config_path: Path | None = None) -> None:
 
 @app.command()
 def extract(
-    input: str = typer.Option(..., "--input", "-i", help="Local PDF path or HTTPS URL"),
+    inputs: list[str] = typer.Argument(
+        ...,
+        metavar="INPUT...",
+        help=(
+            "One or more PDF paths, HTTPS URLs, or a single folder. "
+            "All inputs must be for the same company and are merged into one output."
+        ),
+    ),
     company: str = typer.Option(..., "--company", "-c", help="Company name"),
     year: str = typer.Option(..., "--year", "-y", help="Fiscal year, e.g. 2025"),
     provider: str | None = typer.Option(None, "--provider", "-p", help="LLM provider"),
@@ -68,21 +91,43 @@ def extract(
     ),
     ticker: str | None = typer.Option(None, "--ticker", help="Company ticker symbol"),
     report_date: str | None = typer.Option(None, "--report-date", help="Report date (ISO-8601)"),
+    eval_id: str | None = typer.Option(
+        None,
+        "--eval-id",
+        help=(
+            "Evaluation dataset ID, e.g. 'lbg-fy2025'. "
+            "Creates data/dataset/eval_data/<eval-id>/ and copies source PDFs there."
+        ),
+    ),
 ) -> None:
-    """Extract board governance data from a PDF filing."""
+    """Extract board governance data from one or more PDF filings into a single output.
+
+    Examples:\n
+        gov-extract extract report.pdf --company "LBG" --year 2025\n
+        gov-extract extract report1.pdf report2.pdf --company "LBG" --year 2025\n
+        gov-extract extract /reports/folder/ --company "LBG" --year 2025 --eval-id lbg-fy2025
+    """
     _setup_logging(Path(config_file) if config_file else None)
     cfg = get_config(Path(config_file) if config_file else None)
+
+    resolved_inputs = _resolve_inputs(inputs)
+    if not resolved_inputs:
+        console.print("[bold red]Error: no PDF files found in the provided input(s).[/bold red]")
+        raise typer.Exit(1)
 
     resolved_provider = provider or cfg.llm.default_provider
     resolved_model = model or cfg.llm.default_model
     resolved_output_dir = Path(output_dir) if output_dir else Path(cfg.output.default_dir)
-    resolved_fiscal_year_end = fiscal_year_end or f"{year}-12-31"
+    resolved_fye = fiscal_year_end or f"{year}-12-31"
 
     console.print(
         f"[bold cyan]gov-extract[/bold cyan] extracting [green]{company}[/green] ({year})"
     )
     console.print(f"  Provider: {resolved_provider} / {resolved_model}")
-    console.print(f"  Input: {input}")
+    if len(resolved_inputs) == 1:
+        console.print(f"  Input:    {resolved_inputs[0]}")
+    else:
+        console.print(f"  Inputs:   {len(resolved_inputs)} PDF files")
 
     from gov_extract.export.excel_writer import output_path as excel_path
     from gov_extract.export.excel_writer import write_excel
@@ -95,33 +140,44 @@ def extract(
     from gov_extract.pdf.loader import load_pdf
     from gov_extract.pdf.page_finder import find_governance_pages
 
-    with console.status("Loading PDF..."):
-        pdf_path = load_pdf(input, cfg.pdf.cache_dir)
+    all_chunks = []
+    resolved_pdf_paths: list[str] = []
 
-    with console.status("Extracting page text..."):
-        pages = extract_pages_bulk(pdf_path)
-    console.print(f"  Pages extracted: {len(pages)}")
+    for idx, input_path in enumerate(resolved_inputs, 1):
+        label = f"[{idx}/{len(resolved_inputs)}] " if len(resolved_inputs) > 1 else ""
 
-    with console.status("Finding governance pages..."):
-        if page_hint:
-            from gov_extract.pdf.page_finder import PageRange
+        with console.status(f"{label}Loading PDF..."):
+            pdf_path = load_pdf(input_path, cfg.pdf.cache_dir)
+        resolved_pdf_paths.append(str(pdf_path))
 
-            ranges = [PageRange(max(1, page_hint - 2), min(len(pages), page_hint + 80))]
-        else:
-            ranges = find_governance_pages(pages, cfg.pdf.governance_keywords)
+        with console.status(f"{label}Extracting page text..."):
+            pages = extract_pages_bulk(pdf_path)
+        console.print(f"  {label}Pages extracted: {len(pages)}  ({pdf_path.name})")
 
-    gov_pages: dict[int, str] = {}
-    for r in ranges:
-        for p in r.pages():
-            if p in pages:
-                gov_pages[p] = pages[p]
+        with console.status(f"{label}Finding governance pages..."):
+            if page_hint:
+                from gov_extract.pdf.page_finder import PageRange
 
-    console.print(f"  Governance pages: {len(gov_pages)} pages across {len(ranges)} range(s)")
+                ranges = [PageRange(max(1, page_hint - 2), min(len(pages), page_hint + 80))]
+            else:
+                ranges = find_governance_pages(pages, cfg.pdf.governance_keywords)
 
-    with console.status("Chunking pages..."):
-        chunks = chunk_pages(gov_pages, max_tokens=cfg.pdf.max_pages_per_chunk * 600)
+        gov_pages: dict[int, str] = {}
+        for r in ranges:
+            for p in r.pages():
+                if p in pages:
+                    gov_pages[p] = pages[p]
 
-    chunking_label = len(chunks) if cfg.llm.chunking else 1
+        console.print(
+            f"  {label}Governance pages: {len(gov_pages)} pages across {len(ranges)} range(s)"
+        )
+
+        with console.status(f"{label}Chunking pages..."):
+            chunks = chunk_pages(gov_pages, max_tokens=cfg.pdf.max_pages_per_chunk * 600)
+        all_chunks.extend(chunks)
+
+    source_pdf_path = " | ".join(resolved_pdf_paths)
+    chunking_label = len(all_chunks) if cfg.llm.chunking else 1
     console.print(f"  Extraction: chunks={chunking_label}  rounds={cfg.llm.extraction_rounds}")
 
     safe_company = company.replace(" ", "")
@@ -135,11 +191,11 @@ def extract(
         llm_provider = _get_provider(cfg, resolved_provider, resolved_model)
         doc = run_extraction(
             provider=llm_provider,
-            chunks=chunks,
+            chunks=all_chunks,
             company_name=company,
             filing_type=filing_type,
-            fiscal_year_end=resolved_fiscal_year_end,
-            source_pdf_path=str(pdf_path),
+            fiscal_year_end=resolved_fye,
+            source_pdf_path=source_pdf_path,
             provider_name=resolved_provider,
             model_name=resolved_model,
             company_ticker=ticker,
@@ -163,6 +219,16 @@ def extract(
     console.print(f"  JSON:     {json_out}")
     if markdown_out is not None:
         console.print(f"  Markdown: {markdown_out}")
+
+    if eval_id:
+        eval_dir = Path(cfg.output.eval_dataset_dir) / eval_id
+        eval_dir.mkdir(parents=True, exist_ok=True)
+        for pdf_str in resolved_pdf_paths:
+            src = Path(pdf_str)
+            dst = eval_dir / src.name
+            if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+                shutil.copy2(src, dst)
+        console.print(f"  Eval dir: {eval_dir}  ({len(resolved_pdf_paths)} PDF(s) copied)")
 
 
 @app.command()

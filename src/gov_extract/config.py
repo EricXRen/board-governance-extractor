@@ -58,6 +58,7 @@ class OutputConfig(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     default_dir: str = "./outputs"
+    eval_dataset_dir: str = "./data/dataset/eval_data"
 
 
 class LoggingConfig(BaseSettings):

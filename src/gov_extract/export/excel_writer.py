@@ -402,3 +402,5 @@ def output_path(company_name: str, fiscal_year: str, output_dir: Path) -> Path:
     """
     safe_name = company_name.replace(" ", "")
     return output_dir / f"{safe_name}_{fiscal_year}_Board_Governance.xlsx"
+
+

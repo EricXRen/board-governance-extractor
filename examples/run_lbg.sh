@@ -22,21 +22,12 @@ uv run gov-extract extract \
   --model deepseek-v4-flash \
   --output-dir ./outputs
 
-uv run gov-extract extract \
-  --input data/2025-lbg-annual-report.pdf \
-  --company "Lloyds Banking Group" \
-  --year 2025 \
-  --output-dir ./outputs
-  
- 
- 
 
 
-uv run gov-extract extract \
-  --input data/AstraZeneca_AR_2025.pdf \
-  --company "AstraZeneca" \
-  --year 2025 \
-  --output-dir ./outputs
+## For Lloyds Banking Group
+uv run gov-extract extract data/2025-lbg-annual-report.pdf \
+  --company "Lloyds Banking Group" --year 2025 \
+  --output-dir ./outputs/lbg-2025 --eval-id lbg-2025
 
 
   # uv run gov-extract extract --input <pdf> --company "..." --year 2025 \
@@ -55,3 +46,19 @@ uv run gov-extract evaluate \
 
 # To generate the evaluation schema (if you want to customize it or add more fields), edit src/gov_extract/models/generate_schema.py and then run:
 uv run src/gov_extract/models/generate_schema.py
+
+
+## For AstraZeneca
+uv run gov-extract extract data/AstraZeneca_AR_2025.pdf data/AstraZeneca_ProxyNotice_2025.pdf \
+  --company "AstraZeneca" --year 2025 \
+  --output-dir ./outputs/azn-2025 --eval-id azn-2025
+
+uv run src/gov_extract/export/excel_to_json.py outputs/AstraZeneca_2025_Board_Governance-gt.xlsx \
+    --company "AstraZeneca" --year 2025 --eval-id azn-2025
+
+uv run gov-extract evaluate \
+    --extracted outputs/AstraZeneca_2025_Board_Governance.json \
+    --ground-truth data/eval_data/azn-2025/AstraZeneca_2025_Board_Governance-gt.json \
+    --output-dir ./outputs/azn-2025
+
+

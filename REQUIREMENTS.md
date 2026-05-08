@@ -29,6 +29,9 @@ Build a Python command-line application that automatically extracts structured b
 | FR-1.3 | Support multi-hundred-page PDFs by chunking pages intelligently (page-range or semantic). |
 | FR-1.4 | Pre-identify governance-relevant pages (e.g. "Board of Directors", "Directors' Report", "Proxy Statement", "Committee Reports") before sending to the LLM, to minimise token usage. |
 | FR-1.5 | Preserve raw extracted page text alongside LLM outputs for auditability. |
+| FR-1.6 | Accept multiple PDF inputs for the **same company** in a single command invocation, producing one merged output pair (`*.xlsx` / `*.json`). Inputs are supplied as space-separated positional arguments (e.g. `gov-extract extract file1.pdf file2.pdf --company ... --year ...`) or as a single directory path, in which case all `.pdf` files found directly inside that directory are processed. |
+| FR-1.7 | `--company` and `--year` remain required regardless of the number of input PDFs. |
+| FR-1.8 | In multi-PDF mode, `source_pdf_path` in the output metadata records all resolved PDF paths joined by `" \| "`. |
 
 ### FR-2 — Data Extraction
 
@@ -309,7 +312,8 @@ gov-extract evaluate-corpus --extracted-dir <dir/>   # all *_extracted.json file
 ### FR-8 — CLI Interface
 
 ```
-gov-extract extract  --input <pdf_path_or_url>
+# Single PDF
+gov-extract extract  <pdf_path_or_url>
                      --company <name>
                      --year <fiscal_year>
                      --provider <anthropic|openai|azure_openai>
@@ -317,6 +321,22 @@ gov-extract extract  --input <pdf_path_or_url>
                      --output-dir <path>
                      [--page-hint <governance_start_page>]
                      [--config <config_yaml>]
+
+# Multiple PDFs for the same company → one merged output
+gov-extract extract  <file1.pdf> <file2.pdf> ...
+                     --company <name>
+                     --year <fiscal_year>
+                     --provider <anthropic|openai|azure_openai>
+                     --model <model_id>
+                     --output-dir <path>
+
+# Directory of PDFs (all *.pdf files inside → one merged output)
+gov-extract extract  <directory/>
+                     --company <name>
+                     --year <fiscal_year>
+                     --provider <anthropic|openai|azure_openai>
+                     --model <model_id>
+                     --output-dir <path>
 
 gov-extract evaluate --extracted <extracted.json>
                      --ground-truth <ground_truth.json>
