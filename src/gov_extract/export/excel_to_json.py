@@ -3,7 +3,7 @@
 Mirrors the five-sheet structure written by :mod:`gov_extract.export.excel_writer`.
 Primarily used to produce ground-truth JSON files from manually prepared spreadsheets.
 
-Fields not represented in the Excel format (``special_roles``, ``date_joined_board``,
+Fields not represented in the Excel format (``other_positions``, ``date_joined_board``,
 ``attendance_notes``) are silently set to their defaults (``[]`` / ``None``).
 
 Run directly to convert an Excel workbook to a ground-truth JSON file::
@@ -30,6 +30,7 @@ from gov_extract.models.director import (
     CommitteeAttendance,
     Director,
 )
+from gov_extract.models.director_election import DirectorElection, DirectorElectionSummary
 from gov_extract.models.document import BoardGovernanceDocument
 from gov_extract.models.metadata import CompanyMetadata
 
@@ -176,8 +177,8 @@ def _read_board_overview(ws: object) -> tuple[dict[str, dict], list[str]]:
         if not name:
             continue
 
-        # Board meetings column stores "attended/scheduled" as a string
-        board_mtg = _str(row[10]) if len(row) > 10 else None
+        # Board meetings column stores "attended/scheduled" as a string (col index 12)
+        board_mtg = _str(row[12]) if len(row) > 12 else None
         board_attended: int | None = None
         board_scheduled: int | None = None
         if board_mtg and "/" in board_mtg:
@@ -191,14 +192,16 @@ def _read_board_overview(ws: object) -> tuple[dict[str, dict], list[str]]:
             "independence_status": _str(row[3]) if len(row) > 3 else None,
             "year_joined_board": _int(row[4]) if len(row) > 4 else None,
             "tenure_years": _float(row[5]) if len(row) > 5 else None,
-            "nationality": _str(row[6]) if len(row) > 6 else None,
+            "term_end_year": _int(row[6]) if len(row) > 6 else None,
             "year_end_status": _str(row[7]) if len(row) > 7 else "Active",
             # Fallback committee columns (overridden by Committee Memberships sheet)
             "committees_fallback": _list(row[8]) if len(row) > 8 else [],
             "chairs_fallback": _list(row[9]) if len(row) > 9 else [],
+            "num_holding_shares": _int(row[10]) if len(row) > 10 else None,
+            "pct_holding_shares": _pct(row[11]) if len(row) > 11 else None,
             "board_meetings_attended": board_attended,
             "board_meetings_scheduled": board_scheduled,
-            "board_attendance_pct": _pct(row[11]) if len(row) > 11 else None,
+            "board_attendance_pct": _pct(row[13]) if len(row) > 13 else None,
         }
         order.append(name)
 
@@ -218,11 +221,9 @@ def _read_biographical(ws: object) -> dict[str, dict]:
             "post_nominals": _str(row[1]) if len(row) > 1 else None,
             "age": _int(row[2]) if len(row) > 2 else None,
             "age_band": _str(row[3]) if len(row) > 3 else None,
-            "nationality": _str(row[4]) if len(row) > 4 else None,
-            "qualifications": _list(row[5]) if len(row) > 5 else [],
-            "expertise_areas": _list(row[6]) if len(row) > 6 else [],
-            "career_summary": _str(row[7]) if len(row) > 7 else None,
-            "other_directorships": _list(row[8]) if len(row) > 8 else [],
+            "gender": _str(row[4]) if len(row) > 4 else None,
+            "affiliation": _str(row[5]) if len(row) > 5 else None,
+            "career_summary": _str(row[6]) if len(row) > 6 else None,
         }
     return bios
 
@@ -333,6 +334,79 @@ def _read_meeting_attendance(ws: object) -> dict[str, dict]:
 
 
 # ---------------------------------------------------------------------------
+# Election sheet readers (optional sheets)
+# ---------------------------------------------------------------------------
+
+def _read_election_summary(ws: object) -> DirectorElectionSummary:
+    """Parse the Election Summary sheet into a DirectorElectionSummary."""
+    data: dict[str, object] = {}
+    for row in ws.iter_rows(min_row=2, values_only=True):  # type: ignore[union-attr]
+        if not row or row[0] is None:
+            continue
+        metric = str(row[0]).strip()
+        value = row[1] if len(row) > 1 else None
+        if metric and not metric.startswith("Source:"):
+            data[metric] = value
+
+    return DirectorElectionSummary(
+        num_directors_to_elect=_int(data.get("Directors to Elect")),
+        candidates_disclosed=_bool_yn(data.get("Candidates Disclosed")),
+        incumbent_nominees=_list(data.get("Incumbent Nominees")),
+        new_nominees=_list(data.get("New Nominees")),
+    )
+
+
+def _read_election_candidates(ws: object) -> list[Director]:
+    """Parse the Election Candidates sheet into a list of Directors.
+
+    The sheet layout is identical to Board Overview, so parsing logic is the
+    same as :func:`_read_board_overview` followed by minimal Director construction
+    (no biographical or attendance sheets for election candidates).
+    """
+    candidates: list[Director] = []
+    for row in ws.iter_rows(min_row=2, values_only=True):  # type: ignore[union-attr]
+        if not _is_data_row(row):
+            continue
+        name = _str(row[0])
+        if not name:
+            continue
+
+        board_mtg = _str(row[12]) if len(row) > 12 else None
+        board_attended: int | None = None
+        board_scheduled: int | None = None
+        if board_mtg and "/" in board_mtg:
+            parts = board_mtg.split("/", 1)
+            board_attended = _int(parts[0])
+            board_scheduled = _int(parts[1])
+
+        designation = _str(row[1]) if len(row) > 1 else None
+        candidate = Director(
+            biographical=BiographicalDetails(full_name=name),
+            board_role=BoardRoleDetails(
+                designation=designation or "Non-Executive Director",  # type: ignore[arg-type]
+                board_role=_str(row[2]) if len(row) > 2 else designation or "Non-Executive Director",
+                independence_status=_str(row[3]) if len(row) > 3 else "Independent",  # type: ignore[arg-type]
+                year_joined_board=_int(row[4]) if len(row) > 4 else None,
+                tenure_years=_float(row[5]) if len(row) > 5 else None,
+                term_end_year=_int(row[6]) if len(row) > 6 else None,
+                year_end_status=_str(row[7]) if len(row) > 7 else "Active",
+                committee_memberships=_list(row[8]) if len(row) > 8 else [],
+                committee_chair_of=_list(row[9]) if len(row) > 9 else [],
+                other_positions=[],
+                num_holding_shares=_int(row[10]) if len(row) > 10 else None,
+                pct_holding_shares=_pct(row[11]) if len(row) > 11 else None,
+            ),
+            attendance=AttendanceDetails(
+                board_meetings_attended=board_attended,
+                board_meetings_scheduled=board_scheduled,
+                board_attendance_pct=_pct(row[13]) if len(row) > 13 else None,
+            ),
+        )
+        candidates.append(candidate)
+    return candidates
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
@@ -404,20 +478,15 @@ def read_excel(
         board_scheduled = att.get("board_meetings_scheduled") or ov.get("board_meetings_scheduled")
         board_pct = att.get("board_attendance_pct") or ov.get("board_attendance_pct")
 
-        # Nationality: Biographical Details is richer; fall back to Board Overview
-        nationality = bio.get("nationality") or ov.get("nationality")
-
         director = Director(
             biographical=BiographicalDetails(
                 full_name=name,
                 post_nominals=bio.get("post_nominals"),
                 age=bio.get("age"),
                 age_band=bio.get("age_band"),
-                nationality=nationality,
-                qualifications=bio.get("qualifications", []),
-                expertise_areas=bio.get("expertise_areas", []),
+                gender=bio.get("gender"),
+                affiliation=bio.get("affiliation"),
                 career_summary=bio.get("career_summary"),
-                other_directorships=bio.get("other_directorships", []),
             ),
             board_role=BoardRoleDetails(
                 designation=ov.get("designation") or "Non-Executive Director",
@@ -425,10 +494,13 @@ def read_excel(
                 independence_status=ov.get("independence_status") or "Independent",
                 year_joined_board=ov.get("year_joined_board"),
                 tenure_years=ov.get("tenure_years"),
+                term_end_year=ov.get("term_end_year"),
                 year_end_status=ov.get("year_end_status") or "Active",
                 committee_memberships=committee_memberships,
                 committee_chair_of=committee_chair_of,
-                special_roles=[],
+                other_positions=[],
+                num_holding_shares=ov.get("num_holding_shares"),
+                pct_holding_shares=ov.get("pct_holding_shares"),
             ),
             attendance=AttendanceDetails(
                 board_meetings_attended=board_attended,
@@ -451,12 +523,28 @@ def read_excel(
         llm_model="ground_truth",
     )
 
+    # Optional election sheets
+    director_election: DirectorElection | None = None
+    if "Election Summary" in wb.sheetnames and "Election Candidates" in wb.sheetnames:
+        election_summary = _read_election_summary(wb["Election Summary"])
+        election_candidates = _read_election_candidates(wb["Election Candidates"])
+        director_election = DirectorElection(
+            summary=election_summary,
+            candidates=election_candidates,
+        )
+
     doc = BoardGovernanceDocument(
         company=company,
         directors=directors,
         board_summary=board_summary,
+        director_election=director_election,
     )
-    logger.info("excel_read", path=str(path), directors=len(directors))
+    logger.info(
+        "excel_read",
+        path=str(path),
+        directors=len(directors),
+        election_candidates=len(director_election.candidates) if director_election else 0,
+    )
     return doc
 
 

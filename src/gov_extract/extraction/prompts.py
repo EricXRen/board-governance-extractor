@@ -6,6 +6,7 @@ import json
 
 from gov_extract.models.board_summary import BoardSummary
 from gov_extract.models.director import Director
+from gov_extract.models.director_election import DirectorElection
 
 
 def system_prompt() -> str:
@@ -24,7 +25,8 @@ CRITICAL INSTRUCTIONS:
 - Return `null` for any field that is not present in the text. It is better to return null than to guess.
 - Do not invent committee names, dates, attendance figures, or biographical details.
 - If a field is ambiguous or unclear, return null rather than guessing.
-- For lists (expertise_areas, qualifications, etc.), return an empty list [] if nothing is stated.
+- For lists (other_positions, committee_memberships, etc.), return an empty list [] if nothing is stated.
+- For full_name, extract only the given name and surname — strip any pre-nominals (Sir, Lord, Dr) and post-nominals (CBE, OBE, FCA, etc.). Store post-nominals separately in the post_nominals field.
 - Return a JSON object `{{"directors": [...]}}` containing all Director objects. If no directors are found, return `{{"directors": []}}`.
 
 The Director object schema is:
@@ -50,20 +52,21 @@ Your task is to read the provided filing text and produce a comprehensive Markdo
 
 CRITICAL INSTRUCTIONS:
 - Extract ONLY what is explicitly stated in the text. Do NOT infer, guess, or fabricate.
-- For each director, create a section headed with their full name (including post-nominals).
+- For each director, create a section headed with their full name (given name + surname only; strip pre-nominals and post-nominals from the heading but note them separately).
 - Under each director, include every available detail as labelled bullet points, for example:
   - **Role / Designation:** Non-Executive Director
   - **Board role:** Senior Independent Director
   - **Independence:** Independent
   - **Year joined:** 2018 / Date joined: 2018-03-01
   - **Tenure:** 7 years
+  - **Term end year:** 2027
   - **Age / Age band:** 58 / 55–60
-  - **Nationality:** British
-  - **Qualifications:** ACA, MBA
-  - **Expertise areas:** Finance, Risk, Technology
+  - **Gender:** Female
+  - **Post-nominals:** CBE
+  - **Affiliation:** University of Oxford
   - **Committee memberships:** Audit Committee (Member), Risk Committee (Chair)
-  - **Special roles:** Senior Independent Director
-  - **Other directorships:** Barclays plc, HSBC Holdings plc
+  - **Other positions:** Senior Independent Director
+  - **Shares held:** 12,500 / % of outstanding: 0.002%
   - **Career summary:** <biography as written>
   - **Board attendance:** 10/12
   - **Committee attendance:** Audit Committee 7/7, Risk Committee 5/6
@@ -121,7 +124,8 @@ You have been given a Markdown document that was carefully extracted from a corp
 CRITICAL INSTRUCTIONS:
 - Convert ONLY what is present in the Markdown. Do NOT infer, guess, or hallucinate.
 - Return `null` for any field not mentioned in the Markdown.
-- For lists (expertise_areas, qualifications, etc.), return [] if nothing is stated.
+- For lists (other_directorships, other_positions, etc.), return [] if nothing is stated.
+- For full_name, use only the given name and surname — strip any pre-nominals and post-nominals.
 - Return a JSON object `{{"directors": [...]}}` containing all Director objects. If no directors are present, return `{{"directors": []}}`.
 
 The Director object schema is:
@@ -260,3 +264,68 @@ Look especially for:
 --- END TEXT ---
 
 Return a single BoardSummary JSON object."""
+
+
+def director_election_system_prompt() -> str:
+    """Return the system prompt for director election extraction.
+
+    Returns:
+        System prompt string with embedded DirectorElection JSON schema.
+    """
+    schema = json.dumps(DirectorElection.model_json_schema(), indent=2)
+    return f"""You are a governance data analyst extracting director election information from corporate filings.
+
+Your task is to find the director election section (annual general meeting agenda, proxy vote proposal, or similar) and extract structured data.
+
+CRITICAL INSTRUCTIONS:
+- Extract ONLY what is explicitly stated in the text. Do NOT infer, guess, or hallucinate.
+- Return `null` for the entire object if there is no director election section in the text.
+- For `candidates_disclosed`: return `false` only when the filing explicitly states that candidate names are withheld or confidential. Return `true` when candidate names are listed. Return `null` if the filing does not comment on disclosure.
+- `incumbent_nominees` are current board members standing for re-election. `new_nominees` are candidates not currently on the board.
+- For each candidate in `candidates`, extract as much biographical and role detail as is stated — return `null` for any field not present.
+- For candidate `full_name`, strip pre-nominals and post-nominals (same rule as current directors).
+
+The DirectorElection schema is:
+```json
+{schema}
+```
+
+Output format: Return a single DirectorElection JSON object, or `null` if no election section exists."""
+
+
+def director_election_user_prompt(
+    text: str,
+    company_name: str,
+    filing_type: str,
+    fiscal_year_end: str,
+    is_markdown: bool = False,
+) -> str:
+    """Return the user prompt for director election extraction.
+
+    Args:
+        text: Full governance text or combined round-1 markdown.
+        company_name: Name of the company.
+        filing_type: e.g. "Annual Report".
+        fiscal_year_end: ISO-8601 date string.
+        is_markdown: True when ``text`` is a pre-extracted Markdown summary.
+
+    Returns:
+        Formatted user prompt string.
+    """
+    source_label = "Markdown summary extracted from" if is_markdown else "text extracted from"
+    return f"""The following is {source_label} the {filing_type} for {company_name} (fiscal year ending {fiscal_year_end}).
+
+Find the director election section (AGM agenda, proxy statement proposals, or similar) and extract:
+- How many director seats are up for election
+- Which current board members are standing for re-election (incumbent nominees)
+- Which candidates are newly proposed (new nominees)
+- Whether candidate names are publicly disclosed
+- Full details for each candidate (use the Director schema)
+
+If the filing contains no director election section, return null.
+
+--- BEGIN TEXT ---
+{text}
+--- END TEXT ---
+
+Return a single DirectorElection JSON object, or null if no election section exists."""

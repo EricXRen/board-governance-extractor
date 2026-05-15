@@ -15,6 +15,8 @@ from gov_extract.extraction.chunker import TextChunk
 from gov_extract.extraction.prompts import (
     board_summary_system_prompt,
     board_summary_user_prompt,
+    director_election_system_prompt,
+    director_election_user_prompt,
     markdown_system_prompt,
     markdown_user_prompt,
     structured_from_markdown_system_prompt,
@@ -25,6 +27,7 @@ from gov_extract.extraction.prompts import (
 from gov_extract.llm.base import LLMProvider
 from gov_extract.models.board_summary import BoardSummary
 from gov_extract.models.director import Director
+from gov_extract.models.director_election import DirectorElection
 from gov_extract.models.document import BoardGovernanceDocument
 from gov_extract.models.metadata import CompanyMetadata
 
@@ -394,6 +397,60 @@ def _extract_board_summary(
     return summary
 
 
+def _extract_director_election(
+    provider: LLMProvider,
+    text: str,
+    company_name: str,
+    filing_type: str,
+    fiscal_year_end: str,
+    is_markdown: bool = False,
+) -> DirectorElection | None:
+    """Extract director election data from the governance text or markdown.
+
+    Always a single LLM call (never chunked), following the same pattern as
+    :func:`_extract_board_summary`.  Returns ``None`` when the filing contains
+    no election section.
+
+    Args:
+        provider: Configured LLM provider.
+        text: Full governance text or combined round-1 markdown.
+        company_name: Company name for the user prompt.
+        filing_type: Filing type for the user prompt.
+        fiscal_year_end: Fiscal year end date for the user prompt.
+        is_markdown: True when ``text`` is pre-extracted Markdown (round 2).
+
+    Returns:
+        Populated :class:`~gov_extract.models.director_election.DirectorElection`,
+        or ``None`` if no election section is found.
+    """
+    sys_prompt = director_election_system_prompt()
+    usr_prompt = director_election_user_prompt(
+        text, company_name, filing_type, fiscal_year_end, is_markdown=is_markdown
+    )
+    try:
+        result = provider.extract(sys_prompt, usr_prompt, DirectorElection)
+        election = result if isinstance(result, DirectorElection) else None
+    except Exception as e:
+        logger.warning("director_election_extraction_failed_structured", error=str(e))
+        try:
+            raw = provider.extract_raw_json(sys_prompt, usr_prompt)
+            raw_stripped = raw.strip()
+            if raw_stripped.lower() in ("null", "none", ""):
+                election = None
+            else:
+                election = DirectorElection.model_validate_json(raw_stripped)
+        except Exception as e2:
+            logger.error("director_election_extraction_failed", error=str(e2))
+            election = None
+
+    logger.info(
+        "director_election_extracted",
+        company=company_name,
+        candidates=len(election.candidates) if election else 0,
+    )
+    return election
+
+
 def _compute_board_summary(summary: BoardSummary, directors: list[Director]) -> BoardSummary:
     """Fill in BoardSummary fields that can be derived from the Director list.
 
@@ -661,6 +718,12 @@ def run_extraction(
     )
     board_summary = _compute_board_summary(board_summary, merged_directors)
 
+    # Extract director election section (single-pass, returns None when absent).
+    director_election = _extract_director_election(
+        provider, summary_text, company_name, filing_type, fiscal_year_end,
+        is_markdown=is_markdown_summary,
+    )
+
     metadata = CompanyMetadata(
         company_name=company_name,
         company_ticker=company_ticker,
@@ -673,4 +736,9 @@ def run_extraction(
         llm_model=model_name,
     )
 
-    return BoardGovernanceDocument(company=metadata, directors=merged_directors, board_summary=board_summary)
+    return BoardGovernanceDocument(
+        company=metadata,
+        directors=merged_directors,
+        board_summary=board_summary,
+        director_election=director_election,
+    )

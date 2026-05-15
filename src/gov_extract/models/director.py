@@ -26,11 +26,9 @@ class BiographicalDetails(BaseModel):
     post_nominals: str | None = None
     age: int | None = None
     age_band: str | None = None
-    nationality: str | None = None
-    qualifications: list[str] = []
-    expertise_areas: list[str] = []
+    gender: str | None = None
+    affiliation: str | None = None
     career_summary: str | None = None
-    other_directorships: list[str] = []
 
 
 class BoardRoleDetails(BaseModel):
@@ -49,10 +47,13 @@ class BoardRoleDetails(BaseModel):
     year_joined_board: int | None = None
     date_joined_board: str | None = None
     tenure_years: float | None = None
+    term_end_year: int | None = None
     year_end_status: str
     committee_memberships: list[str] = []
     committee_chair_of: list[str] = []
-    special_roles: list[str] = []
+    other_positions: list[str] = []
+    num_holding_shares: int | None = None
+    pct_holding_shares: float | None = None
 
 
 class AttendanceDetails(BaseModel):

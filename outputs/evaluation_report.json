@@ -1,16 +1,16 @@
 {
-  "company_name": "Lloyds Banking Group",
-  "extracted_path": "outputs/LloydsBankingGroup_2025_Board_Governance_deepseek.json",
-  "ground_truth_path": "outputs/LloydsBankingGroup_2025_Board_Governance_openai.json",
+  "company_name": "AstraZeneca",
+  "extracted_path": "outputs/AstraZeneca_2025_Board_Governance.json",
+  "ground_truth_path": "data/eval_data/azn-2025/AstraZeneca_2025_Board_Governance-gt.json",
   "director_results": [
     {
-      "director_name": "Charlie Nunn",
+      "director_name": "Michel Demar\u00e9",
       "field_results": [
         {
           "field_path": "biographical.full_name",
           "metric_used": "exact_match",
-          "predicted_value": "Charlie Nunn",
-          "ground_truth_value": "Charlie Nunn",
+          "predicted_value": "Michel Demar\u00e9",
+          "ground_truth_value": "Michel Demar\u00e9",
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -27,8 +27,8 @@
         {
           "field_path": "biographical.age",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
+          "predicted_value": 68,
+          "ground_truth_value": 68,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -64,20 +64,16 @@
           "field_path": "biographical.expertise_areas",
           "metric_used": "list_f1",
           "predicted_value": [],
-          "ground_truth_value": [
-            "financial services experience including in chief executive and other leadership roles",
-            "strategic planning and implementation",
-            "digital transformation"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.career_summary",
           "metric_used": "llm_semantic_similarity",
-          "predicted_value": "Charlie has over 25 years\u2019 experience in the financial services sector. Prior to joining the Group, Charlie held a range of leadership positions at HSBC, including Global Chief Executive, Wealth and Personal Banking, and Group Head of Wealth Management and Digital, as well as Global Chief Operating Officer of Retail Banking and Wealth Management. Charlie began his career at Accenture, where he worked for 13 years in the US, France, Switzerland and the UK before being made a Partner. He then moved to McKinsey & Co. as a Senior Partner, leading on projects for five years.",
-          "ground_truth_value": "Charlie has over 25 years\u2019 experience in the financial services sector. Prior to joining the Group, Charlie held a range of leadership positions at HSBC, including Global Chief Executive, Wealth and Personal Banking, and Group Head of Wealth Management and Digital, as well as Global Chief Operating Officer of Retail Banking and Wealth Management. Charlie began his career at Accenture, where he worked for 13 years in the US, France, Switzerland and the UK before being made a Partner. He then moved to McKinsey & Co. as a Senior Partner, leading on projects for five years.",
+          "predicted_value": "Previously Vice-Chairman of UBS Group AG, Chairman of Syngenta, CFO of ABB Ltd, and earlier roles at Baxter International and Dow Chemical.",
+          "ground_truth_value": "Previously Vice-Chairman of UBS Group AG, Chairman of Syngenta, CFO of ABB Ltd, and earlier roles at Baxter International and Dow Chemical.",
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -85,8 +81,226 @@
         {
           "field_path": "biographical.other_directorships",
           "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
+          "predicted_value": [
+            "Vodafone Group plc (Non-Executive Director)",
+            "Louis Dreyfus Int\u2019l Holding BV (Non-Executive Director)",
+            "IMD Business School (Chairman)"
+          ],
+          "ground_truth_value": [
+            "Vodafone Group plc (Non-Executive Director)",
+            "Louis Dreyfus Int\u2019l Holding BV (Non-Executive Director)",
+            "IMD Business School (Chairman)"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.designation",
+          "metric_used": "exact_match",
+          "predicted_value": "Chair",
+          "ground_truth_value": "Chair",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.board_role",
+          "metric_used": "fuzzy_match",
+          "predicted_value": "Non-Executive Chair",
+          "ground_truth_value": "Non-Executive Chair",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.independence_status",
+          "metric_used": "exact_match",
+          "predicted_value": "Chair (independent on appointment)",
+          "ground_truth_value": "Chair (independent on appointment)",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.year_joined_board",
+          "metric_used": "numeric_error",
+          "predicted_value": 2019,
+          "ground_truth_value": 2019,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.tenure_years",
+          "metric_used": "numeric_error",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.committee_memberships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Remuneration Committee",
+            "Nomination and Governance Committee"
+          ],
+          "ground_truth_value": [
+            "Remuneration Committee"
+          ],
+          "score": 0.6666666666666666,
+          "passed": false,
+          "failure_mode": "below_threshold"
+        },
+        {
+          "field_path": "board_role.committee_chair_of",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Nomination and Governance Committee"
+          ],
+          "ground_truth_value": [
+            "Nomination and Governance Committee"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_attended",
+          "metric_used": "numeric_error",
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_scheduled",
+          "metric_used": "numeric_error",
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_attendance_pct",
+          "metric_used": "numeric_error",
+          "predicted_value": 100.0,
+          "ground_truth_value": 100.0,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        }
+      ],
+      "field_pass_rate": 0.9473684210526315,
+      "perfect_match": false,
+      "false_negative_count": 0,
+      "hallucination_count": 0,
+      "matched": true
+    },
+    {
+      "director_name": "Pascal Soriot",
+      "field_results": [
+        {
+          "field_path": "biographical.full_name",
+          "metric_used": "exact_match",
+          "predicted_value": "Pascal Soriot",
+          "ground_truth_value": "Pascal Soriot",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.post_nominals",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age",
+          "metric_used": "numeric_error",
+          "predicted_value": 65,
+          "ground_truth_value": 65,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age_band",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.nationality",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.qualifications",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Doctor of Veterinary Medicine",
+            "MBA from HEC Paris"
+          ],
+          "ground_truth_value": [
+            "Doctor of Veterinary Medicine",
+            "MBA from HEC Paris"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.expertise_areas",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Science",
+            "Medicine",
+            "Strategic management"
+          ],
+          "ground_truth_value": [
+            "Science",
+            "Medicine",
+            "Strategic management"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.career_summary",
+          "metric_used": "llm_semantic_similarity",
+          "predicted_value": "Previously COO of Roche's pharmaceuticals division and CEO of Genentech. Holds a Doctor of Veterinary Medicine and MBA from HEC Paris. Received a knighthood for services to life sciences and leadership in COVID-19 response.",
+          "ground_truth_value": "Previously COO of Roche's pharmaceuticals division and CEO of Genentech. Holds a Doctor of Veterinary Medicine and MBA from HEC Paris. Received a knighthood for services to life sciences and leadership in COVID-19 response.",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.other_directorships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Sustainable Markets Initiative Limited (Board member)",
+            "Agilent Technologies Inc. (Board member)"
+          ],
+          "ground_truth_value": [
+            "Sustainable Markets Initiative Limited (Board member)",
+            "Agilent Technologies Inc. (Board member)"
+          ],
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -103,8 +317,8 @@
         {
           "field_path": "board_role.board_role",
           "metric_used": "fuzzy_match",
-          "predicted_value": "Group Chief Executive",
-          "ground_truth_value": "Group Chief Executive",
+          "predicted_value": "Chief Executive Officer",
+          "ground_truth_value": "Chief Executive Officer",
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -121,8 +335,8 @@
         {
           "field_path": "board_role.year_joined_board",
           "metric_used": "numeric_error",
-          "predicted_value": 2021,
-          "ground_truth_value": 2021,
+          "predicted_value": 2012,
+          "ground_truth_value": 2012,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -157,8 +371,8 @@
         {
           "field_path": "attendance.board_meetings_attended",
           "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
+          "predicted_value": 9,
+          "ground_truth_value": 9,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -166,8 +380,8 @@
         {
           "field_path": "attendance.board_meetings_scheduled",
           "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
+          "predicted_value": 9,
+          "ground_truth_value": 9,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -182,20 +396,20 @@
           "failure_mode": null
         }
       ],
-      "field_pass_rate": 0.9473684210526315,
-      "perfect_match": false,
-      "false_negative_count": 1,
+      "field_pass_rate": 1.0,
+      "perfect_match": true,
+      "false_negative_count": 0,
       "hallucination_count": 0,
       "matched": true
     },
     {
-      "director_name": "William Chalmers",
+      "director_name": "Aradhana Sarin",
       "field_results": [
         {
           "field_path": "biographical.full_name",
           "metric_used": "exact_match",
-          "predicted_value": "William Chalmers",
-          "ground_truth_value": "William Chalmers",
+          "predicted_value": "Aradhana Sarin",
+          "ground_truth_value": "Aradhana Sarin",
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -212,8 +426,8 @@
         {
           "field_path": "biographical.age",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
+          "predicted_value": 50,
+          "ground_truth_value": 50,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -239,8 +453,14 @@
         {
           "field_path": "biographical.qualifications",
           "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
+          "predicted_value": [
+            "Medical degree from University of Delhi",
+            "MBA from Stanford Business School"
+          ],
+          "ground_truth_value": [
+            "Medical degree from University of Delhi",
+            "MBA from Stanford Business School"
+          ],
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -249,35 +469,37 @@
           "field_path": "biographical.expertise_areas",
           "metric_used": "list_f1",
           "predicted_value": [
-            "Strategic planning and development",
-            "mergers and acquisitions",
-            "equity and debt capital structuring and risk management"
+            "Finance",
+            "Healthcare"
           ],
           "ground_truth_value": [
-            "board-level strategic and financial leadership",
-            "strategic planning and development",
-            "mergers and acquisitions",
-            "equity and debt capital structuring",
-            "risk management"
+            "Finance",
+            "Healthcare"
           ],
-          "score": 0.5,
-          "passed": false,
-          "failure_mode": "below_threshold"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.career_summary",
           "metric_used": "llm_semantic_similarity",
-          "predicted_value": "William has worked in financial services for over 25 years and previously held a number of senior roles at Morgan Stanley, including Co-Head of the Global Financial Institutions Group and Head of EMEA Financial Institutions Group. Before joining Morgan Stanley, William worked for J. P. Morgan, again in the Financial Institutions Group.",
-          "ground_truth_value": "William joined the Board in August 2019, when he was appointed Chief Financial Officer and was Interim Group Chief Executive from May 2021 to August 2021. William has worked in financial services for over 25 years and previously held a number of senior roles at Morgan Stanley, including Co-Head of the Global Financial Institutions Group and Head of EMEA Financial Institutions Group. Before joining Morgan Stanley, William worked for J. P. Morgan, again in the Financial Institutions Group.",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
+          "predicted_value": "Previously CFO of Alexion, with experience at Citi, UBS, and JP Morgan. Trained as a medical doctor.",
+          "ground_truth_value": "Previously CFO of Alexion, with experience at Citi, UBS, and JP Morgan. Trained as a medical doctor.",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.other_directorships",
           "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
+          "predicted_value": [
+            "American Red Cross (Board of Governors)",
+            "Anheuser-Busch InBev (Independent Director and Audit Committee member)"
+          ],
+          "ground_truth_value": [
+            "American Red Cross (Board of Governors)",
+            "Anheuser-Busch InBev (Independent Director and Audit Committee member)"
+          ],
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -312,829 +534,6 @@
         {
           "field_path": "board_role.year_joined_board",
           "metric_used": "numeric_error",
-          "predicted_value": 2019,
-          "ground_truth_value": 2019,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.tenure_years",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.committee_memberships",
-          "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.committee_chair_of",
-          "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_meetings_attended",
-          "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_meetings_scheduled",
-          "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_attendance_pct",
-          "metric_used": "numeric_error",
-          "predicted_value": 100.0,
-          "ground_truth_value": 100.0,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        }
-      ],
-      "field_pass_rate": 0.8947368421052632,
-      "perfect_match": false,
-      "false_negative_count": 0,
-      "hallucination_count": 0,
-      "matched": true
-    },
-    {
-      "director_name": "Cathy Turner",
-      "field_results": [
-        {
-          "field_path": "biographical.full_name",
-          "metric_used": "exact_match",
-          "predicted_value": "Cathy Turner",
-          "ground_truth_value": "Cathy Turner",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.post_nominals",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.age",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.age_band",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.nationality",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.qualifications",
-          "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.expertise_areas",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Executive and non-executive financial services experience",
-            "complex remuneration matters",
-            "communications expertise with stakeholders including investors, regulators, government, media and unions"
-          ],
-          "ground_truth_value": [
-            "significant executive and non-executive financial services experience",
-            "knowledge of complex remuneration matters",
-            "communications expertise with a broad range of stakeholders including investors, regulators, government, media and unions"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
-        },
-        {
-          "field_path": "biographical.career_summary",
-          "metric_used": "llm_semantic_similarity",
-          "predicted_value": "Cathy has significant financial services experience, having worked in senior executive positions at Barclays plc and at the Group. Cathy has previously been a Non-Executive Director and Chair of the Remuneration Committee of Aldermore Group plc, Quilter plc, Spectris plc and Countrywide plc.",
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "biographical.other_directorships",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Non-Executive Director of Rentokil Initial plc",
-            "Partner on a part-time basis at Manchester Square Partners LLP"
-          ],
-          "ground_truth_value": [
-            "Non-Executive Director of Rentokil Initial plc",
-            "Partner on a part-time basis at Manchester Square Partners LLP"
-          ],
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.designation",
-          "metric_used": "exact_match",
-          "predicted_value": "Non-Executive Director",
-          "ground_truth_value": "Non-Executive Director",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.board_role",
-          "metric_used": "fuzzy_match",
-          "predicted_value": "Senior Independent Director",
-          "ground_truth_value": "Senior Independent Director",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.independence_status",
-          "metric_used": "exact_match",
-          "predicted_value": "Independent",
-          "ground_truth_value": "Independent",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.year_joined_board",
-          "metric_used": "numeric_error",
-          "predicted_value": 2022,
-          "ground_truth_value": 2022,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.tenure_years",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.committee_memberships",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Board Risk Committee",
-            "Remuneration Committee",
-            "Nomination and Governance Committee"
-          ],
-          "ground_truth_value": [
-            "Nomination and Governance Committee (Member)",
-            "Audit Committee (Member)",
-            "Board Risk Committee (Member)",
-            "Remuneration Committee (Chair)"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
-        },
-        {
-          "field_path": "board_role.committee_chair_of",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Remuneration Committee"
-          ],
-          "ground_truth_value": [
-            "Remuneration Committee"
-          ],
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_meetings_attended",
-          "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_meetings_scheduled",
-          "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_attendance_pct",
-          "metric_used": "numeric_error",
-          "predicted_value": 100.0,
-          "ground_truth_value": 100.0,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        }
-      ],
-      "field_pass_rate": 0.8421052631578947,
-      "perfect_match": false,
-      "false_negative_count": 0,
-      "hallucination_count": 1,
-      "matched": true
-    },
-    {
-      "director_name": "Nathan Bostock",
-      "field_results": [
-        {
-          "field_path": "biographical.full_name",
-          "metric_used": "exact_match",
-          "predicted_value": "Nathan Bostock",
-          "ground_truth_value": "Nathan Bostock",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.post_nominals",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.age",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.age_band",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.nationality",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.qualifications",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Chartered accountant"
-          ],
-          "ground_truth_value": [
-            "chartered accountant"
-          ],
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.expertise_areas",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Financial, risk and regulatory expertise",
-            "experience in large-scale customer and corporate facing businesses",
-            "executive experience in the financial services industry"
-          ],
-          "ground_truth_value": [
-            "financial, risk and regulatory expertise",
-            "large-scale customer and corporate facing businesses",
-            "executive experience in the financial services industry"
-          ],
-          "score": 0.6666666666666666,
-          "passed": false,
-          "failure_mode": "below_threshold"
-        },
-        {
-          "field_path": "biographical.career_summary",
-          "metric_used": "llm_semantic_similarity",
-          "predicted_value": "Nathan was Chief Executive Officer of Santander UK plc from 2014 until 2022 and then Head of Investment Platforms at Banco Santander S.A. until his retirement from Santander in 2023. Prior to joining Santander in 2014, Nathan was an executive director and Group Chief Financial Officer of RBS and previously held the post of Chief Risk Officer at RBS. Before joining RBS, Nathan held various senior positions at Santander UK plc between 2004 and 2009, including Executive Director, Finance Director and commercial Chief Executive Officer roles in Financial Markets and Corporate Banking and in Cards and Insurance. He is qualified as a chartered accountant.",
-          "ground_truth_value": "Nathan was Chief Executive Officer of Santander UK plc from 2014 until 2022 and then Head of Investment Platforms at Banco Santander S.A. until his retirement from Santander in 2023. Prior to joining Santander in 2014, Nathan was an executive director and Group Chief Financial Officer of RBS and previously held the post of Chief Risk Officer at RBS. Before joining RBS, Nathan held various senior positions at Santander UK plc between 2004 and 2009, including Executive Director, Finance Director and commercial Chief Executive Officer roles in Financial Markets and Corporate Banking and in Cards and Insurance. He is qualified as a chartered accountant.",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.other_directorships",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Non-Executive Director of Centrica plc"
-          ],
-          "ground_truth_value": [
-            "Non-executive director and chair designate of Jupiter Fund Management plc with effect from 1 March 2026",
-            "Chair of Jupiter Fund Management plc with effect from 1 April 2026"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
-        },
-        {
-          "field_path": "board_role.designation",
-          "metric_used": "exact_match",
-          "predicted_value": "Non-Executive Director",
-          "ground_truth_value": "Non-Executive Director",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.board_role",
-          "metric_used": "fuzzy_match",
-          "predicted_value": "Independent Non-Executive Director",
-          "ground_truth_value": "Chair of Lloyds Bank Corporate Markets plc and Lloyds Bank GmbH",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
-        },
-        {
-          "field_path": "board_role.independence_status",
-          "metric_used": "exact_match",
-          "predicted_value": "Independent",
-          "ground_truth_value": "Independent",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.year_joined_board",
-          "metric_used": "numeric_error",
-          "predicted_value": 2024,
-          "ground_truth_value": 2024,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.tenure_years",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.committee_memberships",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Audit Committee",
-            "Board Risk Committee"
-          ],
-          "ground_truth_value": [
-            "Audit Committee (Member)",
-            "Board Risk Committee (Member)"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
-        },
-        {
-          "field_path": "board_role.committee_chair_of",
-          "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_meetings_attended",
-          "metric_used": "numeric_error",
-          "predicted_value": 9,
-          "ground_truth_value": 9,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_meetings_scheduled",
-          "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_attendance_pct",
-          "metric_used": "numeric_error",
-          "predicted_value": 90.0,
-          "ground_truth_value": 90.0,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        }
-      ],
-      "field_pass_rate": 0.7894736842105263,
-      "perfect_match": false,
-      "false_negative_count": 0,
-      "hallucination_count": 0,
-      "matched": true
-    },
-    {
-      "director_name": "Sarah Legg",
-      "field_results": [
-        {
-          "field_path": "biographical.full_name",
-          "metric_used": "exact_match",
-          "predicted_value": "Sarah Legg",
-          "ground_truth_value": "Sarah Legg",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.post_nominals",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.age",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.age_band",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.nationality",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.qualifications",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Fellow of the Chartered Institute of Management Accountants (FCMA)",
-            "Fellow of the Association of Corporate Treasurers"
-          ],
-          "ground_truth_value": [
-            "Fellow of the Chartered Institute of Management Accountants",
-            "Fellow of the Association of Corporate Treasurers"
-          ],
-          "score": 0.5,
-          "passed": false,
-          "failure_mode": "below_threshold"
-        },
-        {
-          "field_path": "biographical.expertise_areas",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Financial leadership and regulatory reporting skills",
-            "audit and risk experience in financial leadership",
-            "transformation programme experience"
-          ],
-          "ground_truth_value": [
-            "financial markets",
-            "treasury",
-            "risk management",
-            "international accounting standards"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
-        },
-        {
-          "field_path": "biographical.career_summary",
-          "metric_used": "llm_semantic_similarity",
-          "predicted_value": "Sarah has spent her entire executive career in financial services with almost 30 years at HSBC. She was the Group Financial Controller, a Group General Manager and CFO for HSBC\u2019s Asia Pacific region. She also spent eight years as a Non-Executive Director of Hang Seng Bank Limited.",
-          "ground_truth_value": "Sarah has spent her entire executive career in financial services with almost 30 years at HSBC. She was the Group Financial Controller, a Group General Manager and CFO for HSBC\u2019s Asia Pacific region. She also spent eight years as a Non-Executive Director of Hang Seng Bank Limited.",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.other_directorships",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Non-Executive Director of Severn Trent plc",
-            "Non-Executive Director of Man Group plc",
-            "Trustee of the Lloyds Bank Foundation for England and Wales"
-          ],
-          "ground_truth_value": [
-            "Non-Executive Director of Severn Trent plc",
-            "Non-Executive Director of Man Group plc",
-            "Trustee of the Lloyds Bank Foundation for England and Wales"
-          ],
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.designation",
-          "metric_used": "exact_match",
-          "predicted_value": "Non-Executive Director",
-          "ground_truth_value": "Non-Executive Director",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.board_role",
-          "metric_used": "fuzzy_match",
-          "predicted_value": "Independent Non-Executive Director",
-          "ground_truth_value": "Chair, Audit Committee",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
-        },
-        {
-          "field_path": "board_role.independence_status",
-          "metric_used": "exact_match",
-          "predicted_value": "Independent",
-          "ground_truth_value": "Independent",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.year_joined_board",
-          "metric_used": "numeric_error",
-          "predicted_value": 2019,
-          "ground_truth_value": 2019,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.tenure_years",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.committee_memberships",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Audit Committee",
-            "Board Risk Committee",
-            "Responsible Business Committee"
-          ],
-          "ground_truth_value": [
-            "Audit Committee (Chair)",
-            "Board Risk Committee (Member)"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
-        },
-        {
-          "field_path": "board_role.committee_chair_of",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Audit Committee"
-          ],
-          "ground_truth_value": [
-            "Audit Committee"
-          ],
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_meetings_attended",
-          "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_meetings_scheduled",
-          "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "attendance.board_attendance_pct",
-          "metric_used": "numeric_error",
-          "predicted_value": 100.0,
-          "ground_truth_value": 100.0,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        }
-      ],
-      "field_pass_rate": 0.7894736842105263,
-      "perfect_match": false,
-      "false_negative_count": 0,
-      "hallucination_count": 0,
-      "matched": true
-    },
-    {
-      "director_name": "Harmeen Mehta",
-      "field_results": [
-        {
-          "field_path": "biographical.full_name",
-          "metric_used": "exact_match",
-          "predicted_value": "Harmeen Mehta",
-          "ground_truth_value": "Harmeen Mehta",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.post_nominals",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.age",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.age_band",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.nationality",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.qualifications",
-          "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.expertise_areas",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Leading digital, AI-driven, complex transformation",
-            "building and running technology-led businesses",
-            "international and financial services knowledge"
-          ],
-          "ground_truth_value": [
-            "digital, AI-driven, complex transformation",
-            "building and running technology-led businesses",
-            "creating new ventures",
-            "international and financial services knowledge"
-          ],
-          "score": 0.5714285714285715,
-          "passed": false,
-          "failure_mode": "below_threshold"
-        },
-        {
-          "field_path": "biographical.career_summary",
-          "metric_used": "llm_semantic_similarity",
-          "predicted_value": "Harmeen was appointed Chief Digital and Innovation Officer at Equinix in April 2025. Prior to that role, she was Chief Digital and Innovation Officer at BT and spent seven years as Global Chief Information Officer and Head of Cyber Security and Cloud Business at Bharti Airtel, leading its cloud and security businesses. Earlier in her career, Harmeen held CIO positions at BBVA, HSBC and Bank of America Merrill Lynch.",
-          "ground_truth_value": "Harmeen was appointed Chief Digital and Innovation Officer at Equinix in April 2025. Prior to that role, she was Chief Digital and Innovation Officer at BT and spent seven years as Global Chief Information Officer and Head of Cyber Security and Cloud Business at Bharti Airtel, leading its cloud and security businesses. Earlier in her career, Harmeen held CIO positions at BBVA, HSBC and Bank of America Merrill Lynch.",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "biographical.other_directorships",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Chief Digital and Innovation Officer at Equinix",
-            "Non-Executive Director, UK Parliament, Information & Digital Board"
-          ],
-          "ground_truth_value": [
-            "Chief Digital and Innovation Officer at Equinix",
-            "Non-Executive Director, UK Parliament, Information & Digital Board"
-          ],
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.designation",
-          "metric_used": "exact_match",
-          "predicted_value": "Non-Executive Director",
-          "ground_truth_value": "Non-Executive Director",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.board_role",
-          "metric_used": "fuzzy_match",
-          "predicted_value": "Independent Non-Executive Director",
-          "ground_truth_value": "Independent non-executive director",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.independence_status",
-          "metric_used": "exact_match",
-          "predicted_value": "Independent",
-          "ground_truth_value": "Independent",
-          "score": 1.0,
-          "passed": true,
-          "failure_mode": null
-        },
-        {
-          "field_path": "board_role.year_joined_board",
-          "metric_used": "numeric_error",
           "predicted_value": 2021,
           "ground_truth_value": 2021,
           "score": 1.0,
@@ -1171,8 +570,8 @@
         {
           "field_path": "attendance.board_meetings_attended",
           "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
+          "predicted_value": 9,
+          "ground_truth_value": 9,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1180,8 +579,8 @@
         {
           "field_path": "attendance.board_meetings_scheduled",
           "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
+          "predicted_value": 9,
+          "ground_truth_value": 9,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1196,20 +595,20 @@
           "failure_mode": null
         }
       ],
-      "field_pass_rate": 0.9473684210526315,
-      "perfect_match": false,
+      "field_pass_rate": 1.0,
+      "perfect_match": true,
       "false_negative_count": 0,
       "hallucination_count": 0,
       "matched": true
     },
     {
-      "director_name": "Chris Vogelzang",
+      "director_name": "Philip Broadley",
       "field_results": [
         {
           "field_path": "biographical.full_name",
           "metric_used": "exact_match",
-          "predicted_value": "Chris Vogelzang",
-          "ground_truth_value": "Chris Vogelzang",
+          "predicted_value": "Philip Broadley",
+          "ground_truth_value": "Philip Broadley",
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1217,8 +616,8 @@
         {
           "field_path": "biographical.post_nominals",
           "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
+          "predicted_value": "FCA",
+          "ground_truth_value": "FCA",
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1226,8 +625,8 @@
         {
           "field_path": "biographical.age",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
+          "predicted_value": 64,
+          "ground_truth_value": 64,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1253,8 +652,16 @@
         {
           "field_path": "biographical.qualifications",
           "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
+          "predicted_value": [
+            "BA in Philosophy, Politics and Economics from Oxford University",
+            "MSc in Behavioural Science from LSE",
+            "Fellow of the Institute of Chartered Accountants in England and Wales"
+          ],
+          "ground_truth_value": [
+            "BA in Philosophy, Politics and Economics from Oxford University",
+            "MSc in Behavioural Science from LSE",
+            "Fellow of the Institute of Chartered Accountants in England and Wales"
+          ],
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1263,36 +670,34 @@
           "field_path": "biographical.expertise_areas",
           "metric_used": "list_f1",
           "predicted_value": [
-            "Retail and commercial banking",
-            "understanding of technology\u2019s role in financial services",
-            "track record of driving transformation within organisations"
+            "Finance",
+            "Accounting"
           ],
           "ground_truth_value": [
-            "retail and commercial banking",
-            "technology\u2019s role in financial services",
-            "driving transformation within organisations"
+            "Finance",
+            "Accounting"
           ],
-          "score": 0.3333333333333333,
-          "passed": false,
-          "failure_mode": "below_threshold"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.career_summary",
           "metric_used": "llm_semantic_similarity",
-          "predicted_value": "Chris was Chief Executive Officer of Danske Bank A/S from 2019 until 2021. Prior to that, he held a number of senior positions at ABN AMRO, including Managing Board member with responsibility for Retail and Private Banking, Chief Executive Officer of Retail Banking for The Netherlands and Chief Executive Officer of Global Private Banking.",
-          "ground_truth_value": "Appointed as a non-executive director and as a member of the Responsible Business Committee with effect from 16 June 2025 to supplement the Board\u2019s existing retail and commercial banking experience.",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
+          "predicted_value": "Previously Group Finance Director of Prudential and Old Mutual. Served as Chairman of the 100 Group of Finance Directors.",
+          "ground_truth_value": "Previously Group Finance Director of Prudential and Old Mutual. Served as Chairman of the 100 Group of Finance Directors.",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.other_directorships",
           "metric_used": "list_f1",
           "predicted_value": [
-            "Non-Executive Director of Wolters Kluwer N.V."
+            "Lancashire Holdings Limited (Non-Executive Chair)"
           ],
           "ground_truth_value": [
-            "Non-Executive Director of Wolters Kluwer N.V."
+            "Lancashire Holdings Limited (Non-Executive Chair)"
           ],
           "score": 1.0,
           "passed": true,
@@ -1310,8 +715,426 @@
         {
           "field_path": "board_role.board_role",
           "metric_used": "fuzzy_match",
-          "predicted_value": "Independent Non-Executive Director",
-          "ground_truth_value": "Independent non-executive director",
+          "predicted_value": "Senior Independent Non-Executive Director",
+          "ground_truth_value": "Senior Independent Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.independence_status",
+          "metric_used": "exact_match",
+          "predicted_value": "Independent",
+          "ground_truth_value": "Independent",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.year_joined_board",
+          "metric_used": "numeric_error",
+          "predicted_value": 2017,
+          "ground_truth_value": 2017,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.tenure_years",
+          "metric_used": "numeric_error",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.committee_memberships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Audit Committee",
+            "Remuneration Committee",
+            "Nomination and Governance Committee"
+          ],
+          "ground_truth_value": [
+            "Nomination and Governance Committee",
+            "Remuneration Committee"
+          ],
+          "score": 0.8,
+          "passed": false,
+          "failure_mode": "below_threshold"
+        },
+        {
+          "field_path": "board_role.committee_chair_of",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Audit Committee"
+          ],
+          "ground_truth_value": [
+            "Audit Committee"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_attended",
+          "metric_used": "numeric_error",
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_scheduled",
+          "metric_used": "numeric_error",
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_attendance_pct",
+          "metric_used": "numeric_error",
+          "predicted_value": 100.0,
+          "ground_truth_value": 100.0,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        }
+      ],
+      "field_pass_rate": 0.9473684210526315,
+      "perfect_match": false,
+      "false_negative_count": 0,
+      "hallucination_count": 0,
+      "matched": true
+    },
+    {
+      "director_name": "Euan Ashley",
+      "field_results": [
+        {
+          "field_path": "biographical.full_name",
+          "metric_used": "exact_match",
+          "predicted_value": "Euan Ashley",
+          "ground_truth_value": "Euan Ashley",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.post_nominals",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age",
+          "metric_used": "numeric_error",
+          "predicted_value": 53,
+          "ground_truth_value": 53,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age_band",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.nationality",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.qualifications",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "MBChB (Medicine) from Glasgow University",
+            "DPhil in cardiovascular cellular biology and molecular genetics from Oxford University"
+          ],
+          "ground_truth_value": [
+            "MBChB (Medicine) from Glasgow University",
+            "DPhil in cardiovascular cellular biology and molecular genetics from Oxford University"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.expertise_areas",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Cardiovascular medicine",
+            "Genetics",
+            "AI in healthcare"
+          ],
+          "ground_truth_value": [
+            "Cardiovascular medicine",
+            "Genetics",
+            "AI in healthcare"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.career_summary",
+          "metric_used": "llm_semantic_similarity",
+          "predicted_value": "Professor of Medicine at Stanford University, Chair of Department of Medicine. Research focuses on genetic mechanisms of cardiovascular disease.",
+          "ground_truth_value": "Professor of Medicine at Stanford University, Chair of Department of Medicine. Research focuses on genetic mechanisms of cardiovascular disease.",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.other_directorships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "DexCom, Inc. (Board member)"
+          ],
+          "ground_truth_value": [
+            "DexCom, Inc. (Board member)"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.designation",
+          "metric_used": "exact_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.board_role",
+          "metric_used": "fuzzy_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.independence_status",
+          "metric_used": "exact_match",
+          "predicted_value": "Independent",
+          "ground_truth_value": "Independent",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.year_joined_board",
+          "metric_used": "numeric_error",
+          "predicted_value": 2020,
+          "ground_truth_value": 2020,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.tenure_years",
+          "metric_used": "numeric_error",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.committee_memberships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Science Committee",
+            "Nomination and Governance Committee"
+          ],
+          "ground_truth_value": [
+            "Nomination and Governance Committee"
+          ],
+          "score": 0.6666666666666666,
+          "passed": false,
+          "failure_mode": "below_threshold"
+        },
+        {
+          "field_path": "board_role.committee_chair_of",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Science Committee"
+          ],
+          "ground_truth_value": [
+            "Science Committee"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_attended",
+          "metric_used": "numeric_error",
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_scheduled",
+          "metric_used": "numeric_error",
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_attendance_pct",
+          "metric_used": "numeric_error",
+          "predicted_value": 100.0,
+          "ground_truth_value": 100.0,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        }
+      ],
+      "field_pass_rate": 0.9473684210526315,
+      "perfect_match": false,
+      "false_negative_count": 0,
+      "hallucination_count": 0,
+      "matched": true
+    },
+    {
+      "director_name": "Birgit Conix",
+      "field_results": [
+        {
+          "field_path": "biographical.full_name",
+          "metric_used": "exact_match",
+          "predicted_value": "Birgit Conix",
+          "ground_truth_value": "Birgit Conix",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.post_nominals",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age",
+          "metric_used": "numeric_error",
+          "predicted_value": 59,
+          "ground_truth_value": 59,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age_band",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.nationality",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.qualifications",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "MBA from University of Chicago Booth School of Business",
+            "MSc in Business Economics from Tilburg University"
+          ],
+          "ground_truth_value": [
+            "MBA from University of Chicago Booth School of Business",
+            "MSc in Business Economics from Tilburg University"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.expertise_areas",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Finance",
+            "CFO experience"
+          ],
+          "ground_truth_value": [
+            "Finance",
+            "CFO experience"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.career_summary",
+          "metric_used": "llm_semantic_similarity",
+          "predicted_value": "Previously Group CFO of Sonova and TUI, CFO of Telenet Group, and senior positions at Johnson & Johnson.",
+          "ground_truth_value": "Previously Group CFO of Sonova and TUI, CFO of Telenet Group, and senior positions at Johnson & Johnson.",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.other_directorships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "ASML (Supervisory Board member, Chair of ESG Committee)",
+            "Ricola (Board member, Chair of Audit Committee)"
+          ],
+          "ground_truth_value": [
+            "ASML (Supervisory Board member, Chair of ESG Committee)",
+            "Ricola (Board member, Chair of Audit Committee)"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.designation",
+          "metric_used": "exact_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.board_role",
+          "metric_used": "fuzzy_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1347,15 +1170,14 @@
           "field_path": "board_role.committee_memberships",
           "metric_used": "list_f1",
           "predicted_value": [
-            "Responsible Business Committee"
+            "Audit Committee"
           ],
           "ground_truth_value": [
-            "Responsible Business Committee (Member, with effect from 16 June 2025)",
-            "Board Risk Committee (Member, with effect from 1 April 2026)"
+            "Audit Committee"
           ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.committee_chair_of",
@@ -1369,8 +1191,8 @@
         {
           "field_path": "attendance.board_meetings_attended",
           "metric_used": "numeric_error",
-          "predicted_value": 5,
-          "ground_truth_value": 5,
+          "predicted_value": 7,
+          "ground_truth_value": 7,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1378,8 +1200,8 @@
         {
           "field_path": "attendance.board_meetings_scheduled",
           "metric_used": "numeric_error",
-          "predicted_value": 5,
-          "ground_truth_value": 5,
+          "predicted_value": 8,
+          "ground_truth_value": 8,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1387,27 +1209,27 @@
         {
           "field_path": "attendance.board_attendance_pct",
           "metric_used": "numeric_error",
-          "predicted_value": 100.0,
-          "ground_truth_value": 100.0,
+          "predicted_value": 87.5,
+          "ground_truth_value": 88.0,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
         }
       ],
-      "field_pass_rate": 0.8421052631578947,
-      "perfect_match": false,
+      "field_pass_rate": 1.0,
+      "perfect_match": true,
       "false_negative_count": 0,
       "hallucination_count": 0,
       "matched": true
     },
     {
-      "director_name": "Scott Wheway",
+      "director_name": "Rene Haas",
       "field_results": [
         {
           "field_path": "biographical.full_name",
           "metric_used": "exact_match",
-          "predicted_value": "Scott Wheway",
-          "ground_truth_value": "Scott Wheway",
+          "predicted_value": "Rene Haas",
+          "ground_truth_value": "Rene Haas",
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1415,8 +1237,8 @@
         {
           "field_path": "biographical.post_nominals",
           "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
+          "predicted_value": "CBE",
+          "ground_truth_value": "CBE",
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1424,8 +1246,8 @@
         {
           "field_path": "biographical.age",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
+          "predicted_value": 62,
+          "ground_truth_value": 62,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1451,8 +1273,12 @@
         {
           "field_path": "biographical.qualifications",
           "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
+          "predicted_value": [
+            "Bachelor of Science in Electrical and Electronics Engineering from Clarkson University"
+          ],
+          "ground_truth_value": [
+            "Bachelor of Science in Electrical and Electronics Engineering from Clarkson University"
+          ],
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1460,8 +1286,16 @@
         {
           "field_path": "biographical.expertise_areas",
           "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
+          "predicted_value": [
+            "Technology",
+            "Semiconductors",
+            "AI"
+          ],
+          "ground_truth_value": [
+            "Technology",
+            "Semiconductors",
+            "AI"
+          ],
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1469,17 +1303,23 @@
         {
           "field_path": "biographical.career_summary",
           "metric_used": "llm_semantic_similarity",
-          "predicted_value": null,
-          "ground_truth_value": "The Board is grateful for the contribution Scott made to the Group and for the leadership and commercial acumen he brought to the Board and in his role as Chair of Scottish Widows Group.",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": "CEO of Arm. Previously President of Arm's IP Product Groups, and roles at NVIDIA, Scintera Networks, Tensilica.",
+          "ground_truth_value": "CEO of Arm. Previously President of Arm's IP Product Groups, and roles at NVIDIA, Scintera Networks, Tensilica.",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.other_directorships",
           "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
+          "predicted_value": [
+            "Arm China (Board member)",
+            "SoftBank Group (Board member)"
+          ],
+          "ground_truth_value": [
+            "Arm China (Board member)",
+            "SoftBank Group (Board member)"
+          ],
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1497,25 +1337,25 @@
           "field_path": "board_role.board_role",
           "metric_used": "fuzzy_match",
           "predicted_value": "Non-Executive Director",
-          "ground_truth_value": "non-executive director of the Board",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.independence_status",
           "metric_used": "exact_match",
           "predicted_value": "Independent",
-          "ground_truth_value": "Not Independent",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
+          "ground_truth_value": "Independent",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.year_joined_board",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
+          "predicted_value": 2025,
+          "ground_truth_value": 2025,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1533,22 +1373,29 @@
           "field_path": "board_role.committee_memberships",
           "metric_used": "list_f1",
           "predicted_value": [
+            "Sustainability Committee",
             "Nomination and Governance Committee",
-            "Board Risk Committee"
+            "Remuneration Committee",
+            "Science Committee"
           ],
           "ground_truth_value": [
-            "Nomination and Governance Committee (Member)",
-            "Board Risk Committee (Member)"
+            "Nomination and Governance Committee",
+            "Remuneration Committee",
+            "Science Committee"
           ],
-          "score": 0.0,
+          "score": 0.8571428571428571,
           "passed": false,
           "failure_mode": "below_threshold"
         },
         {
           "field_path": "board_role.committee_chair_of",
           "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": [],
+          "predicted_value": [
+            "Sustainability Committee"
+          ],
+          "ground_truth_value": [
+            "Sustainability Committee"
+          ],
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1581,20 +1428,20 @@
           "failure_mode": null
         }
       ],
-      "field_pass_rate": 0.7894736842105263,
+      "field_pass_rate": 0.9473684210526315,
       "perfect_match": false,
-      "false_negative_count": 1,
+      "false_negative_count": 0,
       "hallucination_count": 0,
       "matched": true
     },
     {
-      "director_name": "Catherine Woods",
+      "director_name": "Karen Knudsen",
       "field_results": [
         {
           "field_path": "biographical.full_name",
           "metric_used": "exact_match",
-          "predicted_value": "Catherine Woods",
-          "ground_truth_value": "Catherine Woods",
+          "predicted_value": "Karen Knudsen",
+          "ground_truth_value": "Karen Knudsen",
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1611,8 +1458,8 @@
         {
           "field_path": "biographical.age",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
+          "predicted_value": 55,
+          "ground_truth_value": 55,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1648,24 +1495,22 @@
           "field_path": "biographical.expertise_areas",
           "metric_used": "list_f1",
           "predicted_value": [
-            "Executive experience of international financial institutions",
-            "risk and transformation oversight",
-            "culture and corporate governance"
+            "Oncology",
+            "Cancer research"
           ],
           "ground_truth_value": [
-            "international financial institutions",
-            "risk and transformation oversight",
-            "culture and corporate governance"
+            "Oncology",
+            "Cancer research"
           ],
-          "score": 0.6666666666666666,
-          "passed": false,
-          "failure_mode": "below_threshold"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.career_summary",
           "metric_used": "llm_semantic_similarity",
-          "predicted_value": "Catherine is a former Deputy Chair and Senior Independent Director of AIB Group plc where she also chaired the Board Audit Committee. In her executive career with J.P. Morgan Securities, she was Vice President, European Financial Institutions, Mergers and Acquisitions, and Vice President Equity Research Department, forming the European Banks Team.",
-          "ground_truth_value": "Catherine is a former Deputy Chair and Senior Independent Director of AIB Group plc where she also chaired the Board Audit Committee. In her executive career with J.P. Morgan Securities, she was Vice President, European Financial Institutions, Mergers and Acquisitions, and Vice President Equity Research Department, forming the European Banks Team.",
+          "predicted_value": "CEO of American Cancer Society, formerly Professor at Thomas Jefferson University.",
+          "ground_truth_value": "CEO of American Cancer Society, formerly Professor at Thomas Jefferson University.",
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1674,10 +1519,16 @@
           "field_path": "biographical.other_directorships",
           "metric_used": "list_f1",
           "predicted_value": [
-            "Deputy Chair of BlackRock Asset Management Ireland Limited"
+            "Parker Institute for Cancer Immunotherapy (CEO)",
+            "Exai Bio (Independent Director)",
+            "Research America (Board Member)",
+            "ArteraAI (Board Advisor)"
           ],
           "ground_truth_value": [
-            "Deputy Chair of BlackRock Asset Management Ireland Limited"
+            "Parker Institute for Cancer Immunotherapy (CEO)",
+            "Exai Bio (Independent Director)",
+            "Research America (Board Member)",
+            "ArteraAI (Board Advisor)"
           ],
           "score": 1.0,
           "passed": true,
@@ -1695,11 +1546,218 @@
         {
           "field_path": "board_role.board_role",
           "metric_used": "fuzzy_match",
-          "predicted_value": "Independent Non-Executive Director",
-          "ground_truth_value": "Chair, Board Risk Committee",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "below_threshold"
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.independence_status",
+          "metric_used": "exact_match",
+          "predicted_value": "Independent",
+          "ground_truth_value": "Independent",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.year_joined_board",
+          "metric_used": "numeric_error",
+          "predicted_value": 2025,
+          "ground_truth_value": 2025,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.tenure_years",
+          "metric_used": "numeric_error",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.committee_memberships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Science Committee",
+            "Sustainability Committee"
+          ],
+          "ground_truth_value": [
+            "Science Committee",
+            "Sustainability Committee"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.committee_chair_of",
+          "metric_used": "list_f1",
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_attended",
+          "metric_used": "numeric_error",
+          "predicted_value": 6,
+          "ground_truth_value": 6,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_scheduled",
+          "metric_used": "numeric_error",
+          "predicted_value": 6,
+          "ground_truth_value": 6,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_attendance_pct",
+          "metric_used": "numeric_error",
+          "predicted_value": 100.0,
+          "ground_truth_value": 100.0,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        }
+      ],
+      "field_pass_rate": 1.0,
+      "perfect_match": true,
+      "false_negative_count": 0,
+      "hallucination_count": 0,
+      "matched": true
+    },
+    {
+      "director_name": "Diana Layfield",
+      "field_results": [
+        {
+          "field_path": "biographical.full_name",
+          "metric_used": "exact_match",
+          "predicted_value": "Diana Layfield",
+          "ground_truth_value": "Diana Layfield",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.post_nominals",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age",
+          "metric_used": "numeric_error",
+          "predicted_value": 54,
+          "ground_truth_value": 54,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age_band",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.nationality",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.qualifications",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "BA from Oxford University",
+            "MA in International Economics and Public Administration from Harvard University"
+          ],
+          "ground_truth_value": [
+            "BA from Oxford University",
+            "MA in International Economics and Public Administration from Harvard University"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.expertise_areas",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Technology",
+            "Life sciences",
+            "Finance"
+          ],
+          "ground_truth_value": [
+            "Technology",
+            "Life sciences",
+            "Finance"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.career_summary",
+          "metric_used": "llm_semantic_similarity",
+          "predicted_value": "Senior leadership roles at Google, Standard Chartered Bank, McKinsey.",
+          "ground_truth_value": "Senior leadership roles at Google, Standard Chartered Bank, McKinsey.",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.other_directorships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "British International Investment plc (Chair)",
+            "London School of Hygiene & Tropical Medicine (Council Member)"
+          ],
+          "ground_truth_value": [
+            "British International Investment plc (Chair)",
+            "London School of Hygiene & Tropical Medicine (Council Member)"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.designation",
+          "metric_used": "exact_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.board_role",
+          "metric_used": "fuzzy_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.independence_status",
@@ -1732,15 +1790,425 @@
           "field_path": "board_role.committee_memberships",
           "metric_used": "list_f1",
           "predicted_value": [
-            "Audit Committee",
-            "Board Risk Committee",
+            "Science Committee",
             "Remuneration Committee"
           ],
           "ground_truth_value": [
-            "Board Risk Committee (Chair)",
-            "Audit Committee (Member)"
+            "Remuneration Committee",
+            "Science Committee"
           ],
-          "score": 0.0,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.committee_chair_of",
+          "metric_used": "list_f1",
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_attended",
+          "metric_used": "numeric_error",
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_scheduled",
+          "metric_used": "numeric_error",
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_attendance_pct",
+          "metric_used": "numeric_error",
+          "predicted_value": 100.0,
+          "ground_truth_value": 100.0,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        }
+      ],
+      "field_pass_rate": 1.0,
+      "perfect_match": true,
+      "false_negative_count": 0,
+      "hallucination_count": 0,
+      "matched": true
+    },
+    {
+      "director_name": "Anna Manz",
+      "field_results": [
+        {
+          "field_path": "biographical.full_name",
+          "metric_used": "exact_match",
+          "predicted_value": "Anna Manz",
+          "ground_truth_value": "Anna Manz",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.post_nominals",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age",
+          "metric_used": "numeric_error",
+          "predicted_value": 52,
+          "ground_truth_value": 52,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age_band",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.nationality",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.qualifications",
+          "metric_used": "list_f1",
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.expertise_areas",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Finance",
+            "CFO experience"
+          ],
+          "ground_truth_value": [
+            "Finance",
+            "CFO experience"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.career_summary",
+          "metric_used": "llm_semantic_similarity",
+          "predicted_value": "Previously CFO of London Stock Exchange Group and Johnson Matthey, senior finance roles at Diageo.",
+          "ground_truth_value": "Previously CFO of London Stock Exchange Group and Johnson Matthey, senior finance roles at Diageo.",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.other_directorships",
+          "metric_used": "list_f1",
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.designation",
+          "metric_used": "exact_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.board_role",
+          "metric_used": "fuzzy_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.independence_status",
+          "metric_used": "exact_match",
+          "predicted_value": "Independent",
+          "ground_truth_value": "Independent",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.year_joined_board",
+          "metric_used": "numeric_error",
+          "predicted_value": 2023,
+          "ground_truth_value": 2023,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.tenure_years",
+          "metric_used": "numeric_error",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.committee_memberships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Audit Committee"
+          ],
+          "ground_truth_value": [
+            "Audit Committee"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.committee_chair_of",
+          "metric_used": "list_f1",
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_attended",
+          "metric_used": "numeric_error",
+          "predicted_value": 8,
+          "ground_truth_value": 8,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_scheduled",
+          "metric_used": "numeric_error",
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_attendance_pct",
+          "metric_used": "numeric_error",
+          "predicted_value": 88.9,
+          "ground_truth_value": 89.0,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        }
+      ],
+      "field_pass_rate": 1.0,
+      "perfect_match": true,
+      "false_negative_count": 0,
+      "hallucination_count": 0,
+      "matched": true
+    },
+    {
+      "director_name": "Sheri McCoy",
+      "field_results": [
+        {
+          "field_path": "biographical.full_name",
+          "metric_used": "exact_match",
+          "predicted_value": "Sheri McCoy",
+          "ground_truth_value": "Sheri McCoy",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.post_nominals",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age",
+          "metric_used": "numeric_error",
+          "predicted_value": 66,
+          "ground_truth_value": 66,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age_band",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.nationality",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.qualifications",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "BSc in Textile Chemistry from University of Massachusetts Dartmouth",
+            "MSc in Chemical Engineering from Princeton University",
+            "MBA from Rutgers University"
+          ],
+          "ground_truth_value": [
+            "BSc in Textile Chemistry from University of Massachusetts Dartmouth",
+            "MSc in Chemical Engineering from Princeton University",
+            "MBA from Rutgers University"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.expertise_areas",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Pharmaceuticals",
+            "R&D",
+            "Business management"
+          ],
+          "ground_truth_value": [
+            "Pharmaceuticals",
+            "R&D",
+            "Business management"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.career_summary",
+          "metric_used": "llm_semantic_similarity",
+          "predicted_value": "Former CEO of Avon Products, 30-year career at Johnson & Johnson, latterly Vice-Chairman.",
+          "ground_truth_value": "Former CEO of Avon Products, 30-year career at Johnson & Johnson, latterly Vice-Chairman.",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.other_directorships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Stryker (Board)",
+            "Kimberly-Clark (Board)",
+            "Galderma (Board)",
+            "Sail Biomedicines (Board)",
+            "Parexel (Chair)",
+            "Dechra (Chair)"
+          ],
+          "ground_truth_value": [
+            "Stryker (Board)",
+            "Kimberly-Clark (Board)",
+            "Galderma (Board)",
+            "Sail Biomedicines (Board)",
+            "Parexel (Chair)",
+            "Dechra (Chair)"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.designation",
+          "metric_used": "exact_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.board_role",
+          "metric_used": "fuzzy_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.independence_status",
+          "metric_used": "exact_match",
+          "predicted_value": "Independent",
+          "ground_truth_value": "Independent",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.year_joined_board",
+          "metric_used": "numeric_error",
+          "predicted_value": 2017,
+          "ground_truth_value": 2017,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.tenure_years",
+          "metric_used": "numeric_error",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.committee_memberships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Remuneration Committee",
+            "Audit Committee",
+            "Nomination and Governance Committee",
+            "Sustainability Committee"
+          ],
+          "ground_truth_value": [
+            "Audit Committee",
+            "Nomination and Governance Committee",
+            "Sustainability Committee"
+          ],
+          "score": 0.8571428571428571,
           "passed": false,
           "failure_mode": "below_threshold"
         },
@@ -1748,10 +2216,10 @@
           "field_path": "board_role.committee_chair_of",
           "metric_used": "list_f1",
           "predicted_value": [
-            "Board Risk Committee"
+            "Remuneration Committee"
           ],
           "ground_truth_value": [
-            "Board Risk Committee"
+            "Remuneration Committee"
           ],
           "score": 1.0,
           "passed": true,
@@ -1760,8 +2228,8 @@
         {
           "field_path": "attendance.board_meetings_attended",
           "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
+          "predicted_value": 9,
+          "ground_truth_value": 9,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1769,8 +2237,8 @@
         {
           "field_path": "attendance.board_meetings_scheduled",
           "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": 10,
+          "predicted_value": 9,
+          "ground_truth_value": 9,
           "score": 1.0,
           "passed": true,
           "failure_mode": null
@@ -1785,1376 +2253,822 @@
           "failure_mode": null
         }
       ],
-      "field_pass_rate": 0.8421052631578947,
+      "field_pass_rate": 0.9473684210526315,
       "perfect_match": false,
       "false_negative_count": 0,
       "hallucination_count": 0,
       "matched": true
     },
     {
-      "director_name": "Sir Robin Budenberg CBE",
+      "director_name": "Tony Mok",
       "field_results": [
         {
           "field_path": "biographical.full_name",
           "metric_used": "exact_match",
-          "predicted_value": "Sir Robin Budenberg CBE",
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "predicted_value": "Tony Mok",
+          "ground_truth_value": "Tony Mok",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.post_nominals",
           "metric_used": "fuzzy_match",
           "predicted_value": null,
           "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.age",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "predicted_value": 64,
+          "ground_truth_value": 64,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.age_band",
           "metric_used": "fuzzy_match",
           "predicted_value": null,
           "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.nationality",
           "metric_used": "fuzzy_match",
           "predicted_value": null,
           "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "biographical.qualifications",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Chartered accountant"
-          ],
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "biographical.expertise_areas",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Financial services and investment banking",
-            "governance and strategic advisory",
-            "regulatory",
-            "public policy and stakeholder management"
-          ],
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "biographical.career_summary",
-          "metric_used": "llm_semantic_similarity",
-          "predicted_value": "Robin was Chair of The Crown Estate for nine years until July 2025. He spent 25 years advising UK companies and the UK Government while working for S.G. Warburg/UBS Investment Bank and was formerly Chief Executive and Chairman of UK Financial Investments (UKFI), managing the Government\u2019s investments in UK banks following the 2008 financial crisis. He qualified as a chartered accountant.",
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "biographical.other_directorships",
-          "metric_used": "list_f1",
-          "predicted_value": [],
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "board_role.designation",
-          "metric_used": "exact_match",
-          "predicted_value": "Chair",
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "board_role.board_role",
-          "metric_used": "fuzzy_match",
-          "predicted_value": "Chair",
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "board_role.independence_status",
-          "metric_used": "exact_match",
-          "predicted_value": "Chair (independent on appointment)",
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "board_role.year_joined_board",
-          "metric_used": "numeric_error",
-          "predicted_value": 2020,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "board_role.tenure_years",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "board_role.committee_memberships",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Nomination and Governance Committee",
-            "Remuneration Committee",
-            "Responsible Business Committee"
-          ],
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "board_role.committee_chair_of",
-          "metric_used": "list_f1",
-          "predicted_value": [
-            "Nomination and Governance Committee"
-          ],
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "attendance.board_meetings_attended",
-          "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "attendance.board_meetings_scheduled",
-          "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "attendance.board_attendance_pct",
-          "metric_used": "numeric_error",
-          "predicted_value": 100.0,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        }
-      ],
-      "field_pass_rate": 0.0,
-      "perfect_match": false,
-      "false_negative_count": 0,
-      "hallucination_count": 19,
-      "matched": false
-    },
-    {
-      "director_name": "Amanda Mackenzie LVO OBE",
-      "field_results": [
-        {
-          "field_path": "biographical.full_name",
-          "metric_used": "exact_match",
-          "predicted_value": "Amanda Mackenzie LVO OBE",
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "biographical.post_nominals",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "biographical.age",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "biographical.age_band",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
-        },
-        {
-          "field_path": "biographical.nationality",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.qualifications",
           "metric_used": "list_f1",
           "predicted_value": [],
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.expertise_areas",
           "metric_used": "list_f1",
           "predicted_value": [
-            "ESG matters including responsible business and sustainability",
-            "customer engagement and digital technology",
-            "marketing and brand"
+            "Oncology",
+            "Lung cancer research"
           ],
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "ground_truth_value": [
+            "Oncology",
+            "Lung cancer research"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.career_summary",
           "metric_used": "llm_semantic_similarity",
-          "predicted_value": "Amanda was Chief Executive of Business in the Community, of which King Charles III is the Royal Founding Patron and which promotes responsible business and corporate responsibility. Prior to that role, she was a member of Aviva\u2019s Group Executive for seven years as Chief Marketing and Communications Officer and was seconded to help launch the United Nations Sustainable Development Goals. She is also a former Director of British Airways AirMiles, BT, Hewlett Packard Inc and British Gas.",
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "predicted_value": "Li Shu Fan Medical Foundation endowed Professor and Chairman of Department of Clinical Oncology at Chinese University of Hong Kong.",
+          "ground_truth_value": "Li Shu Fan Medical Foundation endowed Professor and Chairman of Department of Clinical Oncology at Chinese University of Hong Kong.",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.other_directorships",
           "metric_used": "list_f1",
           "predicted_value": [
-            "Non-Executive Director of The British Land Company plc",
-            "Chair of The Queen\u2019s Reading Room",
-            "Chair and partner of Otherwise Partners LLP"
+            "HUTCHMED (China) Limited (Non-Executive Director)",
+            "Prenetics Global Limited (Scientific Advisory Board)",
+            "Insighta (Board)"
           ],
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "ground_truth_value": [
+            "HUTCHMED (China) Limited (Non-Executive Director)",
+            "Prenetics Global Limited (Scientific Advisory Board)",
+            "Insighta (Board)"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.designation",
           "metric_used": "exact_match",
           "predicted_value": "Non-Executive Director",
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.board_role",
           "metric_used": "fuzzy_match",
-          "predicted_value": "Independent Non-Executive Director",
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.independence_status",
           "metric_used": "exact_match",
           "predicted_value": "Independent",
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "ground_truth_value": "Independent",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.year_joined_board",
           "metric_used": "numeric_error",
-          "predicted_value": 2018,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "predicted_value": 2019,
+          "ground_truth_value": 2019,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.tenure_years",
           "metric_used": "numeric_error",
           "predicted_value": null,
           "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.committee_memberships",
           "metric_used": "list_f1",
           "predicted_value": [
-            "Nomination and Governance Committee",
-            "Remuneration Committee",
-            "Audit Committee",
-            "Responsible Business Committee"
+            "Science Committee"
           ],
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "ground_truth_value": [
+            "Science Committee"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.committee_chair_of",
           "metric_used": "list_f1",
-          "predicted_value": [
-            "Responsible Business Committee"
-          ],
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "attendance.board_meetings_attended",
           "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "attendance.board_meetings_scheduled",
           "metric_used": "numeric_error",
-          "predicted_value": 10,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "attendance.board_attendance_pct",
           "metric_used": "numeric_error",
           "predicted_value": 100.0,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "hallucination"
+          "ground_truth_value": 100.0,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         }
       ],
-      "field_pass_rate": 0.0,
-      "perfect_match": false,
+      "field_pass_rate": 1.0,
+      "perfect_match": true,
       "false_negative_count": 0,
-      "hallucination_count": 19,
-      "matched": false
+      "hallucination_count": 0,
+      "matched": true
     },
     {
-      "director_name": "Sir Robin Budenberg",
+      "director_name": "Marcus Wallenberg",
       "field_results": [
         {
           "field_path": "biographical.full_name",
           "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Sir Robin Budenberg",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": "Marcus Wallenberg",
+          "ground_truth_value": "Marcus Wallenberg",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.post_nominals",
           "metric_used": "fuzzy_match",
           "predicted_value": null,
-          "ground_truth_value": "CBE",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.age",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": 68,
+          "ground_truth_value": 68,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.age_band",
           "metric_used": "fuzzy_match",
           "predicted_value": null,
           "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.nationality",
           "metric_used": "fuzzy_match",
           "predicted_value": null,
           "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.qualifications",
           "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [
-            "chartered accountant"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.expertise_areas",
           "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [
-            "financial services and investment banking",
-            "governance and strategic advisory",
-            "regulatory, public policy and stakeholder management"
+          "predicted_value": [
+            "International business",
+            "Banking"
           ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "ground_truth_value": [
+            "International business",
+            "Banking"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.career_summary",
           "metric_used": "llm_semantic_similarity",
-          "predicted_value": null,
-          "ground_truth_value": "Robin was Chair of The Crown Estate for nine years until July 2025. He spent 25 years advising UK companies and the UK Government while working for S.G. Warburg/UBS Investment Bank and was formerly Chief Executive and Chairman of UK Financial Investments (UKFI), managing the Government\u2019s investments in UK banks following the 2008 financial crisis. He qualified as a chartered accountant.",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": "Extensive business experience across industries including pharmaceuticals.",
+          "ground_truth_value": "Extensive business experience across industries including pharmaceuticals.",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.other_directorships",
           "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": [
+            "Skandinaviska Enskilda Banken AB (Chair)",
+            "Saab AB (Chair)",
+            "Wallenberg Investments AB (Chair)",
+            "FAM AB (Chair)",
+            "Investor AB (Vice-Chair)",
+            "EQT AB (Vice-Chair)",
+            "Royal Swedish Academy of Engineering Sciences (Chair)",
+            "Knut and Alice Wallenberg Foundation (Board member)"
+          ],
+          "ground_truth_value": [
+            "Skandinaviska Enskilda Banken AB (Chair)",
+            "Saab AB (Chair)",
+            "Wallenberg Investments AB (Chair)",
+            "FAM AB (Chair)",
+            "Investor AB (Vice-Chair)",
+            "EQT AB (Vice-Chair)",
+            "Royal Swedish Academy of Engineering Sciences (Chair)",
+            "Knut and Alice Wallenberg Foundation (Board member)"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.designation",
           "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Chair",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.board_role",
           "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": "Chair",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.independence_status",
           "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Chair (independent on appointment)",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": "Not Independent",
+          "ground_truth_value": "Not Independent",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.year_joined_board",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": 2020,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": 1999,
+          "ground_truth_value": 1999,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.tenure_years",
           "metric_used": "numeric_error",
           "predicted_value": null,
           "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.committee_memberships",
           "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [
-            "Nomination and Governance Committee (Chair)",
-            "Responsible Business Committee (Member)",
-            "Remuneration Committee (Member)"
+          "predicted_value": [
+            "Science Committee",
+            "Sustainability Committee"
           ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "ground_truth_value": [
+            "Science Committee",
+            "Sustainability Committee"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.committee_chair_of",
           "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [
-            "Nomination and Governance Committee"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "attendance.board_meetings_attended",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": 10,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": 8,
+          "ground_truth_value": 8,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "attendance.board_meetings_scheduled",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": 10,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": 9,
+          "ground_truth_value": 9,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "attendance.board_attendance_pct",
           "metric_used": "numeric_error",
+          "predicted_value": 88.9,
+          "ground_truth_value": 89.0,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        }
+      ],
+      "field_pass_rate": 1.0,
+      "perfect_match": true,
+      "false_negative_count": 0,
+      "hallucination_count": 0,
+      "matched": true
+    },
+    {
+      "director_name": "Deborah DiSanzo",
+      "field_results": [
+        {
+          "field_path": "biographical.full_name",
+          "metric_used": "exact_match",
+          "predicted_value": "Deborah DiSanzo",
+          "ground_truth_value": "Deborah DiSanzo",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.post_nominals",
+          "metric_used": "fuzzy_match",
           "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age",
+          "metric_used": "numeric_error",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.age_band",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.nationality",
+          "metric_used": "fuzzy_match",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.qualifications",
+          "metric_used": "list_f1",
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.expertise_areas",
+          "metric_used": "list_f1",
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.career_summary",
+          "metric_used": "llm_semantic_similarity",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "biographical.other_directorships",
+          "metric_used": "list_f1",
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.designation",
+          "metric_used": "exact_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.board_role",
+          "metric_used": "fuzzy_match",
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.independence_status",
+          "metric_used": "exact_match",
+          "predicted_value": "Independent",
+          "ground_truth_value": "Independent",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.year_joined_board",
+          "metric_used": "numeric_error",
+          "predicted_value": 2017,
+          "ground_truth_value": 2017,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.tenure_years",
+          "metric_used": "numeric_error",
+          "predicted_value": null,
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.committee_memberships",
+          "metric_used": "list_f1",
+          "predicted_value": [
+            "Audit Committee"
+          ],
+          "ground_truth_value": [
+            "Audit Committee"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "board_role.committee_chair_of",
+          "metric_used": "list_f1",
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_attended",
+          "metric_used": "numeric_error",
+          "predicted_value": 3,
+          "ground_truth_value": 3,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_meetings_scheduled",
+          "metric_used": "numeric_error",
+          "predicted_value": 3,
+          "ground_truth_value": 3,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
+        },
+        {
+          "field_path": "attendance.board_attendance_pct",
+          "metric_used": "numeric_error",
+          "predicted_value": 100.0,
           "ground_truth_value": 100.0,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         }
       ],
-      "field_pass_rate": 0.0,
-      "perfect_match": false,
-      "false_negative_count": 19,
+      "field_pass_rate": 1.0,
+      "perfect_match": true,
+      "false_negative_count": 0,
       "hallucination_count": 0,
-      "matched": false
+      "matched": true
     },
     {
-      "director_name": "Amanda Mackenzie",
+      "director_name": "Andreas Rummelt",
       "field_results": [
         {
           "field_path": "biographical.full_name",
           "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Amanda Mackenzie",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": "Andreas Rummelt",
+          "ground_truth_value": "Andreas Rummelt",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.post_nominals",
           "metric_used": "fuzzy_match",
           "predicted_value": null,
-          "ground_truth_value": "LVO OBE",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.age",
           "metric_used": "numeric_error",
           "predicted_value": null,
           "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.age_band",
           "metric_used": "fuzzy_match",
           "predicted_value": null,
           "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.nationality",
           "metric_used": "fuzzy_match",
           "predicted_value": null,
           "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.qualifications",
           "metric_used": "list_f1",
-          "predicted_value": null,
+          "predicted_value": [],
           "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.expertise_areas",
           "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [
-            "ESG matters including responsible business and sustainability",
-            "customer engagement",
-            "digital technology",
-            "marketing and brand"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.career_summary",
           "metric_used": "llm_semantic_similarity",
           "predicted_value": null,
-          "ground_truth_value": "Amanda was Chief Executive of Business in the Community, of which King Charles III is the Royal Founding Patron and which promotes responsible business and corporate responsibility. Prior to that role, she was a member of Aviva\u2019s Group Executive for seven years as Chief Marketing and Communications Officer and was seconded to help launch the United Nations Sustainable Development Goals. She is also a former Director of British Airways AirMiles, BT, Hewlett Packard Inc and British Gas.",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "ground_truth_value": null,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "biographical.other_directorships",
           "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [
-            "Non-Executive Director of The British Land Company plc",
-            "Chair of The Queen\u2019s Reading Room",
-            "Chair and partner of Otherwise Partners LLP"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.designation",
           "metric_used": "exact_match",
-          "predicted_value": null,
+          "predicted_value": "Non-Executive Director",
           "ground_truth_value": "Non-Executive Director",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.board_role",
           "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": "Chair, Responsible Business Committee",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": "Non-Executive Director",
+          "ground_truth_value": "Non-Executive Director",
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.independence_status",
           "metric_used": "exact_match",
-          "predicted_value": null,
+          "predicted_value": "Independent",
           "ground_truth_value": "Independent",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.year_joined_board",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": 2018,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": 2021,
+          "ground_truth_value": 2021,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.tenure_years",
           "metric_used": "numeric_error",
           "predicted_value": null,
           "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.committee_memberships",
           "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [
-            "Remuneration Committee (Member)",
-            "Nomination and Governance Committee (Member)",
-            "Audit Committee (Member)",
-            "Responsible Business Committee (Chair)"
+          "predicted_value": [
+            "Sustainability Committee"
           ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "ground_truth_value": [
+            "Sustainability Committee"
+          ],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "board_role.committee_chair_of",
           "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [
-            "Responsible Business Committee"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": [],
+          "ground_truth_value": [],
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "attendance.board_meetings_attended",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": 10,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": 3,
+          "ground_truth_value": 3,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "attendance.board_meetings_scheduled",
           "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": 10,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "predicted_value": 3,
+          "ground_truth_value": 3,
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         },
         {
           "field_path": "attendance.board_attendance_pct",
           "metric_used": "numeric_error",
-          "predicted_value": null,
+          "predicted_value": 100.0,
           "ground_truth_value": 100.0,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
+          "score": 1.0,
+          "passed": true,
+          "failure_mode": null
         }
       ],
-      "field_pass_rate": 0.0,
-      "perfect_match": false,
-      "false_negative_count": 19,
+      "field_pass_rate": 1.0,
+      "perfect_match": true,
+      "false_negative_count": 0,
       "hallucination_count": 0,
-      "matched": false
-    },
-    {
-      "director_name": "Nigel Hinshelwood",
-      "field_results": [
-        {
-          "field_path": "biographical.full_name",
-          "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Nigel Hinshelwood",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.post_nominals",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.age",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.age_band",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.nationality",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.qualifications",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.expertise_areas",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [
-            "financial services sector in the UK and worldwide",
-            "large-scale transformation",
-            "operations",
-            "technology"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.career_summary",
-          "metric_used": "llm_semantic_similarity",
-          "predicted_value": null,
-          "ground_truth_value": "Nigel was a partner at Ernst & Young and also held various roles at HSBC, including Deputy CEO of HSBC Bank plc, Head of HSBC Insurance Holdings, Chief Operating Officer for EMEA and Global Head of Operations.",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.other_directorships",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.designation",
-          "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Non-Executive Director",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.board_role",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": "Senior Independent Director of the Ring-Fenced Banks",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.independence_status",
-          "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Independent",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.year_joined_board",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": 2019,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.tenure_years",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.committee_memberships",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.committee_chair_of",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "attendance.board_meetings_attended",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "attendance.board_meetings_scheduled",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "attendance.board_attendance_pct",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        }
-      ],
-      "field_pass_rate": 0.0,
-      "perfect_match": false,
-      "false_negative_count": 19,
-      "hallucination_count": 0,
-      "matched": false
-    },
-    {
-      "director_name": "Sarah Bentley",
-      "field_results": [
-        {
-          "field_path": "biographical.full_name",
-          "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Sarah Bentley",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.post_nominals",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.age",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.age_band",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.nationality",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.qualifications",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.expertise_areas",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [
-            "digital and digital transformation",
-            "customer and marketing"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.career_summary",
-          "metric_used": "llm_semantic_similarity",
-          "predicted_value": null,
-          "ground_truth_value": "Sarah was formerly Chief Executive Officer and Executive Director of Thames Water Utilities Limited. Prior to those roles, Sarah was Chief Customer Officer at Severn Trent plc and a member of its Executive Committee and the Managing Partner for Accenture\u2019s Digital business unit in the UK & Ireland.",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.other_directorships",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.designation",
-          "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Non-Executive Director",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.board_role",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": "Non-executive director of the Ring-Fenced Banks",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.independence_status",
-          "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Independent",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.year_joined_board",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": 2019,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.tenure_years",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.committee_memberships",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.committee_chair_of",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "attendance.board_meetings_attended",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "attendance.board_meetings_scheduled",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "attendance.board_attendance_pct",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        }
-      ],
-      "field_pass_rate": 0.0,
-      "perfect_match": false,
-      "false_negative_count": 19,
-      "hallucination_count": 0,
-      "matched": false
-    },
-    {
-      "director_name": "Brendan Gilligan",
-      "field_results": [
-        {
-          "field_path": "biographical.full_name",
-          "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Brendan Gilligan",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.post_nominals",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.age",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.age_band",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.nationality",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.qualifications",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.expertise_areas",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [
-            "core strategic finance and controllership roles in the financial services industry",
-            "serving on the boards of regulated financial services businesses in the UK, France, Switzerland and Poland"
-          ],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.career_summary",
-          "metric_used": "llm_semantic_similarity",
-          "predicted_value": null,
-          "ground_truth_value": "Brendan worked in commercial and consumer banking services and financing with Woodchester Investments plc and, after its acquisition by General Electric Company, with GE Capital.",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "biographical.other_directorships",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.designation",
-          "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Non-Executive Director",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.board_role",
-          "metric_used": "fuzzy_match",
-          "predicted_value": null,
-          "ground_truth_value": "Independent non-executive director of the Ring-Fenced Banks",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.independence_status",
-          "metric_used": "exact_match",
-          "predicted_value": null,
-          "ground_truth_value": "Independent",
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.year_joined_board",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": 2019,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.tenure_years",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.committee_memberships",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "board_role.committee_chair_of",
-          "metric_used": "list_f1",
-          "predicted_value": null,
-          "ground_truth_value": [],
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "attendance.board_meetings_attended",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "attendance.board_meetings_scheduled",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        },
-        {
-          "field_path": "attendance.board_attendance_pct",
-          "metric_used": "numeric_error",
-          "predicted_value": null,
-          "ground_truth_value": null,
-          "score": 0.0,
-          "passed": false,
-          "failure_mode": "false_negative"
-        }
-      ],
-      "field_pass_rate": 0.0,
-      "perfect_match": false,
-      "false_negative_count": 19,
-      "hallucination_count": 0,
-      "matched": false
+      "matched": true
     }
   ],
-  "document_field_pass_rate": 0.48026315789473684,
+  "document_field_pass_rate": 0.9824561403508771,
   "document_perfect_match": false,
-  "director_perfect_match_rate": 0.0,
+  "director_perfect_match_rate": 0.6666666666666666,
   "per_field_pass_rate": {
-    "biographical.full_name": 0.5625,
-    "biographical.post_nominals": 0.5625,
-    "biographical.age": 0.5625,
-    "biographical.age_band": 0.5625,
-    "biographical.nationality": 0.5625,
-    "biographical.qualifications": 0.5,
-    "biographical.expertise_areas": 0.0625,
-    "biographical.career_summary": 0.3125,
-    "biographical.other_directorships": 0.5,
-    "board_role.designation": 0.5625,
-    "board_role.board_role": 0.3125,
-    "board_role.independence_status": 0.5,
-    "board_role.year_joined_board": 0.5625,
-    "board_role.tenure_years": 0.5625,
-    "board_role.committee_memberships": 0.1875,
-    "board_role.committee_chair_of": 0.5625,
-    "attendance.board_meetings_attended": 0.5625,
-    "attendance.board_meetings_scheduled": 0.5625,
-    "attendance.board_attendance_pct": 0.5625
+    "biographical.full_name": 1.0,
+    "biographical.post_nominals": 1.0,
+    "biographical.age": 1.0,
+    "biographical.age_band": 1.0,
+    "biographical.nationality": 1.0,
+    "biographical.qualifications": 1.0,
+    "biographical.expertise_areas": 1.0,
+    "biographical.career_summary": 1.0,
+    "biographical.other_directorships": 1.0,
+    "board_role.designation": 1.0,
+    "board_role.board_role": 1.0,
+    "board_role.independence_status": 1.0,
+    "board_role.year_joined_board": 1.0,
+    "board_role.tenure_years": 1.0,
+    "board_role.committee_memberships": 0.6666666666666666,
+    "board_role.committee_chair_of": 1.0,
+    "attendance.board_meetings_attended": 1.0,
+    "attendance.board_meetings_scheduled": 1.0,
+    "attendance.board_attendance_pct": 1.0
   },
   "per_field_type_pass_rate": {
-    "biographical": 0.4652777777777778,
-    "board_role": 0.4642857142857143,
-    "attendance": 0.5625
+    "biographical": 1.0,
+    "board_role": 0.9523809523809523,
+    "attendance": 1.0
   },
-  "false_negative_rate": 0.3333333333333333,
-  "hallucination_rate": 0.20930232558139536
+  "false_negative_rate": 0.0,
+  "hallucination_rate": 0.0
 }

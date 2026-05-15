@@ -25,7 +25,7 @@ uv run gov-extract extract \
 
 
 ## For Lloyds Banking Group
-uv run gov-extract extract data/2025-lbg-annual-report.pdf \
+uv run gov-extract extract data/2025-lbg-annual-report.pdf  data/2025-lbg-notice-of-agm.pdf \
   --company "Lloyds Banking Group" --year 2025 \
   --output-dir ./outputs/lbg-2025 --eval-id lbg-2025
 

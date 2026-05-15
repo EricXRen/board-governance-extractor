@@ -14,6 +14,7 @@ from gov_extract.models.director import (
     CommitteeAttendance,
     Director,
 )
+from gov_extract.models.director_election import DirectorElection, DirectorElectionSummary
 from gov_extract.models.document import BoardGovernanceDocument
 from gov_extract.models.metadata import CompanyMetadata
 
@@ -107,9 +108,9 @@ class TestDirectorModels:
 
     def test_biographical_defaults(self) -> None:
         bio = BiographicalDetails(full_name="Test Person")
-        assert bio.qualifications == []
-        assert bio.expertise_areas == []
-        assert bio.other_directorships == []
+        assert bio.gender is None
+        assert bio.affiliation is None
+        assert bio.career_summary is None
 
     def test_extra_field_forbidden_biographical(self) -> None:
         with pytest.raises(ValidationError):
@@ -133,3 +134,44 @@ class TestBoardGovernanceDocument:
         assert "properties" in schema
         assert "company" in schema["properties"]
         assert "directors" in schema["properties"]
+
+    def test_director_election_optional(self) -> None:
+        doc = BoardGovernanceDocument(company=make_metadata(), directors=[])
+        assert doc.director_election is None
+
+    def test_director_election_round_trip(self) -> None:
+        election = DirectorElection(
+            summary=DirectorElectionSummary(
+                num_directors_to_elect=3,
+                incumbent_nominees=["Alice Smith", "Bob Jones"],
+                new_nominees=["Carol White"],
+                candidates_disclosed=True,
+            ),
+            candidates=[],
+        )
+        doc = BoardGovernanceDocument(
+            company=make_metadata(), directors=[], director_election=election
+        )
+        restored = BoardGovernanceDocument.model_validate_json(doc.model_dump_json())
+        assert restored.director_election is not None
+        assert restored.director_election.summary.num_directors_to_elect == 3
+        assert restored.director_election.summary.incumbent_nominees == ["Alice Smith", "Bob Jones"]
+        assert restored.director_election.summary.candidates_disclosed is True
+
+
+class TestDirectorElectionModels:
+    def test_summary_defaults(self) -> None:
+        s = DirectorElectionSummary()
+        assert s.num_directors_to_elect is None
+        assert s.incumbent_nominees == []
+        assert s.new_nominees == []
+        assert s.candidates_disclosed is None
+
+    def test_election_defaults(self) -> None:
+        e = DirectorElection()
+        assert e.candidates == []
+        assert e.summary.num_directors_to_elect is None
+
+    def test_extra_field_forbidden(self) -> None:
+        with pytest.raises(ValidationError):
+            DirectorElectionSummary(num_directors_to_elect=2, unknown="x")  # type: ignore[call-arg]

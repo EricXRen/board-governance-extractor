@@ -19,9 +19,13 @@
         "age_band": "61-65",
         "nationality": "British",
         "qualifications": [],
-        "expertise_areas": ["Financial Services", "Strategy", "Corporate Finance", "Government & Regulation"],
-        "career_summary": "Robin was Chair of UK Financial Investments from 2012 to 2021. He was previously Deputy Chairman and Head of UK Investment Banking at UBS. He is a Trustee of the Tate.",
-        "other_directorships": []
+        "expertise_areas": [
+          "Financial Services",
+          "Strategy",
+          "Corporate Finance",
+          "Government & Regulation"
+        ],
+        "career_summary": "Robin was Chair of UK Financial Investments from 2012 to 2021. He was previously Deputy Chairman and Head of UK Investment Banking at UBS. He is a Trustee of the Tate."
       },
       "board_role": {
         "designation": "Chair",
@@ -31,8 +35,12 @@
         "date_joined_board": "2021-01-01",
         "tenure_years": 4.0,
         "year_end_status": "Active",
-        "committee_memberships": ["Nominations and Governance Committee"],
-        "committee_chair_of": ["Nominations and Governance Committee"],
+        "committee_memberships": [
+          "Nominations and Governance Committee"
+        ],
+        "committee_chair_of": [
+          "Nominations and Governance Committee"
+        ],
         "special_roles": []
       },
       "attendance": {
@@ -59,9 +67,13 @@
         "age_band": "46-50",
         "nationality": "British",
         "qualifications": [],
-        "expertise_areas": ["Banking", "Retail Financial Services", "Technology", "Strategy"],
-        "career_summary": "Charlie joined Lloyds Banking Group as Group Chief Executive in August 2021. He was previously Head of Wealth and Personal Banking at HSBC.",
-        "other_directorships": []
+        "expertise_areas": [
+          "Banking",
+          "Retail Financial Services",
+          "Technology",
+          "Strategy"
+        ],
+        "career_summary": "Charlie joined Lloyds Banking Group as Group Chief Executive in August 2021. He was previously Head of Wealth and Personal Banking at HSBC."
       },
       "board_role": {
         "designation": "Executive Director",
@@ -90,10 +102,15 @@
         "age": null,
         "age_band": "51-55",
         "nationality": "British",
-        "qualifications": ["CA"],
-        "expertise_areas": ["Finance", "Banking", "Capital Markets"],
-        "career_summary": "William joined Lloyds Banking Group as Chief Financial Officer in October 2019. He was previously CFO of Prudential plc's US business Jackson National Life.",
-        "other_directorships": []
+        "qualifications": [
+          "CA"
+        ],
+        "expertise_areas": [
+          "Finance",
+          "Banking",
+          "Capital Markets"
+        ],
+        "career_summary": "William joined Lloyds Banking Group as Chief Financial Officer in October 2019. He was previously CFO of Prudential plc's US business Jackson National Life."
       },
       "board_role": {
         "designation": "Executive Director",
@@ -123,9 +140,13 @@
         "age_band": "51-55",
         "nationality": "British",
         "qualifications": [],
-        "expertise_areas": ["Utility Sector", "Customer Experience", "Digital Transformation", "ESG"],
-        "career_summary": "Sarah was Chief Executive of Thames Water from 2021 to 2023. She has previously held senior roles at Severn Trent and Accenture.",
-        "other_directorships": ["Landsec Group PLC"]
+        "expertise_areas": [
+          "Utility Sector",
+          "Customer Experience",
+          "Digital Transformation",
+          "ESG"
+        ],
+        "career_summary": "Sarah was Chief Executive of Thames Water from 2021 to 2023. She has previously held senior roles at Severn Trent and Accenture."
       },
       "board_role": {
         "designation": "Non-Executive Director",
@@ -135,7 +156,10 @@
         "date_joined_board": "2023-09-01",
         "tenure_years": 1.3,
         "year_end_status": "Active",
-        "committee_memberships": ["Remuneration Committee", "Responsible Business Committee"],
+        "committee_memberships": [
+          "Remuneration Committee",
+          "Responsible Business Committee"
+        ],
         "committee_chair_of": [],
         "special_roles": []
       },
@@ -162,10 +186,16 @@
         "age": null,
         "age_band": "56-60",
         "nationality": "British",
-        "qualifications": ["ACA"],
-        "expertise_areas": ["Financial Services", "Insurance", "Risk", "Finance"],
-        "career_summary": "Liam was Chief Executive of Covea Insurance in the UK. He has previously held senior roles at Prudential, Aviva and Direct Line.",
-        "other_directorships": []
+        "qualifications": [
+          "ACA"
+        ],
+        "expertise_areas": [
+          "Financial Services",
+          "Insurance",
+          "Risk",
+          "Finance"
+        ],
+        "career_summary": "Liam was Chief Executive of Covea Insurance in the UK. He has previously held senior roles at Prudential, Aviva and Direct Line."
       },
       "board_role": {
         "designation": "Non-Executive Director",
@@ -175,7 +205,10 @@
         "date_joined_board": "2022-06-01",
         "tenure_years": 2.6,
         "year_end_status": "Active",
-        "committee_memberships": ["Audit Committee", "Risk Committee"],
+        "committee_memberships": [
+          "Audit Committee",
+          "Risk Committee"
+        ],
         "committee_chair_of": [],
         "special_roles": []
       },
@@ -210,9 +243,13 @@
         "age_band": "51-55",
         "nationality": "British",
         "qualifications": [],
-        "expertise_areas": ["Legal", "Regulatory", "Financial Services", "Governance"],
-        "career_summary": "Toni is a solicitor and was Group General Counsel at Legal & General Group. She has also held senior legal roles at RBS.",
-        "other_directorships": ["Aviva PLC"]
+        "expertise_areas": [
+          "Legal",
+          "Regulatory",
+          "Financial Services",
+          "Governance"
+        ],
+        "career_summary": "Toni is a solicitor and was Group General Counsel at Legal & General Group. She has also held senior legal roles at RBS."
       },
       "board_role": {
         "designation": "Non-Executive Director",
@@ -222,7 +259,11 @@
         "date_joined_board": "2020-10-01",
         "tenure_years": 4.3,
         "year_end_status": "Active",
-        "committee_memberships": ["Audit Committee", "Nominations and Governance Committee", "Responsible Business Committee"],
+        "committee_memberships": [
+          "Audit Committee",
+          "Nominations and Governance Committee",
+          "Responsible Business Committee"
+        ],
         "committee_chair_of": [],
         "special_roles": []
       },
@@ -250,9 +291,13 @@
         "age_band": "66-70",
         "nationality": "British",
         "qualifications": [],
-        "expertise_areas": ["Banking", "Risk", "Credit", "Financial Services"],
-        "career_summary": "Alan was Group Chief Risk Officer at Royal Bank of Scotland. He was also a Non-Executive Director of Ulster Bank.",
-        "other_directorships": []
+        "expertise_areas": [
+          "Banking",
+          "Risk",
+          "Credit",
+          "Financial Services"
+        ],
+        "career_summary": "Alan was Group Chief Risk Officer at Royal Bank of Scotland. He was also a Non-Executive Director of Ulster Bank."
       },
       "board_role": {
         "designation": "Non-Executive Director",
@@ -262,9 +307,17 @@
         "date_joined_board": "2018-01-01",
         "tenure_years": 7.0,
         "year_end_status": "Active",
-        "committee_memberships": ["Risk Committee", "Remuneration Committee", "Nominations and Governance Committee"],
-        "committee_chair_of": ["Risk Committee"],
-        "special_roles": ["Senior Independent Director"]
+        "committee_memberships": [
+          "Risk Committee",
+          "Remuneration Committee",
+          "Nominations and Governance Committee"
+        ],
+        "committee_chair_of": [
+          "Risk Committee"
+        ],
+        "special_roles": [
+          "Senior Independent Director"
+        ]
       },
       "attendance": {
         "board_meetings_attended": 10,
@@ -297,9 +350,13 @@
         "age_band": "56-60",
         "nationality": "British",
         "qualifications": [],
-        "expertise_areas": ["Marketing", "Brand", "Sustainability", "Consumer"],
-        "career_summary": "Amanda is Chair of WWF-UK. She was previously Chief Marketing and Communications Officer at Aviva and has held senior roles at BT and British Airways.",
-        "other_directorships": ["WWF-UK"]
+        "expertise_areas": [
+          "Marketing",
+          "Brand",
+          "Sustainability",
+          "Consumer"
+        ],
+        "career_summary": "Amanda is Chair of WWF-UK. She was previously Chief Marketing and Communications Officer at Aviva and has held senior roles at BT and British Airways."
       },
       "board_role": {
         "designation": "Non-Executive Director",
@@ -309,8 +366,14 @@
         "date_joined_board": "2020-03-01",
         "tenure_years": 5.0,
         "year_end_status": "Active",
-        "committee_memberships": ["Remuneration Committee", "Responsible Business Committee", "Nominations and Governance Committee"],
-        "committee_chair_of": ["Responsible Business Committee"],
+        "committee_memberships": [
+          "Remuneration Committee",
+          "Responsible Business Committee",
+          "Nominations and Governance Committee"
+        ],
+        "committee_chair_of": [
+          "Responsible Business Committee"
+        ],
         "special_roles": []
       },
       "attendance": {
@@ -337,9 +400,13 @@
         "age_band": "61-65",
         "nationality": "British",
         "qualifications": [],
-        "expertise_areas": ["Insurance", "Financial Services", "Strategy", "Risk"],
-        "career_summary": "Nick was Chair of Pension Insurance Corporation and CEO of Lloyd's of London. He is also Chair of Scottish Widows Group.",
-        "other_directorships": ["Scottish Widows Group Limited"]
+        "expertise_areas": [
+          "Insurance",
+          "Financial Services",
+          "Strategy",
+          "Risk"
+        ],
+        "career_summary": "Nick was Chair of Pension Insurance Corporation and CEO of Lloyd's of London. He is also Chair of Scottish Widows Group."
       },
       "board_role": {
         "designation": "Non-Executive Director",
@@ -349,9 +416,14 @@
         "date_joined_board": "2018-09-01",
         "tenure_years": 6.3,
         "year_end_status": "Active",
-        "committee_memberships": ["Risk Committee", "Nominations and Governance Committee"],
+        "committee_memberships": [
+          "Risk Committee",
+          "Nominations and Governance Committee"
+        ],
         "committee_chair_of": [],
-        "special_roles": ["Chair of Scottish Widows Group"]
+        "special_roles": [
+          "Chair of Scottish Widows Group"
+        ]
       },
       "attendance": {
         "board_meetings_attended": 9,
@@ -377,9 +449,13 @@
         "age_band": "56-60",
         "nationality": "British",
         "qualifications": [],
-        "expertise_areas": ["Retail", "Consumer", "Digital", "Marketing"],
-        "career_summary": "Stuart was Chief Marketing Officer at Barclays and has held leadership roles at Nationwide Building Society and Virgin Money.",
-        "other_directorships": []
+        "expertise_areas": [
+          "Retail",
+          "Consumer",
+          "Digital",
+          "Marketing"
+        ],
+        "career_summary": "Stuart was Chief Marketing Officer at Barclays and has held leadership roles at Nationwide Building Society and Virgin Money."
       },
       "board_role": {
         "designation": "Non-Executive Director",
@@ -389,8 +465,13 @@
         "date_joined_board": "2021-03-01",
         "tenure_years": 3.8,
         "year_end_status": "Active",
-        "committee_memberships": ["Audit Committee", "Remuneration Committee"],
-        "committee_chair_of": ["Remuneration Committee"],
+        "committee_memberships": [
+          "Audit Committee",
+          "Remuneration Committee"
+        ],
+        "committee_chair_of": [
+          "Remuneration Committee"
+        ],
         "special_roles": []
       },
       "attendance": {
@@ -423,10 +504,16 @@
         "age": null,
         "age_band": "51-55",
         "nationality": "British",
-        "qualifications": ["FCA"],
-        "expertise_areas": ["Finance", "Technology", "Digital", "Financial Services"],
-        "career_summary": "Cathy was CFO of Kingfisher plc and has held finance roles at Travis Perkins and Pearson. She is a Fellow of the ICAEW.",
-        "other_directorships": ["Haleon plc"]
+        "qualifications": [
+          "FCA"
+        ],
+        "expertise_areas": [
+          "Finance",
+          "Technology",
+          "Digital",
+          "Financial Services"
+        ],
+        "career_summary": "Cathy was CFO of Kingfisher plc and has held finance roles at Travis Perkins and Pearson. She is a Fellow of the ICAEW."
       },
       "board_role": {
         "designation": "Non-Executive Director",
@@ -436,8 +523,13 @@
         "date_joined_board": "2022-03-01",
         "tenure_years": 2.8,
         "year_end_status": "Active",
-        "committee_memberships": ["Audit Committee", "Risk Committee"],
-        "committee_chair_of": ["Audit Committee"],
+        "committee_memberships": [
+          "Audit Committee",
+          "Risk Committee"
+        ],
+        "committee_chair_of": [
+          "Audit Committee"
+        ],
         "special_roles": []
       },
       "attendance": {

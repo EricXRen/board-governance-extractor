@@ -41,15 +41,13 @@ The application must extract the following fields per director. All fields are *
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `full_name` | string | As printed, including post-nominals (e.g. "Sir Robin Budenberg CBE") |
-| `post_nominals` | string | Honours/qualifications appended to name |
+| `full_name` | string | Given name + surname only; strip any pre-nominals (Sir, Lord, Dr) and post-nominals (CBE, OBE, etc.) from the extracted text |
+| `post_nominals` | string | Honours and qualifications appended to the name (e.g. "CBE", "FCA") |
 | `age` | integer | If exact age is given; otherwise `null` |
 | `age_band` | string | If only a band is given (e.g. "56–60") |
-| `nationality` | string | As disclosed |
-| `qualifications` | list[string] | Professional qualifications (e.g. ACA, MBA) |
-| `expertise_areas` | list[string] | Key skills/domains as listed in the report |
+| `gender` | string | As disclosed in the filing (e.g. "Male", "Female") |
+| `affiliation` | string | Current institutional affiliation or primary employer as stated |
 | `career_summary` | string | Free-text biography as extracted |
-| `other_directorships` | list[string] | External board roles held currently |
 
 #### FR-2.2 Board Role & Independence
 
@@ -61,10 +59,13 @@ The application must extract the following fields per director. All fields are *
 | `year_joined_board` | integer | Year of board appointment |
 | `date_joined_board` | string | Full date if available (ISO-8601: YYYY-MM-DD) |
 | `tenure_years` | float | Computed or stated tenure in years |
+| `term_end_year` | integer | Year the director's current term expires, if disclosed |
 | `year_end_status` | string | E.g. "Active", "Retired YYYY-MM-DD" |
 | `committee_memberships` | list[string] | Names of committees the director sits on |
 | `committee_chair_of` | list[string] | Names of committees the director chairs |
-| `special_roles` | list[string] | E.g. "Senior Independent Director", "Chair of Scottish Widows Group" |
+| `other_positions` | list[string] | Other notable positions, e.g. "Senior Independent Director", "Chair of Scottish Widows Group" |
+| `num_holding_shares` | integer | Number of shares held by the director, if disclosed |
+| `pct_holding_shares` | float | Director's shareholding as a percentage of total outstanding shares, if disclosed (0–100) |
 
 #### FR-2.3 Attendance & Performance
 
@@ -131,6 +132,23 @@ Computation rules (applied as fallback when the filing does not state the value)
 - `ceo_chair_separated` = True if no single director holds both "Chair" designation and a CEO/Chief Executive board role
 
 `pct_women` and `voting_standard` have no computation fallback and must come from the filing text.
+
+#### FR-2.6 Director Election
+
+When a filing contains a director election section (AGM agenda, proxy vote proposal, or similar), the application must extract a `director_election` block at the top level of the document. This block is `null` when no election section exists.
+
+**DirectorElectionSummary** (aggregate):
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `num_directors_to_elect` | integer | Number of board seats to be filled |
+| `incumbent_nominees` | list[string] | Names of current board members standing for re-election |
+| `new_nominees` | list[string] | Names of candidates not currently on the board |
+| `candidates_disclosed` | boolean | `false` only when filing explicitly states names are withheld; `true` when names are listed; `null` if not mentioned |
+
+**DirectorElection.candidates** — a list of election candidates, each using the same `Director` schema as current board members (all fields optional).
+
+Extraction rule: always single-pass (same as board summary — never chunked). In two-round mode, extracted from the combined round-1 Markdown.
 
 ### FR-3 — Output: Excel Workbook
 
@@ -389,10 +407,30 @@ BoardGovernanceDocument
 ├── company: CompanyMetadata
 ├── directors: list[Director]
 │   ├── biographical: BiographicalDetails
+│   │   ├── full_name: str              # given name + surname only, no honorifics
+│   │   ├── post_nominals: str | None
+│   │   ├── age: int | None
+│   │   ├── age_band: str | None
+│   │   ├── gender: str | None
+│   │   ├── affiliation: str | None
+│   │   └── career_summary: str | None
 │   ├── board_role: BoardRoleDetails
+│   │   ├── designation: Literal[...]
+│   │   ├── board_role: str
+│   │   ├── independence_status: Literal[...]
+│   │   ├── year_joined_board: int | None
+│   │   ├── date_joined_board: str | None
+│   │   ├── tenure_years: float | None
+│   │   ├── term_end_year: int | None
+│   │   ├── year_end_status: str
+│   │   ├── committee_memberships: list[str]
+│   │   ├── committee_chair_of: list[str]
+│   │   ├── other_positions: list[str]
+│   │   ├── num_holding_shares: int | None
+│   │   └── pct_holding_shares: float | None
 │   └── attendance: AttendanceDetails
 │       └── committee_attendance: list[CommitteeAttendance]
-└── board_summary: BoardSummary
+├── board_summary: BoardSummary
     ├── ceo_chair_separated: bool | None
     ├── voting_standard: "Majority" | "Plurality" | None
     ├── board_size: int | None
@@ -404,6 +442,13 @@ BoardGovernanceDocument
     ├── avg_director_age: float | None
     ├── avg_tenure_years: float | None
     └── notes: str | None
+└── director_election: DirectorElection | None
+    ├── summary: DirectorElectionSummary
+    │   ├── num_directors_to_elect: int | None
+    │   ├── incumbent_nominees: list[str]
+    │   ├── new_nominees: list[str]
+    │   └── candidates_disclosed: bool | None
+    └── candidates: list[Director]   # same schema as directors above
 ```
 
 All models derive from `pydantic.BaseModel` with `model_config = ConfigDict(extra="forbid")`.

@@ -11,6 +11,7 @@ from openpyxl.utils import get_column_letter
 
 from gov_extract.models.board_summary import BoardSummary
 from gov_extract.models.director import Director
+from gov_extract.models.director_election import DirectorElection
 from gov_extract.models.document import BoardGovernanceDocument
 
 logger = structlog.get_logger()
@@ -192,10 +193,12 @@ def _write_board_overview(wb: Workbook, doc: BoardGovernanceDocument) -> None:
         "Independence",
         "Year Joined",
         "Tenure (yrs)",
-        "Nationality",
+        "Term End Year",
         "Status",
         "Committees",
         "Chairs",
+        "Shares Held",
+        "% Shares",
         "Board Meetings",
         "Attendance %",
     ]
@@ -219,10 +222,12 @@ def _write_board_overview(wb: Workbook, doc: BoardGovernanceDocument) -> None:
             role.independence_status,
             role.year_joined_board,
             role.tenure_years,
-            bio.nationality,
+            role.term_end_year,
             role.year_end_status,
             committees,
             chairs,
+            role.num_holding_shares,
+            _format_pct(role.pct_holding_shares) if role.pct_holding_shares is not None else "N/A",
             board_mtg,
             _format_pct(att.board_attendance_pct),
         ]
@@ -232,7 +237,7 @@ def _write_board_overview(wb: Workbook, doc: BoardGovernanceDocument) -> None:
         _apply_row_style(ws, row_idx, fill, alt=(i % 2 == 0))
 
         # Traffic-light attendance cell
-        att_cell = ws.cell(row=row_idx, column=12)
+        att_cell = ws.cell(row=row_idx, column=14)
         att_cell.fill = _att_fill(att.board_attendance_pct)
 
     _autofit_columns(ws)
@@ -246,11 +251,9 @@ def _write_biographical(wb: Workbook, doc: BoardGovernanceDocument) -> None:
         "Post-Nominals",
         "Age",
         "Age Band",
-        "Nationality",
-        "Qualifications",
-        "Expertise Areas",
+        "Gender",
+        "Affiliation",
         "Career Summary",
-        "Other Directorships",
     ]
     _write_header(ws, headers)
 
@@ -261,11 +264,9 @@ def _write_biographical(wb: Workbook, doc: BoardGovernanceDocument) -> None:
             bio.post_nominals,
             bio.age,
             bio.age_band,
-            bio.nationality,
-            "; ".join(bio.qualifications),
-            "; ".join(bio.expertise_areas),
+            bio.gender,
+            bio.affiliation,
             bio.career_summary,
-            "; ".join(bio.other_directorships),
         ]
         ws.append(row)
         fill = _director_fill(director)
@@ -361,6 +362,102 @@ def _write_meeting_attendance(wb: Workbook, doc: BoardGovernanceDocument) -> Non
     _add_footer(ws, len(doc.directors) + 1, len(headers), _footer_text(doc))
 
 
+def _write_election_summary(wb: Workbook, election: DirectorElection, footer: str) -> None:
+    """Write the Election Summary sheet — two-column metric/value table."""
+    ws = wb.create_sheet("Election Summary")
+    _write_header(ws, ["Metric", "Value"])
+    ws.column_dimensions["A"].width = 30
+    ws.column_dimensions["B"].width = 40
+
+    summary = election.summary
+
+    def _yn(v: bool | None) -> str:
+        if v is None:
+            return "N/A"
+        return "Yes" if v else "No"
+
+    rows = [
+        ("Directors to Elect", summary.num_directors_to_elect if summary.num_directors_to_elect is not None else "N/A"),
+        ("Candidates Disclosed", _yn(summary.candidates_disclosed)),
+        ("Incumbent Nominees", "; ".join(summary.incumbent_nominees) or "N/A"),
+        ("New Nominees", "; ".join(summary.new_nominees) or "N/A"),
+        ("Total Candidates", len(election.candidates)),
+    ]
+
+    for i, (metric, value) in enumerate(rows, 2):
+        ws.cell(row=i, column=1).value = metric
+        ws.cell(row=i, column=2).value = value
+        fill = _row_fill(ALT_BG) if i % 2 == 0 else PatternFill()
+        for col in (1, 2):
+            cell = ws.cell(row=i, column=col)
+            cell.fill = fill
+            cell.font = _cell_font()
+            cell.border = _thin_border()
+            cell.alignment = Alignment(vertical="center", wrap_text=True)
+
+    _add_footer(ws, len(rows) + 2, 2, footer)
+
+
+def _write_election_candidates(wb: Workbook, election: DirectorElection, footer: str) -> None:
+    """Write the Election Candidates sheet — same layout as Board Overview."""
+    ws = wb.create_sheet("Election Candidates")
+    headers = [
+        "Name",
+        "Designation",
+        "Board Role",
+        "Independence",
+        "Year Joined",
+        "Tenure (yrs)",
+        "Term End Year",
+        "Status",
+        "Committees",
+        "Chairs",
+        "Shares Held",
+        "% Shares",
+        "Board Meetings",
+        "Attendance %",
+    ]
+    _write_header(ws, headers)
+
+    for i, candidate in enumerate(election.candidates, 1):
+        bio = candidate.biographical
+        role = candidate.board_role
+        att = candidate.attendance
+
+        committees = "; ".join(role.committee_memberships)
+        chairs = "; ".join(role.committee_chair_of)
+        board_mtg = ""
+        if att.board_meetings_attended is not None and att.board_meetings_scheduled is not None:
+            board_mtg = f"{att.board_meetings_attended}/{att.board_meetings_scheduled}"
+
+        row = [
+            bio.full_name,
+            role.designation,
+            role.board_role,
+            role.independence_status,
+            role.year_joined_board,
+            role.tenure_years,
+            role.term_end_year,
+            role.year_end_status,
+            committees,
+            chairs,
+            role.num_holding_shares,
+            _format_pct(role.pct_holding_shares) if role.pct_holding_shares is not None else "N/A",
+            board_mtg,
+            _format_pct(att.board_attendance_pct),
+        ]
+        ws.append(row)
+        row_idx = i + 1
+        fill = _director_fill(candidate)
+        _apply_row_style(ws, row_idx, fill, alt=(i % 2 == 0))
+
+        att_cell = ws.cell(row=row_idx, column=14)
+        att_cell.fill = _att_fill(att.board_attendance_pct)
+
+    _autofit_columns(ws)
+    _add_footer(ws, len(election.candidates) + 1, len(headers), footer)
+
+
 def write_excel(doc: BoardGovernanceDocument, path: Path) -> Path:
     """Write a four-sheet Excel workbook for a BoardGovernanceDocument.
 
@@ -383,6 +480,11 @@ def write_excel(doc: BoardGovernanceDocument, path: Path) -> Path:
     _write_biographical(wb, doc)
     _write_committee_memberships(wb, doc)
     _write_meeting_attendance(wb, doc)
+
+    if doc.director_election is not None:
+        footer = _footer_text(doc)
+        _write_election_summary(wb, doc.director_election, footer)
+        _write_election_candidates(wb, doc.director_election, footer)
 
     wb.save(str(path))
     logger.info("excel_written", path=str(path), directors=len(doc.directors))

@@ -53,9 +53,6 @@ def _director_dict(name: str) -> dict:
     return {
         "biographical": {
             "full_name": name,
-            "qualifications": [],
-            "expertise_areas": [],
-            "other_directorships": [],
         },
         "board_role": {
             "designation": "Non-Executive Director",
@@ -64,7 +61,7 @@ def _director_dict(name: str) -> dict:
             "year_end_status": "Active",
             "committee_memberships": [],
             "committee_chair_of": [],
-            "special_roles": [],
+            "other_positions": [],
         },
         "attendance": {"committee_attendance": []},
     }
@@ -168,12 +165,12 @@ class TestDeduplicateDirectors:
     def test_null_field_filled_from_supplement(self) -> None:
         base = _director("Alice Smith")
         supplement = Director(
-            biographical=BiographicalDetails(full_name="Alice Smith", nationality="British"),
+            biographical=BiographicalDetails(full_name="Alice Smith", affiliation="Oxford University"),
             board_role=base.board_role,
             attendance=base.attendance,
         )
         result = _deduplicate_directors([[base], [supplement]])
-        assert result[0].biographical.nationality == "British"
+        assert result[0].biographical.affiliation == "Oxford University"
 
     def test_existing_non_null_field_not_overwritten(self) -> None:
         base = Director(

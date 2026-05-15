@@ -38,18 +38,19 @@ evaluation:
     "biographical.post_nominals": fuzzy_match
     "biographical.age": numeric_error
     "biographical.age_band": fuzzy_match
-    "biographical.nationality": fuzzy_match
-    "biographical.qualifications": list_f1
-    "biographical.expertise_areas": list_f1
+    "biographical.gender": exact_match
+    "biographical.affiliation": fuzzy_match
     "biographical.career_summary": llm_semantic_similarity
-    "biographical.other_directorships": list_f1
     "board_role.designation": exact_match
     "board_role.board_role": fuzzy_match
     "board_role.independence_status": exact_match
     "board_role.year_joined_board": numeric_error
     "board_role.tenure_years": numeric_error
+    "board_role.term_end_year": numeric_error
     "board_role.committee_memberships": list_f1
     "board_role.committee_chair_of": list_f1
+    "board_role.num_holding_shares": numeric_error
+    "board_role.pct_holding_shares": numeric_error
     "attendance.board_meetings_attended": numeric_error
     "attendance.board_meetings_scheduled": numeric_error
     "attendance.board_attendance_pct": numeric_error

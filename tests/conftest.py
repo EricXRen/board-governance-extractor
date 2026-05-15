@@ -23,14 +23,12 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures"
 def sample_director() -> Director:
     return Director(
         biographical=BiographicalDetails(
-            full_name="Sir Robin Budenberg CBE",
+            full_name="Robin Budenberg",
             post_nominals="CBE",
             age=62,
-            nationality="British",
-            qualifications=["BA", "MBA"],
-            expertise_areas=["Finance", "Strategy"],
+            gender="Male",
+            affiliation="UK Financial Investments",
             career_summary="Former CEO of UK Financial Investments.",
-            other_directorships=["Whitbread PLC"],
         ),
         board_role=BoardRoleDetails(
             designation="Chair",
@@ -42,7 +40,7 @@ def sample_director() -> Director:
             year_end_status="Active",
             committee_memberships=["Nominations Committee"],
             committee_chair_of=["Nominations Committee"],
-            special_roles=["Chair"],
+            other_positions=["Chair"],
         ),
         attendance=AttendanceDetails(
             board_meetings_attended=10,

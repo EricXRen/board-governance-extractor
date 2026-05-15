@@ -27,9 +27,6 @@ def _director_dict(name: str) -> dict:
     return {
         "biographical": {
             "full_name": name,
-            "qualifications": [],
-            "expertise_areas": [],
-            "other_directorships": [],
         },
         "board_role": {
             "designation": "Non-Executive Director",
@@ -38,7 +35,7 @@ def _director_dict(name: str) -> dict:
             "year_end_status": "Active",
             "committee_memberships": [],
             "committee_chair_of": [],
-            "special_roles": [],
+            "other_positions": [],
         },
         "attendance": {"committee_attendance": []},
     }
