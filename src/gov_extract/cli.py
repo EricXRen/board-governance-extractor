@@ -206,7 +206,7 @@ def extract(
             markdown_output_path=markdown_out,
         )
 
-    console.print(f"  Directors extracted: [bold green]{len(doc.directors)}[/bold green]")
+    console.print(f"  Directors extracted: [bold green]{len(doc.current_board.directors)}[/bold green]")
 
     with console.status("Writing outputs..."):
         xlsx_out = excel_path(company, year, resolved_output_dir)
@@ -248,7 +248,7 @@ def validate(
 
     try:
         doc = validate_json_file(path)
-        n = len(doc.directors)
+        n = len(doc.current_board.directors)
         name = doc.company.company_name
         console.print(f"[bold green]Valid![/bold green] {n} directors, company: {name}")
     except Exception as e:

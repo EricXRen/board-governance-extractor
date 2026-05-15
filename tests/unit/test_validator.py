@@ -24,7 +24,7 @@ def _minimal_doc_dict() -> dict:
             "llm_provider": "anthropic",
             "llm_model": "claude-sonnet-4-6",
         },
-        "directors": [],
+        "current_board": {"directors": []},
     }
 
 
@@ -32,12 +32,12 @@ class TestValidateJson:
     def test_valid_empty_directors(self) -> None:
         doc = validate_json(_minimal_doc_dict())
         assert isinstance(doc, BoardGovernanceDocument)
-        assert doc.directors == []
+        assert doc.current_board.directors == []
 
     def test_valid_with_director(self, sample_document: BoardGovernanceDocument) -> None:
         data = sample_document.model_dump(mode="json")
         doc = validate_json(data)
-        assert len(doc.directors) == 1
+        assert len(doc.current_board.directors) == 1
 
     def test_missing_required_field_raises(self) -> None:
         bad = _minimal_doc_dict()
@@ -47,7 +47,7 @@ class TestValidateJson:
 
     def test_invalid_designation_raises(self) -> None:
         data = _minimal_doc_dict()
-        data["directors"] = [
+        data["current_board"]["directors"] = [
             {
                 "biographical": {"full_name": "Test Person"},
                 "board_role": {

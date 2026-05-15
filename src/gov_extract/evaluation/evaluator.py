@@ -232,7 +232,7 @@ def evaluate(
     Returns:
         DocumentResult with all metrics.
     """
-    pairs = _match_directors(extracted_doc.directors, gt_doc.directors)
+    pairs = _match_directors(extracted_doc.current_board.directors, gt_doc.current_board.directors)
 
     director_results: list[DirectorResult] = []
     for ext, gt in pairs:

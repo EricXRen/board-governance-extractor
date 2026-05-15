@@ -107,11 +107,19 @@ All models live in `src/gov_extract/models/`. They are **Pydantic v2** (`BaseMod
 
 ```python
 # document.py
+class CurrentBoard(BaseModel):
+    summary: BoardSummary = Field(default_factory=BoardSummary)
+    directors: list[Director] = []
+
 class BoardGovernanceDocument(BaseModel):
     company: CompanyMetadata
-    directors: list[Director]
-    board_summary: BoardSummary = Field(default_factory=BoardSummary)
+    current_board: CurrentBoard = Field(default_factory=CurrentBoard)
+    director_election: DirectorElection | None = None
 ```
+
+`BoardGovernanceDocument` has two parallel sections, each with the same shape (summary + list):
+- `current_board` — `CurrentBoard(summary, directors)`
+- `director_election` — `DirectorElection(summary, candidates)`
 
 ### CompanyMetadata (`metadata.py`)
 
@@ -198,9 +206,9 @@ class BoardSummary(BaseModel):
     notes: str | None = None
 ```
 
-`pct_women` and `voting_standard` can only come from the filing text. All other fields have computation fallbacks in `_compute_board_summary()` in `extractor.py`.
+`voting_standard` can only come from the filing text. All other fields have computation fallbacks in `_compute_board_summary()` in `extractor.py`. `pct_women` is computed from `director.biographical.gender` (case-insensitive `"Female"` match), using the full director count as the denominator; only computed when at least one director has a known gender.
 
-**Important:** `full_name` is accessed via `director.biographical.full_name`. When merging partial extraction results across chunks, match directors by `biographical.full_name` using fuzzy matching (threshold 90).
+**Important:** Directors are accessed via `doc.current_board.directors`; `full_name` via `director.biographical.full_name`. When merging partial extraction results across chunks, match directors by `biographical.full_name` using fuzzy matching (threshold 90).
 
 ---
 

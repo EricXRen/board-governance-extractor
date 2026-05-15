@@ -14,7 +14,7 @@ class BoardSummary(BaseModel):
     1. Explicitly stated values extracted from the filing text.
     2. Values computed from the extracted Director list (where derivable).
 
-    ``pct_women`` and ``voting_standard`` can only come from the filing text;
+    Only ``voting_standard`` must come exclusively from the filing text;
     all other fields have a computation fallback.
     """
 
@@ -31,7 +31,7 @@ class BoardSummary(BaseModel):
     num_independent_directors: int | None = None
 
     # Diversity and demographics
-    pct_women: float | None = None        # 0–100; stated in filing only
+    pct_women: float | None = None        # 0–100; computed from directors.biographical.gender
     pct_independent: float | None = None  # 0–100
     avg_director_age: float | None = None
     avg_tenure_years: float | None = None

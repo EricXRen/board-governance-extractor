@@ -28,7 +28,7 @@ from gov_extract.llm.base import LLMProvider
 from gov_extract.models.board_summary import BoardSummary
 from gov_extract.models.director import Director
 from gov_extract.models.director_election import DirectorElection
-from gov_extract.models.document import BoardGovernanceDocument
+from gov_extract.models.document import BoardGovernanceDocument, CurrentBoard
 from gov_extract.models.metadata import CompanyMetadata
 
 logger = structlog.get_logger()
@@ -467,9 +467,8 @@ def _compute_board_summary(summary: BoardSummary, directors: list[Director]) -> 
     - ``avg_director_age``: mean age across directors with a known age
     - ``avg_tenure_years``: mean tenure across directors with a known tenure
     - ``ceo_chair_separated``: True if Chair and CEO are different directors
-
-    Not computable (no gender field on Director):
-    - ``pct_women`` — must come from the filing text.
+    - ``pct_women``: percentage of directors whose gender is "Female" (case-insensitive),
+      computed only when at least one director has a known gender
 
     Not computable:
     - ``voting_standard`` — must come from the filing text.
@@ -529,6 +528,12 @@ def _compute_board_summary(summary: BoardSummary, directors: list[Director]) -> 
         }
         if chair_names and ceo_names:
             data["ceo_chair_separated"] = chair_names.isdisjoint(ceo_names)
+
+    if data["pct_women"] is None:
+        gendered = [d for d in directors if d.biographical.gender is not None]
+        if gendered:
+            women = sum(1 for d in gendered if (d.biographical.gender or "").lower() == "female")
+            data["pct_women"] = round(women / len(directors) * 100, 1)
 
     return BoardSummary.model_validate(data)
 
@@ -738,7 +743,6 @@ def run_extraction(
 
     return BoardGovernanceDocument(
         company=metadata,
-        directors=merged_directors,
-        board_summary=board_summary,
+        current_board=CurrentBoard(summary=board_summary, directors=merged_directors),
         director_election=director_election,
     )

@@ -15,7 +15,7 @@ from gov_extract.models.director import (
     Director,
 )
 from gov_extract.models.director_election import DirectorElection, DirectorElectionSummary
-from gov_extract.models.document import BoardGovernanceDocument
+from gov_extract.models.document import BoardGovernanceDocument, CurrentBoard
 from gov_extract.models.metadata import CompanyMetadata
 
 
@@ -123,20 +123,20 @@ class TestBoardGovernanceDocument:
         parsed = json.loads(serialised)
         restored = BoardGovernanceDocument.model_validate(parsed)
         assert restored.company.company_name == sample_document.company.company_name
-        assert len(restored.directors) == len(sample_document.directors)
+        assert len(restored.current_board.directors) == len(sample_document.current_board.directors)
 
     def test_empty_directors(self) -> None:
-        doc = BoardGovernanceDocument(company=make_metadata(), directors=[])
-        assert doc.directors == []
+        doc = BoardGovernanceDocument(company=make_metadata())
+        assert doc.current_board.directors == []
 
     def test_model_json_schema(self) -> None:
         schema = BoardGovernanceDocument.model_json_schema()
         assert "properties" in schema
         assert "company" in schema["properties"]
-        assert "directors" in schema["properties"]
+        assert "current_board" in schema["properties"]
 
     def test_director_election_optional(self) -> None:
-        doc = BoardGovernanceDocument(company=make_metadata(), directors=[])
+        doc = BoardGovernanceDocument(company=make_metadata())
         assert doc.director_election is None
 
     def test_director_election_round_trip(self) -> None:
@@ -150,7 +150,7 @@ class TestBoardGovernanceDocument:
             candidates=[],
         )
         doc = BoardGovernanceDocument(
-            company=make_metadata(), directors=[], director_election=election
+            company=make_metadata(), director_election=election
         )
         restored = BoardGovernanceDocument.model_validate_json(doc.model_dump_json())
         assert restored.director_election is not None

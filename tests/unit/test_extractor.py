@@ -306,8 +306,8 @@ class TestChunkingTrueRounds1:
         chunks = [_chunk(i) for i in range(1, 4)]
         provider = MockProvider(directors=[_director("Alice Smith")])
         doc = run_extraction(provider=provider, chunks=chunks, chunking=True, extraction_rounds=1, **_DEFAULTS)
-        assert len(doc.directors) == 1
-        assert doc.directors[0].biographical.full_name == "Alice Smith"
+        assert len(doc.current_board.directors) == 1
+        assert doc.current_board.directors[0].biographical.full_name == "Alice Smith"
 
     def test_returns_board_governance_document(self) -> None:
         doc = run_extraction(
@@ -323,7 +323,7 @@ class TestChunkingTrueRounds1:
     def test_board_summary_extracted(self) -> None:
         provider = MockProvider(board_summary=BoardSummary(board_size=7))
         doc = run_extraction(provider=provider, chunks=[_chunk(1)], chunking=True, extraction_rounds=1, **_DEFAULTS)
-        assert doc.board_summary.board_size == 7
+        assert doc.current_board.summary.board_size == 7
 
 
 # ---------------------------------------------------------------------------
@@ -347,7 +347,7 @@ class TestChunkingFalseRounds1:
     def test_directors_returned(self) -> None:
         provider = MockProvider(directors=[_director("Alice Smith"), _director("Bob Jones")])
         doc = run_extraction(provider=provider, chunks=[_chunk(1)], chunking=False, extraction_rounds=1, **_DEFAULTS)
-        assert len(doc.directors) == 2
+        assert len(doc.current_board.directors) == 2
 
 
 # ---------------------------------------------------------------------------
@@ -374,7 +374,7 @@ class TestChunkingTrueRounds2:
         doc = run_extraction(
             provider=provider, chunks=[_chunk(1)], chunking=True, extraction_rounds=2, **_DEFAULTS
         )
-        assert len(doc.directors) == 1
+        assert len(doc.current_board.directors) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -436,7 +436,7 @@ class TestRunExtractionEdgeCases:
         doc = run_extraction(
             provider=MockProvider(), chunks=[], chunking=True, extraction_rounds=1, **_DEFAULTS
         )
-        assert doc.directors == []
+        assert doc.current_board.directors == []
 
     def test_metadata_populated_correctly(self) -> None:
         doc = run_extraction(

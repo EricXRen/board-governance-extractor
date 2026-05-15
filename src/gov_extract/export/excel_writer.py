@@ -137,7 +137,7 @@ def _write_board_summary(wb: Workbook, doc: BoardGovernanceDocument) -> None:
     ws.column_dimensions["A"].width = 35
     ws.column_dimensions["B"].width = 20
 
-    summary: BoardSummary = doc.board_summary
+    summary: BoardSummary = doc.current_board.summary
 
     def _pct(v: float | None) -> str:
         return f"{v:.1f}%" if v is not None else "N/A"
@@ -204,7 +204,7 @@ def _write_board_overview(wb: Workbook, doc: BoardGovernanceDocument) -> None:
     ]
     _write_header(ws, headers)
 
-    for i, director in enumerate(doc.directors, 1):
+    for i, director in enumerate(doc.current_board.directors, 1):
         bio = director.biographical
         role = director.board_role
         att = director.attendance
@@ -241,7 +241,7 @@ def _write_board_overview(wb: Workbook, doc: BoardGovernanceDocument) -> None:
         att_cell.fill = _att_fill(att.board_attendance_pct)
 
     _autofit_columns(ws)
-    _add_footer(ws, len(doc.directors) + 1, len(headers), _footer_text(doc))
+    _add_footer(ws, len(doc.current_board.directors) + 1, len(headers), _footer_text(doc))
 
 
 def _write_biographical(wb: Workbook, doc: BoardGovernanceDocument) -> None:
@@ -257,7 +257,7 @@ def _write_biographical(wb: Workbook, doc: BoardGovernanceDocument) -> None:
     ]
     _write_header(ws, headers)
 
-    for i, director in enumerate(doc.directors, 1):
+    for i, director in enumerate(doc.current_board.directors, 1):
         bio = director.biographical
         row = [
             bio.full_name,
@@ -273,7 +273,7 @@ def _write_biographical(wb: Workbook, doc: BoardGovernanceDocument) -> None:
         _apply_row_style(ws, i + 1, fill, alt=(i % 2 == 0))
 
     _autofit_columns(ws, max_width=60)
-    _add_footer(ws, len(doc.directors) + 1, len(headers), _footer_text(doc))
+    _add_footer(ws, len(doc.current_board.directors) + 1, len(headers), _footer_text(doc))
 
 
 def _write_committee_memberships(wb: Workbook, doc: BoardGovernanceDocument) -> None:
@@ -281,7 +281,7 @@ def _write_committee_memberships(wb: Workbook, doc: BoardGovernanceDocument) -> 
 
     # Collect all unique committee names
     all_committees: list[str] = []
-    for director in doc.directors:
+    for director in doc.current_board.directors:
         for c in director.board_role.committee_memberships + director.board_role.committee_chair_of:
             if c not in all_committees:
                 all_committees.append(c)
@@ -290,7 +290,7 @@ def _write_committee_memberships(wb: Workbook, doc: BoardGovernanceDocument) -> 
     headers = ["Name", "Designation"] + all_committees
     _write_header(ws, headers)
 
-    for i, director in enumerate(doc.directors, 1):
+    for i, director in enumerate(doc.current_board.directors, 1):
         role = director.board_role
         row: list[str] = [director.biographical.full_name, role.designation]
         for committee in all_committees:
@@ -305,7 +305,7 @@ def _write_committee_memberships(wb: Workbook, doc: BoardGovernanceDocument) -> 
         _apply_row_style(ws, i + 1, fill, alt=(i % 2 == 0))
 
     _autofit_columns(ws)
-    _add_footer(ws, len(doc.directors) + 1, len(headers), _footer_text(doc))
+    _add_footer(ws, len(doc.current_board.directors) + 1, len(headers), _footer_text(doc))
 
 
 def _write_meeting_attendance(wb: Workbook, doc: BoardGovernanceDocument) -> None:
@@ -313,7 +313,7 @@ def _write_meeting_attendance(wb: Workbook, doc: BoardGovernanceDocument) -> Non
 
     # Collect all committee names from attendance records
     all_committees: list[str] = []
-    for director in doc.directors:
+    for director in doc.current_board.directors:
         for ca in director.attendance.committee_attendance:
             if ca.committee_name not in all_committees:
                 all_committees.append(ca.committee_name)
@@ -324,7 +324,7 @@ def _write_meeting_attendance(wb: Workbook, doc: BoardGovernanceDocument) -> Non
         headers += [f"{c} Att.", f"{c} Sched.", f"{c} %"]
     _write_header(ws, headers)
 
-    for i, director in enumerate(doc.directors, 1):
+    for i, director in enumerate(doc.current_board.directors, 1):
         att = director.attendance
         row: list[object] = [
             director.biographical.full_name,
@@ -359,7 +359,7 @@ def _write_meeting_attendance(wb: Workbook, doc: BoardGovernanceDocument) -> Non
             ws.cell(row=row_idx, column=pct_col).fill = _att_fill(ca.attendance_pct if ca else None)
 
     _autofit_columns(ws)
-    _add_footer(ws, len(doc.directors) + 1, len(headers), _footer_text(doc))
+    _add_footer(ws, len(doc.current_board.directors) + 1, len(headers), _footer_text(doc))
 
 
 def _write_election_summary(wb: Workbook, election: DirectorElection, footer: str) -> None:
@@ -487,7 +487,7 @@ def write_excel(doc: BoardGovernanceDocument, path: Path) -> Path:
         _write_election_candidates(wb, doc.director_election, footer)
 
     wb.save(str(path))
-    logger.info("excel_written", path=str(path), directors=len(doc.directors))
+    logger.info("excel_written", path=str(path), directors=len(doc.current_board.directors))
     return path
 
 

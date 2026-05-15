@@ -26,7 +26,7 @@ def write_json(doc: BoardGovernanceDocument, path: Path) -> Path:
     data = doc.model_dump(mode="json")
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-    logger.info("json_written", path=str(path), directors=len(doc.directors))
+    logger.info("json_written", path=str(path), directors=len(doc.current_board.directors))
     return path
 
 

@@ -108,7 +108,7 @@
           "default": null,
           "title": "Age Band"
         },
-        "nationality": {
+        "gender": {
           "anyOf": [
             {
               "type": "string"
@@ -118,23 +118,19 @@
             }
           ],
           "default": null,
-          "title": "Nationality"
+          "title": "Gender"
         },
-        "qualifications": {
-          "default": [],
-          "items": {
-            "type": "string"
-          },
-          "title": "Qualifications",
-          "type": "array"
-        },
-        "expertise_areas": {
-          "default": [],
-          "items": {
-            "type": "string"
-          },
-          "title": "Expertise Areas",
-          "type": "array"
+        "affiliation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affiliation"
         },
         "career_summary": {
           "anyOf": [
@@ -147,14 +143,6 @@
           ],
           "default": null,
           "title": "Career Summary"
-        },
-        "other_directorships": {
-          "default": [],
-          "items": {
-            "type": "string"
-          },
-          "title": "Other Directorships",
-          "type": "array"
         }
       },
       "required": [
@@ -226,6 +214,18 @@
           "default": null,
           "title": "Tenure Years"
         },
+        "term_end_year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Term End Year"
+        },
         "year_end_status": {
           "title": "Year End Status",
           "type": "string"
@@ -246,13 +246,37 @@
           "title": "Committee Chair Of",
           "type": "array"
         },
-        "special_roles": {
+        "other_positions": {
           "default": [],
           "items": {
             "type": "string"
           },
-          "title": "Special Roles",
+          "title": "Other Positions",
           "type": "array"
+        },
+        "num_holding_shares": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Num Holding Shares"
+        },
+        "pct_holding_shares": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pct Holding Shares"
         }
       },
       "required": [
@@ -266,7 +290,7 @@
     },
     "BoardSummary": {
       "additionalProperties": false,
-      "description": "Aggregate governance statistics for the full board.\n\nFields are populated from two sources (priority order):\n1. Explicitly stated values extracted from the filing text.\n2. Values computed from the extracted Director list (where derivable).\n\n``pct_women`` and ``voting_standard`` can only come from the filing text;\nall other fields have a computation fallback.",
+      "description": "Aggregate governance statistics for the full board.\n\nFields are populated from two sources (priority order):\n1. Explicitly stated values extracted from the filing text.\n2. Values computed from the extracted Director list (where derivable).\n\nOnly ``voting_standard`` must come exclusively from the filing text;\nall other fields have a computation fallback.",
       "properties": {
         "ceo_chair_separated": {
           "anyOf": [
@@ -512,6 +536,25 @@
       "title": "CompanyMetadata",
       "type": "object"
     },
+    "CurrentBoard": {
+      "additionalProperties": false,
+      "description": "Current board composition: aggregate summary plus individual director details.",
+      "properties": {
+        "summary": {
+          "$ref": "#/$defs/BoardSummary"
+        },
+        "directors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Director"
+          },
+          "title": "Directors",
+          "type": "array"
+        }
+      },
+      "title": "CurrentBoard",
+      "type": "object"
+    },
     "Director": {
       "additionalProperties": false,
       "description": "Complete director record combining all sub-models.",
@@ -533,28 +576,98 @@
       ],
       "title": "Director",
       "type": "object"
+    },
+    "DirectorElection": {
+      "additionalProperties": false,
+      "description": "Director election section: summary plus full candidate details.",
+      "properties": {
+        "summary": {
+          "$ref": "#/$defs/DirectorElectionSummary"
+        },
+        "candidates": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Director"
+          },
+          "title": "Candidates",
+          "type": "array"
+        }
+      },
+      "title": "DirectorElection",
+      "type": "object"
+    },
+    "DirectorElectionSummary": {
+      "additionalProperties": false,
+      "description": "Aggregate summary of the director election proposed in the filing.",
+      "properties": {
+        "num_directors_to_elect": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Num Directors To Elect"
+        },
+        "incumbent_nominees": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Incumbent Nominees",
+          "type": "array"
+        },
+        "new_nominees": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "New Nominees",
+          "type": "array"
+        },
+        "candidates_disclosed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidates Disclosed"
+        }
+      },
+      "title": "DirectorElectionSummary",
+      "type": "object"
     }
   },
   "additionalProperties": false,
-  "description": "Complete extraction output: company metadata, all directors, board summary.",
+  "description": "Complete extraction output: company metadata, current board, and director election.",
   "properties": {
     "company": {
       "$ref": "#/$defs/CompanyMetadata"
     },
-    "directors": {
-      "items": {
-        "$ref": "#/$defs/Director"
-      },
-      "title": "Directors",
-      "type": "array"
+    "current_board": {
+      "$ref": "#/$defs/CurrentBoard"
     },
-    "board_summary": {
-      "$ref": "#/$defs/BoardSummary"
+    "director_election": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DirectorElection"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     }
   },
   "required": [
-    "company",
-    "directors"
+    "company"
   ],
   "title": "BoardGovernanceDocument",
   "type": "object",
