@@ -213,6 +213,7 @@ CRITICAL INSTRUCTIONS:
 - For percentage fields (pct_women, pct_independent), return a number between 0 and 100.
 - For ceo_chair_separated: return true if the CEO and Chair are explicitly stated to be different people, false if the same person holds both roles, null if not stated.
 - For voting_standard: return "Majority" or "Plurality" only if the director election voting standard is explicitly stated.
+- For board_evaluation: return true if the filing mentions the board evaluation process AND its outcomes AND any resulting actions; false if board evaluation is explicitly absent or only partially described; null if not mentioned at all.
 - The notes field may capture any other stated board governance policy (e.g. board tenure policy, retirement age, diversity targets).
 
 The BoardSummary schema is:
@@ -251,6 +252,7 @@ Extract the board-level governance summary statistics.
 Look especially for:
 - Whether CEO and Board Chair roles are held by the same or different people
 - The voting standard used for director elections (majority vs plurality)
+- Whether the board evaluation process, its outcomes, and resulting actions are all described
 - Total number of directors on the board
 - Number of executive, non-executive, and independent directors
 - Percentage of women on the board

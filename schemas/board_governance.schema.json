@@ -320,6 +320,18 @@
           "default": null,
           "title": "Voting Standard"
         },
+        "board_evaluation": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Board Evaluation"
+        },
         "board_size": {
           "anyOf": [
             {

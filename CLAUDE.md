@@ -195,18 +195,19 @@ Aggregate governance statistics for the full board. Fields are populated from tw
 class BoardSummary(BaseModel):
     ceo_chair_separated: bool | None = None
     voting_standard: Literal["Majority", "Plurality"] | None = None
+    board_evaluation: bool | None = None   # True if process + outcomes + actions all mentioned
     board_size: int | None = None
     num_executive_directors: int | None = None
     num_non_executive_directors: int | None = None
     num_independent_directors: int | None = None
-    pct_women: float | None = None        # 0–100; stated in filing only (no computation)
+    pct_women: float | None = None        # 0–100; computed from directors.biographical.gender
     pct_independent: float | None = None  # 0–100
     avg_director_age: float | None = None
     avg_tenure_years: float | None = None
     notes: str | None = None
 ```
 
-`voting_standard` can only come from the filing text. All other fields have computation fallbacks in `_compute_board_summary()` in `extractor.py`. `pct_women` is computed from `director.biographical.gender` (case-insensitive `"Female"` match), using the full director count as the denominator; only computed when at least one director has a known gender.
+`voting_standard` and `board_evaluation` can only come from the filing text; there is no computation fallback for either. `pct_women` is computed from `director.biographical.gender` (case-insensitive `"Female"` match), using the full director count as the denominator; only computed when at least one director has a known gender. All remaining fields have computation fallbacks in `_compute_board_summary()` in `extractor.py`.
 
 **Important:** Directors are accessed via `doc.current_board.directors`; `full_name` via `director.biographical.full_name`. When merging partial extraction results across chunks, match directors by `biographical.full_name` using fuzzy matching (threshold 90).
 

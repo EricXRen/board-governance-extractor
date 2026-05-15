@@ -149,6 +149,7 @@ def _write_board_summary(wb: Workbook, doc: BoardGovernanceDocument) -> None:
 
     rows = [
         ("CEO and Chair Separated", _yn(summary.ceo_chair_separated)),
+        ("Board Evaluation Disclosed", _yn(summary.board_evaluation)),
         ("Voting Standard for Directors", summary.voting_standard or "N/A"),
         ("Board Size", summary.board_size if summary.board_size is not None else "N/A"),
         (

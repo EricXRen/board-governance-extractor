@@ -23,6 +23,7 @@ class BoardSummary(BaseModel):
     # Governance structure
     ceo_chair_separated: bool | None = None
     voting_standard: Literal["Majority", "Plurality"] | None = None
+    board_evaluation: bool | None = None   # True if evaluation process, outcomes, and actions are mentioned
 
     # Board composition
     board_size: int | None = None
