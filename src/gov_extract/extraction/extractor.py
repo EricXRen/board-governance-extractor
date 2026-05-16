@@ -28,7 +28,7 @@ from gov_extract.llm.base import LLMProvider
 from gov_extract.models.board_summary import BoardSummary
 from gov_extract.models.director import Director
 from gov_extract.models.director_election import DirectorElection
-from gov_extract.models.document import BoardGovernanceDocument, CurrentBoard
+from gov_extract.models.document import BoardGovernanceDocument, Board
 from gov_extract.models.metadata import CompanyMetadata
 
 logger = structlog.get_logger()
@@ -538,6 +538,34 @@ def _compute_board_summary(summary: BoardSummary, directors: list[Director]) -> 
     return BoardSummary.model_validate(data)
 
 
+def _compute_post_election_board(
+    current_board: Board,
+    director_election: DirectorElection,
+) -> Board:
+    """Build a projected board assuming all election candidates are elected.
+
+    Merges the current active directors with the election candidates (deduplicating
+    by name so re-election nominees are not double-counted), then recomputes the
+    BoardSummary from the merged list.  Text-only fields (``voting_standard``,
+    ``board_evaluation``) are carried over from the current board summary because
+    they cannot be derived from the director list.
+
+    Args:
+        current_board: Extracted current board (summary + directors).
+        director_election: Extracted director election section (summary + candidates).
+
+    Returns:
+        Board representing the projected post-election composition.
+    """
+    merged = _deduplicate_directors([current_board.directors, director_election.candidates])
+    seed = BoardSummary(
+        voting_standard=current_board.summary.voting_standard,
+        board_evaluation=current_board.summary.board_evaluation,
+    )
+    post_summary = _compute_board_summary(seed, merged)
+    return Board(summary=post_summary, directors=merged)
+
+
 def _run_parallel(
     fn: Any,
     chunks: list[TextChunk],
@@ -741,8 +769,16 @@ def run_extraction(
         llm_model=model_name,
     )
 
+    current_board = Board(summary=board_summary, directors=merged_directors)
+    post_election_board = (
+        _compute_post_election_board(current_board, director_election)
+        if director_election and director_election.candidates
+        else None
+    )
+
     return BoardGovernanceDocument(
         company=metadata,
-        current_board=CurrentBoard(summary=board_summary, directors=merged_directors),
+        current_board=current_board,
         director_election=director_election,
+        post_election_board=post_election_board,
     )

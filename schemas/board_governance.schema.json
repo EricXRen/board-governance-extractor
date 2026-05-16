@@ -151,6 +151,25 @@
       "title": "BiographicalDetails",
       "type": "object"
     },
+    "Board": {
+      "additionalProperties": false,
+      "description": "Current board composition: aggregate summary plus individual director details.",
+      "properties": {
+        "summary": {
+          "$ref": "#/$defs/BoardSummary"
+        },
+        "directors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Director"
+          },
+          "title": "Directors",
+          "type": "array"
+        }
+      },
+      "title": "Board",
+      "type": "object"
+    },
     "BoardRoleDetails": {
       "additionalProperties": false,
       "description": "Board role, independence, tenure, and committee information.",
@@ -548,25 +567,6 @@
       "title": "CompanyMetadata",
       "type": "object"
     },
-    "CurrentBoard": {
-      "additionalProperties": false,
-      "description": "Current board composition: aggregate summary plus individual director details.",
-      "properties": {
-        "summary": {
-          "$ref": "#/$defs/BoardSummary"
-        },
-        "directors": {
-          "default": [],
-          "items": {
-            "$ref": "#/$defs/Director"
-          },
-          "title": "Directors",
-          "type": "array"
-        }
-      },
-      "title": "CurrentBoard",
-      "type": "object"
-    },
     "Director": {
       "additionalProperties": false,
       "description": "Complete director record combining all sub-models.",
@@ -664,12 +664,23 @@
       "$ref": "#/$defs/CompanyMetadata"
     },
     "current_board": {
-      "$ref": "#/$defs/CurrentBoard"
+      "$ref": "#/$defs/Board"
     },
     "director_election": {
       "anyOf": [
         {
           "$ref": "#/$defs/DirectorElection"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "post_election_board": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Board"
         },
         {
           "type": "null"

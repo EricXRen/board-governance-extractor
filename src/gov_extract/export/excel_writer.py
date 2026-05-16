@@ -130,40 +130,22 @@ def _add_footer(ws: object, row: int, col_count: int, text: str) -> None:
     cell.font = Font(name=FONT_NAME, italic=True, size=8, color="888888")
 
 
-def _write_board_summary(wb: Workbook, doc: BoardGovernanceDocument) -> None:
-    """Write the Board Summary sheet — one row per metric."""
-    ws = wb.create_sheet("Board Summary")
-    _write_header(ws, ["Metric", "Value"])
-    ws.column_dimensions["A"].width = 35
-    ws.column_dimensions["B"].width = 20
-
-    summary: BoardSummary = doc.current_board.summary
-
+def _summary_rows(summary: BoardSummary) -> list[tuple[str, object]]:
+    """Build the metric/value row list for a BoardSummary."""
     def _pct(v: float | None) -> str:
         return f"{v:.1f}%" if v is not None else "N/A"
 
     def _yn(v: bool | None) -> str:
-        if v is None:
-            return "N/A"
-        return "Yes" if v else "No"
+        return "N/A" if v is None else ("Yes" if v else "No")
 
-    rows = [
+    return [
         ("CEO and Chair Separated", _yn(summary.ceo_chair_separated)),
         ("Board Evaluation Disclosed", _yn(summary.board_evaluation)),
         ("Voting Standard for Directors", summary.voting_standard or "N/A"),
         ("Board Size", summary.board_size if summary.board_size is not None else "N/A"),
-        (
-            "Executive Directors",
-            summary.num_executive_directors if summary.num_executive_directors is not None else "N/A",
-        ),
-        (
-            "Non-Executive Directors",
-            summary.num_non_executive_directors if summary.num_non_executive_directors is not None else "N/A",
-        ),
-        (
-            "Independent Directors",
-            summary.num_independent_directors if summary.num_independent_directors is not None else "N/A",
-        ),
+        ("Executive Directors", summary.num_executive_directors if summary.num_executive_directors is not None else "N/A"),
+        ("Non-Executive Directors", summary.num_non_executive_directors if summary.num_non_executive_directors is not None else "N/A"),
+        ("Independent Directors", summary.num_independent_directors if summary.num_independent_directors is not None else "N/A"),
         ("% Women on Board", _pct(summary.pct_women)),
         ("% Independent Directors", _pct(summary.pct_independent)),
         ("Average Director Age", f"{summary.avg_director_age:.1f}" if summary.avg_director_age is not None else "N/A"),
@@ -171,6 +153,15 @@ def _write_board_summary(wb: Workbook, doc: BoardGovernanceDocument) -> None:
         ("Notes", summary.notes or ""),
     ]
 
+
+def _write_board_summary(wb: Workbook, doc: BoardGovernanceDocument) -> None:
+    """Write the Board Summary sheet — one row per metric."""
+    ws = wb.create_sheet("Board Summary")
+    _write_header(ws, ["Metric", "Value"])
+    ws.column_dimensions["A"].width = 35
+    ws.column_dimensions["B"].width = 20
+
+    rows = _summary_rows(doc.current_board.summary)
     for i, (metric, value) in enumerate(rows, 2):
         ws.cell(row=i, column=1).value = metric
         ws.cell(row=i, column=2).value = value
@@ -182,7 +173,35 @@ def _write_board_summary(wb: Workbook, doc: BoardGovernanceDocument) -> None:
             cell.border = _thin_border()
             cell.alignment = Alignment(vertical="center", wrap_text=True)
 
-    _add_footer(ws, len(rows) + 2, 2, _footer_text(doc))
+    next_row = len(rows) + 2
+
+    if doc.post_election_board is not None:
+        # Blank separator row then section header
+        next_row += 1
+        section_row = next_row
+        next_row += 1
+        for col in (1, 2):
+            cell = ws.cell(row=section_row, column=col)
+            cell.value = "Post-Election Projected Board" if col == 1 else ""
+            cell.fill = _row_fill(HDR_BG)
+            cell.font = Font(name=FONT_NAME, bold=True, color=HDR_FG, size=10)
+            cell.border = _thin_border()
+            cell.alignment = Alignment(vertical="center")
+
+        post_rows = _summary_rows(doc.post_election_board.summary)
+        for i, (metric, value) in enumerate(post_rows, next_row):
+            ws.cell(row=i, column=1).value = metric
+            ws.cell(row=i, column=2).value = value
+            fill = _row_fill(ALT_BG) if i % 2 == 0 else PatternFill()
+            for col in (1, 2):
+                cell = ws.cell(row=i, column=col)
+                cell.fill = fill
+                cell.font = _cell_font()
+                cell.border = _thin_border()
+                cell.alignment = Alignment(vertical="center", wrap_text=True)
+        next_row += len(post_rows)
+
+    _add_footer(ws, next_row, 2, _footer_text(doc))
 
 
 def _write_board_overview(wb: Workbook, doc: BoardGovernanceDocument) -> None:

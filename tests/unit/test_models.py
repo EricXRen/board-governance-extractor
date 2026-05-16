@@ -15,7 +15,7 @@ from gov_extract.models.director import (
     Director,
 )
 from gov_extract.models.director_election import DirectorElection, DirectorElectionSummary
-from gov_extract.models.document import BoardGovernanceDocument, CurrentBoard
+from gov_extract.models.document import BoardGovernanceDocument, Board
 from gov_extract.models.metadata import CompanyMetadata
 
 

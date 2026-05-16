@@ -107,19 +107,21 @@ All models live in `src/gov_extract/models/`. They are **Pydantic v2** (`BaseMod
 
 ```python
 # document.py
-class CurrentBoard(BaseModel):
+class Board(BaseModel):
     summary: BoardSummary = Field(default_factory=BoardSummary)
     directors: list[Director] = []
 
 class BoardGovernanceDocument(BaseModel):
     company: CompanyMetadata
-    current_board: CurrentBoard = Field(default_factory=CurrentBoard)
+    current_board: Board = Field(default_factory=Board)
     director_election: DirectorElection | None = None
+    post_election_board: Board | None = None
 ```
 
-`BoardGovernanceDocument` has two parallel sections, each with the same shape (summary + list):
-- `current_board` — `CurrentBoard(summary, directors)`
-- `director_election` — `DirectorElection(summary, candidates)`
+`BoardGovernanceDocument` has three board-related sections:
+- `current_board` — `Board(summary, directors)`: extracted from the filing
+- `director_election` — `DirectorElection(summary, candidates)`: extracted from the filing; `None` when absent
+- `post_election_board` — `Board(summary, directors)`: computed (not extracted); `None` when `director_election` is absent or has no candidates. Built by deduplicating `current_board.directors + director_election.candidates` and recomputing `BoardSummary` from the merged list. Text-only fields (`voting_standard`, `board_evaluation`) are carried over from `current_board.summary`; all other fields are recomputed.
 
 ### CompanyMetadata (`metadata.py`)
 

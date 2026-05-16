@@ -31,7 +31,7 @@ from gov_extract.models.director import (
     Director,
 )
 from gov_extract.models.director_election import DirectorElection, DirectorElectionSummary
-from gov_extract.models.document import BoardGovernanceDocument, CurrentBoard
+from gov_extract.models.document import BoardGovernanceDocument, Board
 from gov_extract.models.metadata import CompanyMetadata
 
 logger = structlog.get_logger()
@@ -535,7 +535,7 @@ def read_excel(
 
     doc = BoardGovernanceDocument(
         company=company,
-        current_board=CurrentBoard(summary=board_summary, directors=directors),
+        current_board=Board(summary=board_summary, directors=directors),
         director_election=director_election,
     )
     logger.info(

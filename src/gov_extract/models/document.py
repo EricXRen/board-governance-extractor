@@ -8,7 +8,7 @@ from gov_extract.models.director_election import DirectorElection
 from gov_extract.models.metadata import CompanyMetadata
 
 
-class CurrentBoard(BaseModel):
+class Board(BaseModel):
     """Current board composition: aggregate summary plus individual director details."""
 
     model_config = ConfigDict(extra="forbid")
@@ -23,5 +23,6 @@ class BoardGovernanceDocument(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     company: CompanyMetadata
-    current_board: CurrentBoard = Field(default_factory=CurrentBoard)
+    current_board: Board = Field(default_factory=Board)
     director_election: DirectorElection | None = None
+    post_election_board: Board | None = None

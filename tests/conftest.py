@@ -13,7 +13,7 @@ from gov_extract.models.director import (
     CommitteeAttendance,
     Director,
 )
-from gov_extract.models.document import BoardGovernanceDocument, CurrentBoard
+from gov_extract.models.document import BoardGovernanceDocument, Board
 from gov_extract.models.metadata import CompanyMetadata
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -71,5 +71,5 @@ def sample_document(sample_director: Director) -> BoardGovernanceDocument:
             llm_provider="anthropic",
             llm_model="claude-sonnet-4-6",
         ),
-        current_board=CurrentBoard(directors=[sample_director]),
+        current_board=Board(directors=[sample_director]),
     )
