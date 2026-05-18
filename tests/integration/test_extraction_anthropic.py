@@ -59,7 +59,7 @@ def test_lbg_extraction_passes_regression_gate(tmp_path: Path) -> None:
     write_json(doc, json_path)
 
     gt_doc = validate_json_file(FIXTURES / "lbg_ground_truth.json")
-    field_metrics = cfg.evaluation.field_metrics
+    director_field_metrics = cfg.evaluation.director_field_metrics
     thresholds = {
         "fuzzy_match": cfg.evaluation.thresholds.fuzzy_match,
         "list_f1": cfg.evaluation.thresholds.list_f1,
@@ -67,7 +67,7 @@ def test_lbg_extraction_passes_regression_gate(tmp_path: Path) -> None:
         "numeric_error_tolerance": cfg.evaluation.thresholds.numeric_error_tolerance,
     }
 
-    result = evaluate(doc, gt_doc, field_metrics, thresholds)
+    result = evaluate(doc, gt_doc, director_field_metrics, thresholds)
 
     assert result.document_field_pass_rate >= 0.90, (
         f"document_field_pass_rate {result.document_field_pass_rate:.3f} < 0.90"

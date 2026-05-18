@@ -202,6 +202,7 @@ class BoardSummary(BaseModel):
     num_executive_directors: int | None = None
     num_non_executive_directors: int | None = None
     num_independent_directors: int | None = None
+    director_names: list[str] = []         # always computed; never text-extracted
     pct_women: float | None = None        # 0–100; computed from directors.biographical.gender
     pct_independent: float | None = None  # 0–100
     avg_director_age: float | None = None
@@ -209,7 +210,7 @@ class BoardSummary(BaseModel):
     notes: str | None = None
 ```
 
-`voting_standard` and `board_evaluation` can only come from the filing text; there is no computation fallback for either. `pct_women` is computed from `director.biographical.gender` (case-insensitive `"Female"` match), using the full director count as the denominator; only computed when at least one director has a known gender. All remaining fields have computation fallbacks in `_compute_board_summary()` in `extractor.py`.
+`voting_standard` and `board_evaluation` can only come from the filing text; there is no computation fallback for either. `director_names` is **always overwritten** in `_compute_board_summary()` with the full names from the director list — it is never extracted by the LLM. `pct_women` is computed from `director.biographical.gender` (case-insensitive `"Female"` match), using the full director count as the denominator; only computed when at least one director has a known gender. All remaining fields have computation fallbacks in `_compute_board_summary()` in `extractor.py`.
 
 **Important:** Directors are accessed via `doc.current_board.directors`; `full_name` via `director.biographical.full_name`. When merging partial extraction results across chunks, match directors by `biographical.full_name` using fuzzy matching (threshold 90).
 
@@ -434,11 +435,11 @@ The sentence-transformer model is loaded lazily and cached as a module-level sin
 
 ### Metric dispatch by field path
 
-Configured in `config.yaml` under `evaluation.field_metrics`. See `config.yaml` for the full mapping. Key entries:
+Configured in `config.yaml` under `evaluation.director_field_metrics`. See `config.yaml` for the full mapping. Key entries:
 
 ```yaml
 evaluation:
-  field_metrics:
+  director_field_metrics:
     "biographical.full_name":            exact_match
     "biographical.career_summary":       llm_semantic_similarity
     "board_role.committee_memberships":  list_f1

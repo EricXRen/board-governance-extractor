@@ -135,6 +135,75 @@ def _deduplicate_directors(director_lists: list[list[Director]]) -> list[Directo
     return merged
 
 
+def _compute_attendance_pct(directors: list[Director]) -> list[Director]:
+    """Fill board_attendance_pct from attended/scheduled when the LLM left it None.
+
+    Args:
+        directors: Director list to post-process.
+
+    Returns:
+        New list with board_attendance_pct filled where derivable.
+    """
+    result = []
+    for d in directors:
+        att = d.attendance
+        if (
+            att.board_attendance_pct is None
+            and att.board_meetings_attended is not None
+            and att.board_meetings_scheduled is not None
+            and att.board_meetings_scheduled > 0
+        ):
+            new_att = att.model_copy(
+                update={
+                    "board_attendance_pct": round(
+                        att.board_meetings_attended / att.board_meetings_scheduled, 4
+                    )
+                }
+            )
+            result.append(d.model_copy(update={"attendance": new_att}))
+        else:
+            result.append(d)
+    return result
+
+
+def _validate_election_nominees(
+    election: DirectorElection,
+    director_names: list[str],
+) -> None:
+    """Log warnings for likely nominee misclassifications.
+
+    Checks that each incumbent_nominee fuzzy-matches a current director name,
+    and that no new_nominee fuzzy-matches a current director name. Data is not
+    modified — callers should treat these as observability signals only.
+
+    Args:
+        election: Extracted DirectorElection.
+        director_names: Director names from the current board summary.
+    """
+    if not director_names:
+        return
+
+    for name in election.summary.incumbent_nominees:
+        best = max((_fuzzy_ratio(name, dn) for dn in director_names), default=0.0)
+        if best < _MERGE_THRESHOLD:
+            logger.warning(
+                "incumbent_nominee_not_in_board",
+                name=name,
+                best_score=round(best, 1),
+            )
+
+    for name in election.summary.new_nominees:
+        scores = [(_fuzzy_ratio(name, dn), dn) for dn in director_names]
+        best_score, best_match = max(scores, key=lambda x: x[0], default=(0.0, ""))
+        if best_score >= _MERGE_THRESHOLD:
+            logger.warning(
+                "new_nominee_matches_existing_director",
+                name=name,
+                matched=best_match,
+                score=round(best_score, 1),
+            )
+
+
 def _extract_chunk(
     provider: LLMProvider,
     chunk: TextChunk,
@@ -457,7 +526,10 @@ def _compute_board_summary(summary: BoardSummary, directors: list[Director]) -> 
     Only fills fields that are currently ``None`` — stated values from the
     filing are never overwritten.
 
-    Computable fields:
+    Computable fields (always overwritten — not conditional on None):
+    - ``director_names``: full names of all directors in the list
+
+    Computable fields (fill None only — stated values are preserved):
     - ``board_size``: total number of directors
     - ``num_executive_directors``: count with designation "Executive Director"
     - ``num_non_executive_directors``: count with designation "Non-Executive Director"
@@ -484,6 +556,9 @@ def _compute_board_summary(summary: BoardSummary, directors: list[Director]) -> 
         return summary
 
     data = summary.model_dump()
+
+    # Always computed — overwrite regardless of any LLM-returned value
+    data["director_names"] = [d.biographical.full_name for d in directors]
 
     if data["board_size"] is None:
         data["board_size"] = len(directors)
@@ -736,6 +811,8 @@ def run_extraction(
         merged_directors = _deduplicate_directors(all_director_lists)
         summary_text = "\n\n".join(c.text for c in effective_chunks)
 
+    merged_directors = _compute_attendance_pct(merged_directors)
+
     logger.info(
         "extraction_complete",
         company=company_name,
@@ -756,6 +833,26 @@ def run_extraction(
         provider, summary_text, company_name, filing_type, fiscal_year_end,
         is_markdown=is_markdown_summary,
     )
+    if director_election and director_election.candidates:
+        updated_candidates = _compute_attendance_pct(director_election.candidates)
+        director_election = director_election.model_copy(update={"candidates": updated_candidates})
+
+    if director_election:
+        # Fallback: derive num_directors_to_elect from candidate count when absent.
+        if (
+            director_election.summary.num_directors_to_elect is None
+            and director_election.candidates
+        ):
+            updated_summary = director_election.summary.model_copy(
+                update={"num_directors_to_elect": len(director_election.candidates)}
+            )
+            director_election = director_election.model_copy(update={"summary": updated_summary})
+            logger.info(
+                "num_directors_to_elect_derived",
+                count=director_election.summary.num_directors_to_elect,
+            )
+
+        _validate_election_nominees(director_election, board_summary.director_names)
 
     metadata = CompanyMetadata(
         company_name=company_name,

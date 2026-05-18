@@ -33,9 +33,9 @@ logging:
   file: "gov_extract.log"
 
 evaluation:
-  field_metrics:
+  director_field_metrics:
     "biographical.full_name": exact_match
-    "biographical.post_nominals": fuzzy_match
+    # "biographical.post_nominals": fuzzy_match
     "biographical.age": numeric_error
     "biographical.age_band": fuzzy_match
     "biographical.gender": exact_match
@@ -54,6 +54,26 @@ evaluation:
     "attendance.board_meetings_attended": numeric_error
     "attendance.board_meetings_scheduled": numeric_error
     "attendance.board_attendance_pct": numeric_error
+  candidate_field_metrics:
+    "biographical.full_name": exact_match
+    "biographical.gender": exact_match
+    "biographical.career_summary": llm_semantic_similarity
+    "board_role.designation": exact_match
+    "board_role.independence_status": exact_match
+    "board_role.committee_memberships": list_f1
+        "board_role.num_holding_shares": numeric_error
+        "board_role.pct_holding_shares": numeric_error
+  document_field_metrics:
+    "current_board.summary.voting_standard": exact_match
+    "current_board.summary.board_evaluation": exact_match
+    "current_board.summary.board_size": numeric_error
+    "current_board.summary.num_executive_directors": numeric_error
+    "current_board.summary.num_non_executive_directors": numeric_error
+    "current_board.summary.num_independent_directors": numeric_error"
+    "current_board.summary.director_names": list_f1
+    "director_election.summary.num_directors_to_elect": numeric_error
+    "director_election.summary.incumbent_nominees": list_f1
+    "director_election.summary.new_nominees": list_f1
   thresholds:
     fuzzy_match: 90.0
     list_f1: 0.90

@@ -97,7 +97,9 @@ class EvaluationConfig(BaseSettings):
 
     model_config = SettingsConfigDict(extra="ignore")
 
-    field_metrics: dict[str, str] = Field(default_factory=dict)
+    director_field_metrics: dict[str, str] = Field(default_factory=dict)
+    candidate_field_metrics: dict[str, str] = Field(default_factory=dict)
+    document_field_metrics: dict[str, str] = Field(default_factory=dict)
     thresholds: EvaluationThresholds = Field(default_factory=EvaluationThresholds)
     regression_gate: RegressionGateConfig = Field(default_factory=RegressionGateConfig)
 
@@ -121,7 +123,9 @@ class Config:
         gate_raw = eval_raw.get("regression_gate", {})
 
         self.evaluation = EvaluationConfig(
-            field_metrics=eval_raw.get("field_metrics", {}),
+            director_field_metrics=eval_raw.get("director_field_metrics", {}),
+            candidate_field_metrics=eval_raw.get("candidate_field_metrics", {}),
+            document_field_metrics=eval_raw.get("document_field_metrics", {}),
             thresholds=EvaluationThresholds(**thresholds_raw),
             regression_gate=RegressionGateConfig(**gate_raw),
         )

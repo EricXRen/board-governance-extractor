@@ -105,33 +105,37 @@ The application must extract the following fields per director. All fields are *
 
 #### FR-2.5 Board Summary (aggregate, document-level)
 
-In addition to per-director data, the application must extract or derive a `board_summary` block covering aggregate governance statistics for the whole board. Fields are populated from two sources in priority order: (1) explicitly stated values in the filing text, (2) values computed from the extracted Director list.
+In addition to per-director data, the application must extract or derive a `BoardSummary` block (stored at `current_board.summary`) covering aggregate governance statistics for the whole board. Fields are populated from two sources in priority order: (1) explicitly stated values in the filing text, (2) values computed from the extracted Director list.
 
 | Field | Type | Source | Notes |
 |-------|------|--------|-------|
 | `ceo_chair_separated` | boolean | Extracted / computed | True if CEO and Chair are different people |
 | `voting_standard` | enum | Extracted only | `"Majority"` or `"Plurality"` for director elections |
+| `board_evaluation` | boolean | Extracted only | `true` if the filing mentions the board evaluation process AND its outcomes AND any resulting actions; `false` if explicitly absent or only partially described; `null` if not mentioned |
 | `board_size` | integer | Extracted / computed | Total number of directors on the board |
 | `num_executive_directors` | integer | Extracted / computed | Count of Executive Directors |
 | `num_non_executive_directors` | integer | Extracted / computed | Count of Non-Executive Directors |
 | `num_independent_directors` | integer | Extracted / computed | Count of Independent directors |
-| `pct_women` | float | Extracted only | Percentage of women on the board (0–100) |
+| `director_names` | list[string] | Computed only | Full names of all directors; always derived from the extracted Director list; the LLM must never populate this field |
+| `pct_women` | float | Computed only | Percentage of women on the board (0–100); derived from `director.biographical.gender` (case-insensitive `"Female"` match) using the full director count as denominator; only computed when at least one director has a known gender |
 | `pct_independent` | float | Extracted / computed | Percentage of independent directors (0–100) |
 | `avg_director_age` | float | Extracted / computed | Average age across all directors |
 | `avg_tenure_years` | float | Extracted / computed | Average tenure in years |
 | `notes` | string | Extracted only | Any additional governance policies stated in the filing |
 
-Computation rules (applied as fallback when the filing does not state the value):
-- `board_size` = `len(directors)`
-- `num_executive_directors` = count of directors with `designation == "Executive Director"`
-- `num_non_executive_directors` = count with `designation == "Non-Executive Director"`
-- `num_independent_directors` = count with `independence_status` in `{"Independent", "Chair (independent on appointment)"}`
-- `pct_independent` = `num_independent_directors / board_size * 100`
-- `avg_director_age` = mean of non-null `biographical.age` values
-- `avg_tenure_years` = mean of non-null `board_role.tenure_years` values
-- `ceo_chair_separated` = True if no single director holds both "Chair" designation and a CEO/Chief Executive board role
+Computation rules:
+- `director_names` — **always overwritten** in post-processing with `[d.biographical.full_name for d in directors]`; not conditional on `null`
+- `pct_women` — computed when any director has a non-null `biographical.gender`; denominator is the full board size (directors with unknown gender count as non-female)
+- `board_size` = `len(directors)` (fill `null` only)
+- `num_executive_directors` = count of directors with `designation == "Executive Director"` (fill `null` only)
+- `num_non_executive_directors` = count with `designation == "Non-Executive Director"` (fill `null` only)
+- `num_independent_directors` = count with `independence_status` in `{"Independent", "Chair (independent on appointment)"}` (fill `null` only)
+- `pct_independent` = `num_independent_directors / board_size * 100` (fill `null` only)
+- `avg_director_age` = mean of non-null `biographical.age` values (fill `null` only)
+- `avg_tenure_years` = mean of non-null `board_role.tenure_years` values (fill `null` only)
+- `ceo_chair_separated` = True if no single director holds both "Chair" designation and a CEO/Chief Executive board role (fill `null` only)
 
-`pct_women` and `voting_standard` have no computation fallback and must come from the filing text.
+`voting_standard` and `board_evaluation` have no computation fallback and must come from the filing text.
 
 #### FR-2.6 Director Election
 
@@ -165,7 +169,7 @@ Extraction rule: always single-pass (same as board summary — never chunked). I
 | ID | Requirement |
 |----|-------------|
 | FR-4.1 | Produce a `.json` file that validates against the project's JSON Schema (`schemas/board_governance.schema.json`). |
-| FR-4.2 | The top-level object must contain a `company` metadata block, a `directors` array, and a `board_summary` object. |
+| FR-4.2 | The top-level object must contain a `company` metadata block, a `current_board` block (with `summary: BoardSummary` and `directors: list[Director]`), an optional `director_election` block, and an optional `post_election_board` block. |
 | FR-4.3 | Every field defined in FR-2 must appear in the schema (nullable where appropriate). |
 | FR-4.4 | Name the file `{CompanyName}_{FiscalYear}_Board_Governance.json`. |
 | FR-4.5 | The schema file itself must be versioned with a `$schema` declaration and a `version` field. |
@@ -261,6 +265,8 @@ The `failure_mode` field is critical: it distinguishes a missing extraction (the
 
 Before any field comparison, extracted directors must be matched to ground-truth directors by name. Use fuzzy name matching (threshold 90) on `biographical.full_name`. Directors present in extraction but absent in ground truth are **false positive directors** (all fields scored 0, failure mode "hallucination"). Directors present in ground truth but absent in extraction are **false negative directors** (all fields scored 0, failure mode "false_negative"). Both categories contribute to document-level scores.
 
+The same matching logic is applied independently to new election candidates: only `Director` objects in `director_election.candidates` whose names fuzzy-match an entry in `director_election.summary.new_nominees` are evaluated. Incumbents re-standing (listed in `incumbent_nominees`) are excluded to avoid double-counting. New-candidate field results are pooled into all document-level aggregate metrics alongside current-board director results.
+
 #### FR-7.4 Aggregate Metrics — Three Levels
 
 **Level 1 — Director-level**
@@ -294,10 +300,22 @@ Before any field comparison, extracted directors must be matched to ground-truth
 
 #### FR-7.5 Regression Gate
 
-The `evaluate` command must exit with a non-zero status code if any configured threshold is breached, making it suitable for use in CI. The gate thresholds are configurable in `config.yaml`:
+The `evaluate` command must exit with a non-zero status code if any configured threshold is breached, making it suitable for use in CI. The gate thresholds are configurable in `config.yaml`. The evaluation section also contains three independent metric-mapping blocks — paths are relative to the object being evaluated in each case:
 
 ```yaml
 evaluation:
+  director_field_metrics:              # field paths relative to Director
+    "biographical.full_name": exact_match
+    "board_role.committee_memberships": list_f1
+    ...
+  candidate_field_metrics:             # field paths relative to Director (new nominees only)
+    "biographical.full_name": exact_match
+    "board_role.independence_status": exact_match
+    ...
+  document_field_metrics:              # field paths relative to BoardGovernanceDocument
+    "current_board.summary.voting_standard": exact_match
+    "director_election.summary.new_nominees": list_f1
+    ...
   regression_gate:
     document_field_pass_rate: 0.90      # fail if overall pass rate drops below 90%
     director_perfect_match_rate: 0.50   # fail if fewer than 50% of directors are perfect
@@ -405,50 +423,58 @@ The canonical Python data model mirrors the JSON schema and is used for LLM stru
 ```
 BoardGovernanceDocument
 ├── company: CompanyMetadata
-├── directors: list[Director]
-│   ├── biographical: BiographicalDetails
-│   │   ├── full_name: str              # given name + surname only, no honorifics
-│   │   ├── post_nominals: str | None
-│   │   ├── age: int | None
-│   │   ├── age_band: str | None
-│   │   ├── gender: str | None
-│   │   ├── affiliation: str | None
-│   │   └── career_summary: str | None
-│   ├── board_role: BoardRoleDetails
-│   │   ├── designation: Literal[...]
-│   │   ├── board_role: str
-│   │   ├── independence_status: Literal[...]
-│   │   ├── year_joined_board: int | None
-│   │   ├── date_joined_board: str | None
-│   │   ├── tenure_years: float | None
-│   │   ├── term_end_year: int | None
-│   │   ├── year_end_status: str
-│   │   ├── committee_memberships: list[str]
-│   │   ├── committee_chair_of: list[str]
-│   │   ├── other_positions: list[str]
-│   │   ├── num_holding_shares: int | None
-│   │   └── pct_holding_shares: float | None
-│   └── attendance: AttendanceDetails
-│       └── committee_attendance: list[CommitteeAttendance]
-├── board_summary: BoardSummary
-    ├── ceo_chair_separated: bool | None
-    ├── voting_standard: "Majority" | "Plurality" | None
-    ├── board_size: int | None
-    ├── num_executive_directors: int | None
-    ├── num_non_executive_directors: int | None
-    ├── num_independent_directors: int | None
-    ├── pct_women: float | None
-    ├── pct_independent: float | None
-    ├── avg_director_age: float | None
-    ├── avg_tenure_years: float | None
-    └── notes: str | None
-└── director_election: DirectorElection | None
-    ├── summary: DirectorElectionSummary
-    │   ├── num_directors_to_elect: int | None
-    │   ├── incumbent_nominees: list[str]
-    │   ├── new_nominees: list[str]
-    │   └── candidates_disclosed: bool | None
-    └── candidates: list[Director]   # same schema as directors above
+├── current_board: Board                          # extracted from the filing
+│   ├── summary: BoardSummary
+│   │   ├── ceo_chair_separated: bool | None
+│   │   ├── voting_standard: "Majority" | "Plurality" | None   # extracted only
+│   │   ├── board_evaluation: bool | None                      # extracted only
+│   │   ├── board_size: int | None
+│   │   ├── num_executive_directors: int | None
+│   │   ├── num_non_executive_directors: int | None
+│   │   ├── num_independent_directors: int | None
+│   │   ├── director_names: list[str]                          # computed only; always overwritten
+│   │   ├── pct_women: float | None                            # computed from biographical.gender
+│   │   ├── pct_independent: float | None
+│   │   ├── avg_director_age: float | None
+│   │   ├── avg_tenure_years: float | None
+│   │   └── notes: str | None
+│   └── directors: list[Director]
+│       ├── biographical: BiographicalDetails
+│       │   ├── full_name: str              # given name + surname only, no honorifics
+│       │   ├── post_nominals: str | None
+│       │   ├── age: int | None
+│       │   ├── age_band: str | None
+│       │   ├── gender: str | None
+│       │   ├── affiliation: str | None
+│       │   └── career_summary: str | None
+│       ├── board_role: BoardRoleDetails
+│       │   ├── designation: Literal[...]
+│       │   ├── board_role: str
+│       │   ├── independence_status: Literal[...]
+│       │   ├── year_joined_board: int | None
+│       │   ├── date_joined_board: str | None
+│       │   ├── tenure_years: float | None
+│       │   ├── term_end_year: int | None
+│       │   ├── year_end_status: str
+│       │   ├── committee_memberships: list[str]
+│       │   ├── committee_chair_of: list[str]
+│       │   ├── other_positions: list[str]
+│       │   ├── num_holding_shares: int | None
+│       │   └── pct_holding_shares: float | None
+│       └── attendance: AttendanceDetails
+│           └── committee_attendance: list[CommitteeAttendance]
+├── director_election: DirectorElection | None    # null when no election section exists
+│   ├── summary: DirectorElectionSummary
+│   │   ├── num_directors_to_elect: int | None
+│   │   ├── incumbent_nominees: list[str]
+│   │   ├── new_nominees: list[str]
+│   │   └── candidates_disclosed: bool | None
+│   └── candidates: list[Director]               # same schema as current_board.directors
+└── post_election_board: Board | None             # computed; null when no election candidates
+    # Built by deduplicating current_board.directors + director_election.candidates.
+    # BoardSummary is recomputed from the merged list; voting_standard and board_evaluation
+    # are carried over from current_board.summary (text-only fields cannot be recomputed).
+    # Structure identical to current_board (Board with summary + directors).
 ```
 
 All models derive from `pydantic.BaseModel` with `model_config = ConfigDict(extra="forbid")`.
@@ -481,4 +507,4 @@ Located at `schemas/board_governance.schema.json`. Draft 2020-12. All fields nul
 - Multi-document merging (e.g. combining annual report + proxy statement).
 - GUI or web interface.
 - Database persistence.
-- Gender inference from director names (pct_women must be stated in the filing).
+- Gender inference from director names (`biographical.gender` must be disclosed in the filing; the tool never infers gender from a name).

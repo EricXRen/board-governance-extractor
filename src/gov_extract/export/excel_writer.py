@@ -146,6 +146,7 @@ def _summary_rows(summary: BoardSummary) -> list[tuple[str, object]]:
         ("Executive Directors", summary.num_executive_directors if summary.num_executive_directors is not None else "N/A"),
         ("Non-Executive Directors", summary.num_non_executive_directors if summary.num_non_executive_directors is not None else "N/A"),
         ("Independent Directors", summary.num_independent_directors if summary.num_independent_directors is not None else "N/A"),
+        ("Director Names", ", ".join(summary.director_names) if summary.director_names else "N/A"),
         ("% Women on Board", _pct(summary.pct_women)),
         ("% Independent Directors", _pct(summary.pct_independent)),
         ("Average Director Age", f"{summary.avg_director_age:.1f}" if summary.avg_director_age is not None else "N/A"),

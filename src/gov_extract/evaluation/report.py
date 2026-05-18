@@ -90,33 +90,41 @@ def write_excel_report(result: DocumentResult, output_dir: Path) -> Path:
         cell.font = HDR_FONT
         cell.alignment = Alignment(horizontal="center", vertical="center")
 
+    def _append_field_row(label: str, fr: FieldResult) -> None:
+        row = [
+            label,
+            fr.field_path,
+            fr.metric_used,
+            str(fr.predicted_value) if fr.predicted_value is not None else "",
+            str(fr.ground_truth_value) if fr.ground_truth_value is not None else "",
+            round(fr.score, 4),
+            "PASS" if fr.passed else "FAIL",
+            fr.failure_mode or "",
+        ]
+        ws.append(row)  # type: ignore[union-attr]
+        row_idx = ws.max_row  # type: ignore[union-attr]
+        fill = PASS_FILL
+        if fr.failure_mode == "below_threshold":
+            fill = FAIL_FILL
+        elif fr.failure_mode == "hallucination":
+            fill = HALL_FILL
+        elif fr.failure_mode == "false_negative":
+            fill = FN_FILL
+        for cell in ws[row_idx]:  # type: ignore[index]
+            cell.fill = fill
+            cell.font = CELL_FONT
+            cell.alignment = Alignment(vertical="top", wrap_text=True)
+
     for dr in result.director_results:
         for fr in dr.field_results:
-            row = [
-                dr.director_name,
-                fr.field_path,
-                fr.metric_used,
-                str(fr.predicted_value) if fr.predicted_value is not None else "",
-                str(fr.ground_truth_value) if fr.ground_truth_value is not None else "",
-                round(fr.score, 4),
-                "PASS" if fr.passed else "FAIL",
-                fr.failure_mode or "",
-            ]
-            ws.append(row)  # type: ignore[union-attr]
-            row_idx = ws.max_row  # type: ignore[union-attr]
+            _append_field_row(dr.director_name, fr)
 
-            fill = PASS_FILL
-            if fr.failure_mode == "below_threshold":
-                fill = FAIL_FILL
-            elif fr.failure_mode == "hallucination":
-                fill = HALL_FILL
-            elif fr.failure_mode == "false_negative":
-                fill = FN_FILL
+    for dr in result.election_candidate_results:
+        for fr in dr.field_results:
+            _append_field_row(f"[candidate] {dr.director_name}", fr)
 
-            for cell in ws[row_idx]:  # type: ignore[index]
-                cell.fill = fill
-                cell.font = CELL_FONT
-                cell.alignment = Alignment(vertical="top", wrap_text=True)
+    for fr in result.document_field_results:
+        _append_field_row("[document]", fr)
 
     # Column widths
     col_widths = [25, 40, 20, 30, 30, 8, 8, 18]

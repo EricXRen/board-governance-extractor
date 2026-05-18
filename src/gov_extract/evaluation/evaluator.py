@@ -38,6 +38,8 @@ class DocumentResult:
     extracted_path: str
     ground_truth_path: str
     director_results: list[DirectorResult]
+    election_candidate_results: list[DirectorResult]  # new nominees only
+    document_field_results: list[FieldResult]
 
     document_field_pass_rate: float
     document_perfect_match: bool
@@ -115,6 +117,28 @@ def _match_directors(
     return pairs
 
 
+def _filter_new_candidates(
+    candidates: list[Director],
+    new_nominee_names: list[str],
+) -> list[Director]:
+    """Return only candidates whose name fuzzy-matches an entry in new_nominee_names.
+
+    Args:
+        candidates: Full list of election candidates.
+        new_nominee_names: Names from DirectorElectionSummary.new_nominees.
+
+    Returns:
+        Filtered list containing only genuinely new nominees.
+    """
+    result = []
+    for candidate in candidates:
+        for name in new_nominee_names:
+            if _fuzzy_ratio(candidate.biographical.full_name, name) >= _FUZZY_THRESHOLD:
+                result.append(candidate)
+                break
+    return result
+
+
 def _get_field_value(obj: Any, path: str) -> Any:
     """Extract a value from a nested object using dot-notation path.
 
@@ -137,7 +161,7 @@ def _get_field_value(obj: Any, path: str) -> Any:
 def _evaluate_director_pair(
     extracted: Director | None,
     gt: Director | None,
-    field_metrics: dict[str, str],
+    director_field_metrics: dict[str, str],
     thresholds: dict[str, float],
     judge_config: dict[str, str] | None = None,
 ) -> DirectorResult:
@@ -146,7 +170,7 @@ def _evaluate_director_pair(
     Args:
         extracted: Extracted director (None if false negative).
         gt: Ground-truth director (None if hallucination).
-        field_metrics: Mapping of field_path → metric_name.
+        director_field_metrics: Mapping of field_path → metric_name.
         thresholds: Metric thresholds.
         judge_config: Optional {"provider": ..., "model": ...} for llm_semantic_similarity.
 
@@ -172,13 +196,13 @@ def _evaluate_director_pair(
                 hallucination_count=0,
                 matched=False,
             )
-        for fp in field_metrics:
+        for fp in director_field_metrics:
             val = _get_field_value(source, fp)
             pred_val = None if extracted is None else val
             gt_val = None if gt is None else val
             fr = FieldResult(
                 field_path=fp,
-                metric_used=field_metrics[fp],
+                metric_used=director_field_metrics[fp],
                 predicted_value=pred_val,
                 ground_truth_value=gt_val,
                 score=0.0,
@@ -187,7 +211,7 @@ def _evaluate_director_pair(
             )
             field_results.append(fr)
     else:
-        for fp, metric in field_metrics.items():
+        for fp, metric in director_field_metrics.items():
             pred_val = _get_field_value(extracted, fp)
             gt_val = _get_field_value(gt, fp)
             fr = evaluate_field(fp, pred_val, gt_val, metric, thresholds, judge_config)
@@ -209,25 +233,60 @@ def _evaluate_director_pair(
     )
 
 
+def _evaluate_document_fields(
+    extracted_doc: BoardGovernanceDocument,
+    gt_doc: BoardGovernanceDocument,
+    document_field_metrics: dict[str, str],
+    thresholds: dict[str, float],
+    judge_config: dict[str, str] | None = None,
+) -> list[FieldResult]:
+    """Evaluate document-level fields (BoardSummary, DirectorElectionSummary, etc.).
+
+    Args:
+        extracted_doc: LLM-extracted document.
+        gt_doc: Ground-truth document.
+        document_field_metrics: Mapping of dot-notation paths (relative to
+            BoardGovernanceDocument) to metric names.
+        thresholds: Metric thresholds.
+        judge_config: Optional LLM judge config.
+
+    Returns:
+        List of FieldResult, one per configured document field.
+    """
+    results: list[FieldResult] = []
+    for fp, metric in document_field_metrics.items():
+        pred_val = _get_field_value(extracted_doc, fp)
+        gt_val = _get_field_value(gt_doc, fp)
+        fr = evaluate_field(fp, pred_val, gt_val, metric, thresholds, judge_config)
+        results.append(fr)
+    return results
+
+
 def evaluate(
     extracted_doc: BoardGovernanceDocument,
     gt_doc: BoardGovernanceDocument,
-    field_metrics: dict[str, str],
+    director_field_metrics: dict[str, str],
     thresholds: dict[str, float],
     extracted_path: str = "",
     gt_path: str = "",
     judge_config: dict[str, str] | None = None,
+    document_field_metrics: dict[str, str] | None = None,
+    candidate_field_metrics: dict[str, str] | None = None,
 ) -> DocumentResult:
     """Run the full evaluation of an extracted document against ground truth.
 
     Args:
         extracted_doc: LLM-extracted document.
         gt_doc: Manually-annotated ground-truth document.
-        field_metrics: Mapping of field_path → metric_name from config.
+        director_field_metrics: Mapping of field_path → metric_name for current board directors.
         thresholds: Metric thresholds from config.
         extracted_path: Path to the extracted JSON (for reporting).
         gt_path: Path to the ground-truth JSON (for reporting).
         judge_config: Optional {"provider": ..., "model": ...} for llm_semantic_similarity.
+        document_field_metrics: Mapping of BoardGovernanceDocument dot-paths → metric_name.
+            These fields are evaluated once per document, not per director.
+        candidate_field_metrics: Mapping of Director dot-paths → metric_name for new election
+            candidates. Falls back to director_field_metrics when absent or empty.
 
     Returns:
         DocumentResult with all metrics.
@@ -236,7 +295,7 @@ def evaluate(
 
     director_results: list[DirectorResult] = []
     for ext, gt in pairs:
-        dr = _evaluate_director_pair(ext, gt, field_metrics, thresholds, judge_config)
+        dr = _evaluate_director_pair(ext, gt, director_field_metrics, thresholds, judge_config)
         director_results.append(dr)
 
         if ext is None:
@@ -244,8 +303,38 @@ def evaluate(
         elif gt is None:
             logger.warning("director_hallucination", name=ext.biographical.full_name)
 
-    # Aggregate metrics
-    all_field_results = [fr for dr in director_results for fr in dr.field_results]
+    # New election candidates (new_nominees only, evaluated independently)
+    ext_election = extracted_doc.director_election
+    gt_election = gt_doc.director_election
+    ext_new = _filter_new_candidates(
+        ext_election.candidates if ext_election else [],
+        ext_election.summary.new_nominees if ext_election else [],
+    )
+    gt_new = _filter_new_candidates(
+        gt_election.candidates if gt_election else [],
+        gt_election.summary.new_nominees if gt_election else [],
+    )
+    _cand_metrics = candidate_field_metrics or director_field_metrics
+    election_candidate_results: list[DirectorResult] = []
+    for ext, gt in _match_directors(ext_new, gt_new):
+        dr = _evaluate_director_pair(ext, gt, _cand_metrics, thresholds, judge_config)
+        election_candidate_results.append(dr)
+        if ext is None:
+            logger.warning("candidate_false_negative", name=gt.biographical.full_name if gt else "?")  # type: ignore[union-attr]
+        elif gt is None:
+            logger.warning("candidate_hallucination", name=ext.biographical.full_name)
+
+    # Document-level fields (evaluated once, not per director)
+    doc_field_results = _evaluate_document_fields(
+        extracted_doc, gt_doc, document_field_metrics or {}, thresholds, judge_config
+    )
+
+    # Aggregate metrics — pool director + candidate + document fields
+    all_field_results = (
+        [fr for dr in director_results for fr in dr.field_results]
+        + [fr for dr in election_candidate_results for fr in dr.field_results]
+        + doc_field_results
+    )
     total_fields = len(all_field_results)
     passed_fields = sum(1 for fr in all_field_results if fr.passed)
     fn_fields = sum(
@@ -269,7 +358,11 @@ def evaluate(
     total_directors = len(matched_directors) + sum(1 for dr in director_results if not dr.matched)
     perfect_directors = sum(1 for dr in matched_directors if dr.perfect_match)
     perfect_match_rate = perfect_directors / total_directors if total_directors > 0 else 1.0
-    doc_perfect = all(dr.perfect_match for dr in director_results)
+    doc_perfect = (
+        all(dr.perfect_match for dr in director_results)
+        and all(dr.perfect_match for dr in election_candidate_results)
+        and all(fr.passed for fr in doc_field_results)
+    )
 
     # Per-field pass rates
     per_field: dict[str, list[bool]] = {}
@@ -302,6 +395,8 @@ def evaluate(
         extracted_path=extracted_path,
         ground_truth_path=gt_path,
         director_results=director_results,
+        election_candidate_results=election_candidate_results,
+        document_field_results=doc_field_results,
         document_field_pass_rate=doc_pass_rate,
         document_perfect_match=doc_perfect,
         director_perfect_match_rate=perfect_match_rate,
@@ -353,24 +448,32 @@ def check_regression_gate(
 
 def evaluate_corpus(
     document_pairs: list[tuple[BoardGovernanceDocument, BoardGovernanceDocument, str, str]],
-    field_metrics: dict[str, str],
+    director_field_metrics: dict[str, str],
     thresholds: dict[str, float],
     judge_config: dict[str, str] | None = None,
+    document_field_metrics: dict[str, str] | None = None,
+    candidate_field_metrics: dict[str, str] | None = None,
 ) -> CorpusResult:
     """Evaluate multiple (extracted, ground-truth) document pairs.
 
     Args:
         document_pairs: List of (extracted, gt, extracted_path, gt_path) tuples.
-        field_metrics: Metric mapping from config.
+        director_field_metrics: Metric mapping from config for current board directors.
         thresholds: Threshold mapping from config.
         judge_config: Optional {"provider": ..., "model": ...} for llm_semantic_similarity.
+        document_field_metrics: Mapping of BoardGovernanceDocument dot-paths → metric_name.
+        candidate_field_metrics: Mapping of Director dot-paths → metric_name for candidates.
 
     Returns:
         CorpusResult with pooled metrics.
     """
     doc_results: list[DocumentResult] = []
     for ext, gt, ext_path, gt_path in document_pairs:
-        dr = evaluate(ext, gt, field_metrics, thresholds, ext_path, gt_path, judge_config)
+        dr = evaluate(
+            ext, gt, director_field_metrics, thresholds, ext_path, gt_path, judge_config,
+            document_field_metrics=document_field_metrics,
+            candidate_field_metrics=candidate_field_metrics,
+        )
         doc_results.append(dr)
 
     if not doc_results:

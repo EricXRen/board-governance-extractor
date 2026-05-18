@@ -214,6 +214,7 @@ CRITICAL INSTRUCTIONS:
 - For ceo_chair_separated: return true if the CEO and Chair are explicitly stated to be different people, false if the same person holds both roles, null if not stated.
 - For voting_standard: return "Majority" or "Plurality" only if the director election voting standard is explicitly stated.
 - For board_evaluation: return true if the filing mentions the board evaluation process AND its outcomes AND any resulting actions; false if board evaluation is explicitly absent or only partially described; null if not mentioned at all.
+- For director_names: always return [] — this field is populated in post-processing and must not be extracted from the text.
 - The notes field may capture any other stated board governance policy (e.g. board tenure policy, retirement age, diversity targets).
 
 The BoardSummary schema is:

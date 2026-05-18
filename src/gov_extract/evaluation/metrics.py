@@ -56,7 +56,7 @@ def exact_match(pred: str | None, gt: str | None) -> float:
         return 1.0
     if pred is None or gt is None:
         return 0.0
-    return 1.0 if pred.strip().lower() == gt.strip().lower() else 0.0
+    return 1.0 if str(pred).strip().lower() == str(gt).strip().lower() else 0.0
 
 
 def fuzzy_match(pred: str | None, gt: str | None, threshold: float = 90.0) -> float:

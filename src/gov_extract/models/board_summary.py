@@ -30,6 +30,7 @@ class BoardSummary(BaseModel):
     num_executive_directors: int | None = None
     num_non_executive_directors: int | None = None
     num_independent_directors: int | None = None
+    director_names: list[str] = []  # computed from director list; not text-extracted
 
     # Diversity and demographics
     pct_women: float | None = None        # 0–100; computed from directors.biographical.gender

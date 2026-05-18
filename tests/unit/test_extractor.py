@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -19,6 +20,7 @@ from gov_extract.extraction.extractor import (
     _deduplicate_directors,
     _extract_chunk,
     _structured_from_markdown,
+    _validate_election_nominees,
     run_extraction,
 )
 from gov_extract.models.board_summary import BoardSummary
@@ -28,6 +30,7 @@ from gov_extract.models.director import (
     BoardRoleDetails,
     Director,
 )
+from gov_extract.models.director_election import DirectorElection, DirectorElectionSummary
 from gov_extract.models.document import BoardGovernanceDocument
 
 
@@ -87,10 +90,12 @@ class MockProvider:
         directors: list[Director] | None = None,
         markdown: str = "",
         board_summary: BoardSummary | None = None,
+        director_election: DirectorElection | None = None,
     ) -> None:
         self._directors = directors or []
         self._markdown = markdown
         self._board_summary = board_summary or BoardSummary()
+        self._director_election = director_election
         self.extract_calls: list[type] = []
         self.extract_text_call_count: int = 0
 
@@ -100,6 +105,8 @@ class MockProvider:
             return DirectorList(directors=self._directors)
         if response_model is BoardSummary:
             return self._board_summary
+        if response_model is DirectorElection:
+            return self._director_election if self._director_election is not None else DirectorElection()
         return response_model()
 
     def extract_text(self, system_prompt: str, user_prompt: str) -> str:
@@ -523,3 +530,108 @@ class TestStructuredFromMarkdownFallback:
         result = _structured_from_markdown(FailingProvider(raw), "## Carol", "Co", "AR", "2025-12-31")
         assert len(result) == 1
         assert result[0].biographical.full_name == "Carol White"
+
+
+# ---------------------------------------------------------------------------
+# Election nominee validation warnings
+# ---------------------------------------------------------------------------
+
+def _make_election(incumbents: list[str] | None = None, new: list[str] | None = None) -> DirectorElection:
+    return DirectorElection(
+        summary=DirectorElectionSummary(
+            incumbent_nominees=incumbents or [],
+            new_nominees=new or [],
+        )
+    )
+
+
+class TestValidateElectionNominees:
+    def test_incumbent_in_board_no_warning(self) -> None:
+        election = _make_election(incumbents=["Alice Smith"])
+        with patch("gov_extract.extraction.extractor.logger") as mock_log:
+            _validate_election_nominees(election, ["Alice Smith", "Bob Jones"])
+            mock_log.warning.assert_not_called()
+
+    def test_incumbent_not_in_board_warns(self) -> None:
+        election = _make_election(incumbents=["Xavier Unknown"])
+        with patch("gov_extract.extraction.extractor.logger") as mock_log:
+            _validate_election_nominees(election, ["Alice Smith", "Bob Jones"])
+            mock_log.warning.assert_called_once()
+            assert mock_log.warning.call_args[0][0] == "incumbent_nominee_not_in_board"
+
+    def test_new_nominee_not_in_board_no_warning(self) -> None:
+        election = _make_election(new=["New Person"])
+        with patch("gov_extract.extraction.extractor.logger") as mock_log:
+            _validate_election_nominees(election, ["Alice Smith", "Bob Jones"])
+            mock_log.warning.assert_not_called()
+
+    def test_new_nominee_in_board_warns(self) -> None:
+        election = _make_election(new=["Alice Smith"])
+        with patch("gov_extract.extraction.extractor.logger") as mock_log:
+            _validate_election_nominees(election, ["Alice Smith", "Bob Jones"])
+            mock_log.warning.assert_called_once()
+            assert mock_log.warning.call_args[0][0] == "new_nominee_matches_existing_director"
+
+    def test_empty_director_names_skips_all_checks(self) -> None:
+        election = _make_election(incumbents=["Alice Smith"], new=["Bob Jones"])
+        with patch("gov_extract.extraction.extractor.logger") as mock_log:
+            _validate_election_nominees(election, [])
+            mock_log.warning.assert_not_called()
+
+    def test_multiple_incumbents_warns_only_for_unmatched(self) -> None:
+        election = _make_election(incumbents=["Alice Smith", "Xavier Unknown"])
+        with patch("gov_extract.extraction.extractor.logger") as mock_log:
+            _validate_election_nominees(election, ["Alice Smith"])
+            assert mock_log.warning.call_count == 1
+            assert mock_log.warning.call_args[0][0] == "incumbent_nominee_not_in_board"
+
+
+# ---------------------------------------------------------------------------
+# num_directors_to_elect fallback
+# ---------------------------------------------------------------------------
+
+class TestNumDirectorsToElectFallback:
+    def test_derived_from_candidate_count_when_none(self) -> None:
+        election = DirectorElection(
+            summary=DirectorElectionSummary(num_directors_to_elect=None),
+            candidates=[_director("Alice Smith"), _director("Bob Jones")],
+        )
+        doc = run_extraction(
+            provider=MockProvider(director_election=election),
+            chunks=[_chunk(1)],
+            chunking=True,
+            extraction_rounds=1,
+            **_DEFAULTS,
+        )
+        assert doc.director_election is not None
+        assert doc.director_election.summary.num_directors_to_elect == 2
+
+    def test_stated_value_not_overwritten(self) -> None:
+        election = DirectorElection(
+            summary=DirectorElectionSummary(num_directors_to_elect=5),
+            candidates=[_director("Alice Smith")],
+        )
+        doc = run_extraction(
+            provider=MockProvider(director_election=election),
+            chunks=[_chunk(1)],
+            chunking=True,
+            extraction_rounds=1,
+            **_DEFAULTS,
+        )
+        assert doc.director_election is not None
+        assert doc.director_election.summary.num_directors_to_elect == 5
+
+    def test_none_stays_none_when_no_candidates(self) -> None:
+        election = DirectorElection(
+            summary=DirectorElectionSummary(num_directors_to_elect=None),
+            candidates=[],
+        )
+        doc = run_extraction(
+            provider=MockProvider(director_election=election),
+            chunks=[_chunk(1)],
+            chunking=True,
+            extraction_rounds=1,
+            **_DEFAULTS,
+        )
+        assert doc.director_election is not None
+        assert doc.director_election.summary.num_directors_to_elect is None

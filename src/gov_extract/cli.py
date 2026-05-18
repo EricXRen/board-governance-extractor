@@ -282,7 +282,9 @@ def evaluate(
         ext_doc = validate_json_file(Path(extracted))
         gt_doc = validate_json_file(Path(ground_truth))
 
-    field_metrics = cfg.evaluation.field_metrics
+    director_field_metrics = cfg.evaluation.director_field_metrics
+    candidate_field_metrics = cfg.evaluation.candidate_field_metrics
+    document_field_metrics = cfg.evaluation.document_field_metrics
     eval_thresholds = {
         "fuzzy_match": cfg.evaluation.thresholds.fuzzy_match,
         "list_f1": cfg.evaluation.thresholds.list_f1,
@@ -293,7 +295,11 @@ def evaluate(
     judge_config = {"provider": cfg.llm.judge_provider, "model": cfg.llm.judge_model}
 
     with console.status("Evaluating..."):
-        result = _evaluate(ext_doc, gt_doc, field_metrics, eval_thresholds, extracted, ground_truth, judge_config)
+        result = _evaluate(
+            ext_doc, gt_doc, director_field_metrics, eval_thresholds, extracted, ground_truth,
+            judge_config, document_field_metrics=document_field_metrics,
+            candidate_field_metrics=candidate_field_metrics,
+        )
 
     write_evaluation_report(result, resolved_output_dir)
 
@@ -340,7 +346,9 @@ def evaluate_corpus(
         console.print("[bold red]No *_extracted.json files found.[/bold red]")
         raise typer.Exit(1)
 
-    field_metrics = cfg.evaluation.field_metrics
+    director_field_metrics = cfg.evaluation.director_field_metrics
+    candidate_field_metrics = cfg.evaluation.candidate_field_metrics
+    document_field_metrics = cfg.evaluation.document_field_metrics
     eval_thresholds = {
         "fuzzy_match": cfg.evaluation.thresholds.fuzzy_match,
         "list_f1": cfg.evaluation.thresholds.list_f1,
@@ -364,7 +372,11 @@ def evaluate_corpus(
     judge_config = {"provider": cfg.llm.judge_provider, "model": cfg.llm.judge_model}
 
     with console.status(f"Evaluating {len(pairs)} document pairs..."):
-        corpus_result = _eval_corpus(pairs, field_metrics, eval_thresholds, judge_config)
+        corpus_result = _eval_corpus(
+            pairs, director_field_metrics, eval_thresholds, judge_config,
+            document_field_metrics=document_field_metrics,
+            candidate_field_metrics=candidate_field_metrics,
+        )
 
     write_evaluation_report(corpus_result, resolved_output_dir)
     rate = corpus_result.corpus_field_pass_rate
