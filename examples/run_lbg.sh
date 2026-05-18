@@ -35,9 +35,10 @@ uv run gov-extract extract data/2025-lbg-annual-report.pdf  data/2025-lbg-notice
 
 
 uv run gov-extract evaluate \
-    --extracted outputs/LloydsBankingGroup_2025_Board_Governance_deepseek.json \
-    --ground-truth outputs/LloydsBankingGroup_2025_Board_Governance_openai.json \
-    --output-dir ./outputs
+    --extracted outputs/lbg-2025/LloydsBankingGroup_2025_Board_Governance.json \
+    --ground-truth outputs/lbg-2025/LloydsBankingGroup_2025_Board_Governance_deepseek.json \
+    --output-dir ./outputs/lbg-2025
+  
 
 
 #   Optional flags:

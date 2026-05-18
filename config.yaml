@@ -61,15 +61,15 @@ evaluation:
     "board_role.designation": exact_match
     "board_role.independence_status": exact_match
     "board_role.committee_memberships": list_f1
-        "board_role.num_holding_shares": numeric_error
-        "board_role.pct_holding_shares": numeric_error
+    "board_role.num_holding_shares": numeric_error
+    "board_role.pct_holding_shares": numeric_error
   document_field_metrics:
     "current_board.summary.voting_standard": exact_match
     "current_board.summary.board_evaluation": exact_match
     "current_board.summary.board_size": numeric_error
     "current_board.summary.num_executive_directors": numeric_error
     "current_board.summary.num_non_executive_directors": numeric_error
-    "current_board.summary.num_independent_directors": numeric_error"
+    "current_board.summary.num_independent_directors": numeric_error
     "current_board.summary.director_names": list_f1
     "director_election.summary.num_directors_to_elect": numeric_error
     "director_election.summary.incumbent_nominees": list_f1
