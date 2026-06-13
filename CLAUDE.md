@@ -618,4 +618,4 @@ The integration test for full extraction must run `evaluate` against `lbg_ground
 | `schemas/board_governance.schema.json` | Authoritative JSON Schema — generated from Pydantic models; re-generate with `uv run python -m gov_extract.models.generate_schema` |
 | `documents/PRD_v1.0.md` | v1.0 product requirements |
 | `documents/PRD_v1.1.md` | v1.1 product requirements |
-| `documents/PROJECT_PLAN.md` | Phased implementation plan and design decisions |
+| `documents/PROJECT_PLAN_v1.0.md` | v1.0 phased implementation plan and design decisions |
