@@ -82,7 +82,7 @@ AZURE_OPENAI_API_VERSION=2024-08-01-preview
 AZURE_OPENAI_DEPLOYMENT=gpt-4o
 ```
 
-Select the active provider and model in `config.yaml` (see [Configuration Reference](#configuration-reference)), or pass `--provider` / `--model` flags at runtime.
+Set `default_provider` and `default_model` in `config.yaml` (see [Configuration Reference](#configuration-reference)), or override per-run with `--provider` / `--model` flags.
 
 ---
 
@@ -282,15 +282,16 @@ All runtime configuration lives in `config.yaml`. Secrets (API keys, endpoints) 
 
 ```yaml
 llm:
-  default_provider: anthropic        # anthropic | openai | azure_openai
+  default_provider: anthropic        # anthropic | openai | azure_openai | deepseek
   default_model: claude-sonnet-4-6
-  judge_provider: openai             # provider used for LLM-based evaluation metrics
-  judge_model: gpt-4o-mini
+  judge_provider: openai             # provider used for llm_semantic_similarity evaluation metric
+  judge_model: gpt-4o-mini           # model used for the LLM judge
   temperature: 0                     # must be 0 for reproducibility
   reasoning_effort: null             # null = auto-detect; or "low" | "medium" | "high"
                                      # applies to OpenAI o1/o3/o4/gpt-5 series
   chunking: true                     # true = chunk pages; false = single pass
   extraction_rounds: 1               # 1 (direct structured) | 2 (markdown then structured)
+  max_chunk_workers: 5               # parallel threads for chunk extraction (tune to rate limit)
   max_retries: 5
   timeout_seconds: 120
 
@@ -299,6 +300,7 @@ pdf:
   max_pages_per_chunk: 15            # pages per chunk in "chunked" mode
   governance_keywords:               # keywords used to detect governance sections
     - "board of directors"
+    - "board members"
     - "directors' report"
     - "our board"
     - "committee report"
@@ -307,6 +309,7 @@ pdf:
 
 output:
   default_dir: "./outputs"
+  eval_dataset_dir: "./data/eval_data"  # ground-truth files for corpus evaluation
 
 logging:
   level: INFO
@@ -314,10 +317,19 @@ logging:
   file: "gov_extract.log"
 
 evaluation:
-  field_metrics:                     # metric function per field path
+  director_field_metrics:            # metric per field for current_board directors
     "biographical.full_name": exact_match
     "biographical.career_summary": llm_semantic_similarity
+    "board_role.committee_memberships": list_f1
     # ... (see config.yaml for full list)
+  candidate_field_metrics:           # metric per field for director_election candidates
+    "biographical.full_name": exact_match
+    "biographical.career_summary": llm_semantic_similarity
+    # ...
+  document_field_metrics:            # metrics evaluated once per document
+    "current_board.summary.voting_standard": exact_match
+    "current_board.summary.board_size": numeric_error
+    # ...
   thresholds:
     fuzzy_match: 90.0
     list_f1: 0.90
@@ -354,7 +366,7 @@ Five sheets — the first is a high-level summary, the rest cover per-director d
 |-------|----------|
 | Board Summary | Aggregate governance metrics: CEO/chair separation, voting standard, board size, avg age/tenure, % women, % independent |
 | Board Overview | All directors, all key fields — master reference |
-| Biographical Details | Name, age, nationality, qualifications, expertise, career summary, external directorships |
+| Biographical Details | Name, age, gender, affiliation, career summary |
 | Committee Memberships | Director × committee matrix: `C` (chair), `M` (member), `–` (not a member) |
 | Meeting Attendance | Board and per-committee attendance with traffic-light percentage colouring |
 
@@ -372,28 +384,59 @@ Validates against `schemas/board_governance.schema.json` (JSON Schema Draft 2020
     "llm_model": "claude-sonnet-4-6",
     "extraction_timestamp": "2025-04-30T10:00:00+00:00"
   },
-  "directors": [
-    {
-      "biographical": { "full_name": "Sir Robin Budenberg CBE", ... },
-      "board_role": { ... },
-      "attendance": { ... }
-    }
-  ],
-  "board_summary": {
-    "ceo_chair_separated": true,
-    "voting_standard": "Majority",
-    "board_size": 11,
-    "num_executive_directors": 2,
-    "num_non_executive_directors": 9,
-    "num_independent_directors": 9,
-    "pct_women": 45.5,
-    "pct_independent": 81.8,
-    "avg_director_age": 58.3,
-    "avg_tenure_years": 4.7,
-    "notes": null
-  }
+  "current_board": {
+    "summary": {
+      "ceo_chair_separated": true,
+      "voting_standard": "Majority",
+      "board_size": 11,
+      "num_executive_directors": 2,
+      "num_non_executive_directors": 9,
+      "num_independent_directors": 9,
+      "director_names": ["Sir Robin Budenberg CBE", "..."],
+      "pct_women": 45.5,
+      "pct_independent": 81.8,
+      "avg_director_age": 58.3,
+      "avg_tenure_years": 4.7
+    },
+    "directors": [
+      {
+        "biographical": {
+          "full_name": "Sir Robin Budenberg CBE",
+          "age": 62,
+          "gender": "Male",
+          "career_summary": "..."
+        },
+        "board_role": {
+          "designation": "Chair",
+          "board_role": "Chair",
+          "independence_status": "Chair (independent on appointment)",
+          "year_joined_board": 2020,
+          "tenure_years": 5.0,
+          "committee_memberships": ["Nominations"],
+          "committee_chair_of": ["Nominations"],
+          "year_end_status": "Active"
+        },
+        "attendance": {
+          "board_meetings_attended": 12,
+          "board_meetings_scheduled": 12,
+          "board_attendance_pct": 100.0
+        }
+      }
+    ]
+  },
+  "director_election": {
+    "summary": {
+      "num_directors_to_elect": 3,
+      "incumbent_nominees": ["Jane Smith"],
+      "new_nominees": ["John Doe"]
+    },
+    "candidates": []
+  },
+  "post_election_board": null
 }
 ```
+
+`director_election` and `post_election_board` are `null` when the filing contains no proxy/election section. `post_election_board` is always computed (never extracted) — it merges `current_board.directors` with `director_election.candidates` and recomputes the summary.
 
 ---
 
@@ -421,12 +464,12 @@ The evaluation harness scores extraction quality by comparing a machine-extracte
 
 | Field type | Metric |
 |------------|--------|
-| Name, role, nationality | Fuzzy match (threshold 90) |
-| Enums (designation, independence) | Exact match |
+| Name, role, affiliation | Fuzzy match (threshold 90) |
+| Enums (designation, independence, gender) | Exact match |
 | Dates | Exact ISO-8601 match; year-only fallback |
-| Numeric (age, tenure, attendance counts) | Relative error ≤ 5% |
-| Lists (committees, expertise, qualifications) | Set-based F1 (threshold 0.90) |
-| Free text (career summary) | LLM semantic similarity (threshold 0.80) |
+| Numeric (age, tenure, attendance, shares) | Relative error ≤ 5% |
+| Lists (committees, nominees) | Set-based F1 (threshold 0.90) |
+| Free text (career summary) | LLM-as-judge semantic similarity (threshold 0.80) |
 
 ### Failure modes
 

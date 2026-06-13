@@ -50,7 +50,7 @@ board-governance-extractor/
 ├── uv.lock
 ├── CLAUDE.md                          ← YOU ARE HERE
 ├── README.md
-├── REQUIREMENTS.md
+├── PRD.md
 ├── PROJECT_PLAN.md
 ├── .env.example
 ├── config.yaml
@@ -153,11 +153,9 @@ class BiographicalDetails(BaseModel):
     post_nominals: str | None = None
     age: int | None = None
     age_band: str | None = None             # e.g. "56–60"
-    nationality: str | None = None
-    qualifications: list[str] = []
-    expertise_areas: list[str] = []
+    gender: str | None = None
+    affiliation: str | None = None          # political party or institutional affiliation
     career_summary: str | None = None
-    other_directorships: list[str] = []
 
 class BoardRoleDetails(BaseModel):
     designation: Literal["Executive Director", "Non-Executive Director", "Chair"]
@@ -171,10 +169,13 @@ class BoardRoleDetails(BaseModel):
     year_joined_board: int | None = None
     date_joined_board: str | None = None    # ISO-8601
     tenure_years: float | None = None
+    term_end_year: int | None = None        # year current term expires
     year_end_status: str                    # "Active" | "Retired YYYY-MM-DD"
     committee_memberships: list[str] = []
     committee_chair_of: list[str] = []
-    special_roles: list[str] = []
+    other_positions: list[str] = []
+    num_holding_shares: int | None = None
+    pct_holding_shares: float | None = None
 
 class AttendanceDetails(BaseModel):
     board_meetings_attended: int | None = None
@@ -210,7 +211,7 @@ class BoardSummary(BaseModel):
     notes: str | None = None
 ```
 
-`voting_standard` and `board_evaluation` can only come from the filing text; there is no computation fallback for either. `director_names` is **always overwritten** in `_compute_board_summary()` with the full names from the director list — it is never extracted by the LLM. `pct_women` is computed from `director.biographical.gender` (case-insensitive `"Female"` match), using the full director count as the denominator; only computed when at least one director has a known gender. All remaining fields have computation fallbacks in `_compute_board_summary()` in `extractor.py`.
+`voting_standard` must come exclusively from the filing text; there is no computation fallback. `director_names` is **always overwritten** in `_compute_board_summary()` with the full names from the director list — it is never extracted by the LLM. `pct_women` is computed from `director.biographical.gender` (case-insensitive `"Female"` match), using the full director count as the denominator; only computed when at least one director has a known gender. All remaining fields have computation fallbacks in `_compute_board_summary()` in `extractor.py`.
 
 **Important:** Directors are accessed via `doc.current_board.directors`; `full_name` via `director.biographical.full_name`. When merging partial extraction results across chunks, match directors by `biographical.full_name` using fuzzy matching (threshold 90).
 
@@ -377,7 +378,7 @@ Five sheets in this order:
 |-------|---------|
 | `Board Summary` | Two-column metric/value table of all `BoardSummary` fields |
 | `Board Overview` | Master table: all directors, all key fields |
-| `Biographical Details` | Name, age band, nationality, expertise, career, qualifications, external directorships |
+| `Biographical Details` | Name, age band, gender, affiliation, career summary |
 | `Committee Memberships` | Director × committee matrix — `C` (chair), `M` (member), `–` (not a member) |
 | `Meeting Attendance` | Board + per-committee attendance; attendance % with traffic-light colours |
 
@@ -429,22 +430,36 @@ def date_match(pred: str | None, gt: str | None) -> dict[str, float]: ...
 def numeric_error(pred: float | None, gt: float | None, tolerance: float = 0.05) -> dict[str, float]: ...
 def list_f1(pred: list, gt: list) -> dict[str, float]: ...
 def semantic_similarity(pred: str | None, gt: str | None, threshold: float = 0.80) -> float: ...
+def llm_semantic_similarity(pred: str | None, gt: str | None, threshold: float = 0.80,
+                             judge_config: dict[str, str] | None = None) -> float: ...
 ```
 
-The sentence-transformer model is loaded lazily and cached as a module-level singleton. Import only inside the function body, guarded by a `try/except` that raises a clear `RuntimeError` explaining how to install the `eval` extra.
+`semantic_similarity` uses `sentence-transformers` (optional `[eval]` extra; downloads `all-MiniLM-L6-v2` from HuggingFace on first use). `llm_semantic_similarity` uses a cheap LLM judge instead — provider and model come from `config.yaml` (`llm.judge_provider` / `llm.judge_model`); credentials still come from env vars. This is the **default** for free-text fields and works in firewall-restricted environments with no HuggingFace access.
 
 ### Metric dispatch by field path
 
-Configured in `config.yaml` under `evaluation.director_field_metrics`. See `config.yaml` for the full mapping. Key entries:
+Three separate metric mappings are configured in `config.yaml`:
 
 ```yaml
 evaluation:
-  director_field_metrics:
+  director_field_metrics:          # applied to each Director in current_board
     "biographical.full_name":            exact_match
     "biographical.career_summary":       llm_semantic_similarity
     "board_role.committee_memberships":  list_f1
     "attendance.board_attendance_pct":   numeric_error
+
+  candidate_field_metrics:         # applied to each Director in director_election.candidates
+    "biographical.full_name":            exact_match
+    "biographical.career_summary":       llm_semantic_similarity
+    "board_role.committee_memberships":  list_f1
+
+  document_field_metrics:          # applied once per document (dot-path from root)
+    "current_board.summary.voting_standard":          exact_match
+    "current_board.summary.board_size":               numeric_error
+    "director_election.summary.num_directors_to_elect": numeric_error
 ```
+
+See `config.yaml` for the full field listings.
 
 ### Aggregate dataclasses (`evaluation/evaluator.py`)
 
@@ -501,14 +516,15 @@ Secret keys (API keys, endpoints) are **never** in `config.yaml` — env vars on
 ```yaml
 # config.yaml (committed to repo — no secrets)
 llm:
-  default_provider: anthropic
+  default_provider: anthropic        # anthropic | openai | azure_openai | deepseek
   default_model: claude-sonnet-4-6
-  judge_provider: openai
+  judge_provider: openai             # provider for llm_semantic_similarity evaluation metric
   judge_model: gpt-4o-mini
   temperature: 0
-  reasoning_effort: null       # null = auto-detect; "low" | "medium" | "high" to override
-  chunking: true               # true = chunk pages; false = single pass over all pages
-  extraction_rounds: 1         # 1 = direct structured; 2 = markdown then structured
+  reasoning_effort: null             # null = auto-detect; "low" | "medium" | "high" to override
+  chunking: true                     # true = chunk pages; false = single pass over all pages
+  extraction_rounds: 1               # 1 = direct structured; 2 = markdown then structured
+  max_chunk_workers: 5               # parallel worker threads for chunked extraction
   max_retries: 5
   timeout_seconds: 120
 
@@ -517,6 +533,7 @@ pdf:
   max_pages_per_chunk: 15
   governance_keywords:
     - "board of directors"
+    - "board members"
     - "directors' report"
     - "our board"
     - "committee report"
@@ -525,6 +542,7 @@ pdf:
 
 output:
   default_dir: "./outputs"
+  eval_dataset_dir: "./data/eval_data"  # ground-truth files for corpus evaluation
 
 logging:
   level: INFO
@@ -578,7 +596,7 @@ The integration test for full extraction must run `evaluate` against `lbg_ground
 3. **`extra="forbid"` on all Pydantic models.** This prevents silent field-name typos from being accepted.
 4. **Temperature must be 0** for all LLM calls to ensure reproducibility. For reasoning models that use `reasoning_effort`, the `temperature` parameter must not be sent at all.
 5. **Null over hallucination.** The prompt must explicitly instruct the LLM to return `null` for missing fields; this is a correctness requirement, not a style preference.
-6. **The `sentence-transformers` dependency is optional** (`[eval]` extra). The core `extract` command must work without it; `evaluate` must fail gracefully with an informative error if the extra is not installed.
+6. **`llm_semantic_similarity` is the default for free-text fields** and requires no extra dependencies — it uses the configured `judge_provider`/`judge_model` from `config.yaml`. `semantic_similarity` (sentence-transformers) is still available as a metric name but is optional (`[eval]` extra) and requires HuggingFace access. If `semantic_similarity` is used without the extra installed, `evaluate` must fail with a clear error message.
 7. **All file output paths are configurable.** Never write to a hardcoded path — always resolve from `config.output.default_dir` or the `--output-dir` CLI flag.
 8. **Log token usage.** Every LLM call must log `{"event": "llm_call", "provider": ..., "model": ..., "input_tokens": ..., "output_tokens": ...}` via `structlog`.
 9. **Board summary extraction is always single-pass.** Do not chunk the board summary LLM call regardless of the `chunking` setting. It sees the full governance text (rounds=1) or combined markdown (rounds=2).
@@ -592,5 +610,5 @@ The integration test for full extraction must run `evaluate` against `lbg_ground
 | `examples/LBG_Board_Governance_2025.xlsx` | Canonical output format — Excel sheet layout, formatting, and field values |
 | `tests/fixtures/lbg_ground_truth.json` | Canonical output format — JSON structure and field values |
 | `schemas/board_governance.schema.json` | Authoritative JSON Schema — generated from Pydantic models; re-generate with `uv run python -m gov_extract.models.generate_schema` |
-| `REQUIREMENTS.md` | Full product requirements |
+| `PRD.md` | Full product requirements |
 | `PROJECT_PLAN.md` | Phased implementation plan and design decisions |
