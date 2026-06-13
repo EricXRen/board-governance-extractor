@@ -616,5 +616,6 @@ The integration test for full extraction must run `evaluate` against `lbg_ground
 | `examples/LBG_Board_Governance_2025.xlsx` | Canonical output format — Excel sheet layout, formatting, and field values |
 | `tests/fixtures/lbg_ground_truth.json` | Canonical output format — JSON structure and field values |
 | `schemas/board_governance.schema.json` | Authoritative JSON Schema — generated from Pydantic models; re-generate with `uv run python -m gov_extract.models.generate_schema` |
-| `PRD.md` | Full product requirements |
-| `PROJECT_PLAN.md` | Phased implementation plan and design decisions |
+| `documents/PRD_v1.0.md` | v1.0 product requirements |
+| `documents/PRD_v1.1.md` | v1.1 product requirements |
+| `documents/PROJECT_PLAN.md` | Phased implementation plan and design decisions |
