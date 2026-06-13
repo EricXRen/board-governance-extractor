@@ -90,8 +90,7 @@ Set `default_provider` and `default_model` in `config.yaml` (see [Configuration 
 
 ```bash
 # Extract board governance data from a local PDF
-uv run gov-extract extract \
-  --input examples/2025-lbg-annual-report.pdf \
+uv run gov-extract extract examples/2025-lbg-annual-report.pdf \
   --company "Lloyds Banking Group" \
   --year 2025 \
   --provider anthropic \
@@ -115,48 +114,58 @@ uv run gov-extract evaluate \
 
 ### extract
 
-Extract structured board governance data from a PDF filing.
+Extract structured board governance data from one or more PDF filings into a single output.
 
 ```
-gov-extract extract
-  --input <pdf_path_or_url>   Local file path or HTTPS URL to the PDF
-  --company <name>            Company name (used in output filenames)
-  --year <fiscal_year>        Fiscal year, e.g. 2025
-  [--provider <name>]         LLM provider: anthropic | openai | azure_openai
-  [--model <model_id>]        Model ID, e.g. claude-sonnet-4-6 or gpt-4o
+gov-extract extract INPUT... --company <name> --year <year> [options]
+
+  INPUT...                    One or more: local PDF path, HTTPS URL, or a folder
+                              (folder → all *.pdf files inside, sorted). Multiple
+                              inputs are merged into one output document.
+  --company, -c <name>        Company name (used in output filenames)
+  --year, -y <year>           Fiscal year, e.g. 2025
+  [--provider, -p <name>]     LLM provider: anthropic | openai | azure_openai | deepseek
+  [--model, -m <model_id>]    Model ID, e.g. claude-sonnet-4-6 or gpt-4o
   [--filing-type <type>]      Default: "Annual Report"
-  [--fiscal-year-end <date>]  ISO-8601 date, e.g. 2025-12-31. Default: {year}-12-31
+  [--fiscal-year-end <date>]  ISO-8601 date. Default: {year}-12-31
   [--ticker <symbol>]         Company ticker symbol
   [--report-date <date>]      Report publication date (ISO-8601)
   [--page-hint <page>]        Approximate governance section start page
-  [--output-dir <path>]       Output directory. Default: ./outputs
+  [--eval-id <id>]            Register as an evaluation dataset (e.g. lbg-fy2025);
+                              copies source PDFs to data/eval_data/<eval-id>/
+  [--output-dir, -o <path>]   Output directory. Default: ./outputs
   [--config <path>]           Path to a custom config.yaml
 ```
 
 **Examples:**
 
 ```bash
-# From a local file, using Azure OpenAI
-uv run gov-extract extract \
-  --input filings/hsbc-ar-2024.pdf \
-  --company HSBC \
-  --year 2024 \
-  --provider azure_openai \
-  --output-dir ./outputs
+# Single PDF
+uv run gov-extract extract filings/hsbc-ar-2024.pdf \
+  --company HSBC --year 2024 --provider azure_openai
+
+# Multiple PDFs merged (e.g. annual report + proxy statement)
+uv run gov-extract extract report.pdf proxy.pdf \
+  --company "Acme Corp" --year 2025 --provider openai --model gpt-4o
+
+# Entire folder of PDFs
+uv run gov-extract extract /reports/lbg/ \
+  --company "Lloyds Banking Group" --year 2025
+
+# With eval dataset registration
+uv run gov-extract extract report.pdf \
+  --company "Lloyds Banking Group" --year 2025 --eval-id lbg-fy2025
 
 # From a URL (PDF is downloaded and cached)
-uv run gov-extract extract \
-  --input https://example.com/annual-report-2025.pdf \
-  --company "Acme Corp" \
-  --year 2025 \
-  --provider openai \
-  --model gpt-4o
+uv run gov-extract extract https://example.com/annual-report-2025.pdf \
+  --company "Acme Corp" --year 2025
 ```
 
 Output files:
 
 - `{output_dir}/{Company}_{Year}_Board_Governance.xlsx`
 - `{output_dir}/{Company}_{Year}_Board_Governance.json`
+- `{output_dir}/{Company}_{Year}_Board_Governance_round1.md` *(only when `extraction_rounds: 2`)*
 
 ---
 

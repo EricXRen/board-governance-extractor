@@ -22,7 +22,13 @@ uv sync --extra eval --extra dev
 
 # Run the CLI
 uv run gov-extract --help
-uv run gov-extract extract --input examples/2025-lbg-annual-report.pdf --company "Lloyds Banking Group" --year 2025 --provider anthropic --model claude-sonnet-4-6 --output-dir ./outputs
+uv run gov-extract extract examples/2025-lbg-annual-report.pdf --company "Lloyds Banking Group" --year 2025 --provider anthropic --model claude-sonnet-4-6 --output-dir ./outputs
+
+# Multiple PDFs merged into one output
+uv run gov-extract extract report1.pdf report2.pdf --company "Lloyds Banking Group" --year 2025
+
+# All PDFs in a folder, with eval dataset registration
+uv run gov-extract extract /reports/lbg/ --company "Lloyds Banking Group" --year 2025 --eval-id lbg-fy2025
 
 # Validate a JSON output against the schema
 uv run gov-extract validate --json outputs/LloydsBankingGroup_2025_Board_Governance.json
