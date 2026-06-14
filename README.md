@@ -275,12 +275,26 @@ These two settings are fully orthogonal, giving four strategies:
 | `false` | `1` | All text in one structured call (baseline). |
 | `false` | `2` | All text to one Markdown call, then one structured call. |
 
+### `extraction_backend`
+
+| Value | Behaviour |
+|-------|-----------|
+| `pydantic_schema` (default) | Uses the existing JSON-schema-constrained LLM pipeline. |
+| `langextract` | Uses [Google LangExtract](https://github.com/google/langextract) — few-shot examples, multi-pass, char-level grounding. Requires `uv sync --extra langextract`. Provider support: OpenAI and DeepSeek. Board summary always uses the `pydantic_schema` path regardless of this setting. |
+
 Configure in `config.yaml`:
 
 ```yaml
 llm:
-  chunking: true       # true = chunk pages; false = single pass
-  extraction_rounds: 1 # 1 | 2
+  chunking: true              # true = chunk pages; false = single pass
+  extraction_rounds: 1        # 1 | 2
+  extraction_backend: pydantic_schema  # pydantic_schema | langextract
+```
+
+Install the LangExtract extra:
+
+```bash
+uv sync --extra langextract
 ```
 
 ---
@@ -300,6 +314,7 @@ llm:
                                      # applies to OpenAI o1/o3/o4/gpt-5 series
   chunking: true                     # true = chunk pages; false = single pass
   extraction_rounds: 1               # 1 (direct structured) | 2 (markdown then structured)
+  extraction_backend: pydantic_schema  # pydantic_schema | langextract (requires [langextract] extra)
   max_chunk_workers: 5               # parallel threads for chunk extraction (tune to rate limit)
   max_retries: 5
   timeout_seconds: 120

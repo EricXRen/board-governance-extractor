@@ -20,6 +20,9 @@ This file is the authoritative codebase guide for Claude Code. Read it fully bef
 # Install all dependencies (including eval and dev extras)
 uv sync --extra eval --extra dev
 
+# Install LangExtract optional backend
+uv sync --extra langextract
+
 # Run the CLI
 uv run gov-extract --help
 uv run gov-extract extract examples/2025-lbg-annual-report.pdf --company "Lloyds Banking Group" --year 2025 --provider anthropic --model claude-sonnet-4-6 --output-dir ./outputs
@@ -84,7 +87,9 @@ board-governance-extractor/
 │   │   ├── prompts.py                 # All prompt templates (director + board summary + markdown rounds)
 │   │   ├── chunker.py                 # chunk_pages(pages, max_tokens) -> list[TextChunk]
 │   │   ├── extractor.py               # run_extraction(provider, chunks, ...) -> BoardGovernanceDocument
-│   │   └── validator.py               # validate_json(data) -> BoardGovernanceDocument
+│   │   ├── validator.py               # validate_json(data) -> BoardGovernanceDocument
+│   │   ├── langextract_examples.py    # Few-shot ExampleData for LangExtract backend
+│   │   └── langextract_extractor.py   # run_langextract_extraction(...) -> list[Director]
 │   ├── export/
 │   │   ├── excel_writer.py            # write_excel(doc, path) — six sheets (Source References added when populated)
 │   │   └── json_writer.py             # write_json(doc, path)
@@ -538,6 +543,7 @@ llm:
   reasoning_effort: null             # null = auto-detect; "low" | "medium" | "high" to override
   chunking: true                     # true = chunk pages; false = single pass over all pages
   extraction_rounds: 1               # 1 = direct structured; 2 = markdown then structured
+  extraction_backend: pydantic_schema  # pydantic_schema | langextract
   max_chunk_workers: 5               # parallel worker threads for chunked extraction
   max_retries: 5
   timeout_seconds: 120
