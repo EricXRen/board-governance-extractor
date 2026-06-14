@@ -173,30 +173,27 @@ def _extraction_to_director(
 
 
 def _get_langextract_model(llm_provider: str, llm_model: str) -> Any:
-    """Return model_id string (OpenAI gpt-*) or ModelConfig (DeepSeek/custom).
+    """Return a pre-configured OpenAILanguageModel for the given provider and model.
+
+    We bypass LangExtract's pattern-based router and always instantiate
+    OpenAILanguageModel directly. This is required because DeepSeek model IDs
+    (deepseek-*) match the Ollama pattern and would otherwise be misrouted.
 
     Args:
         llm_provider: Provider name from config (e.g. "openai", "deepseek").
         llm_model: Model ID from config (e.g. "gpt-4o", "deepseek-chat").
 
     Returns:
-        String model ID for auto-routed gpt-* models; ModelConfig otherwise.
+        Configured OpenAILanguageModel instance.
     """
-    import langextract as lx  # type: ignore[import]
+    from langextract.providers.openai import OpenAILanguageModel  # type: ignore[import]
 
-    if llm_provider == "openai" and llm_model.startswith("gpt-"):
-        return llm_model
-
-    base_url = os.environ.get("OPENAI_BASE_URL")
     api_key = os.environ.get("OPENAI_API_KEY", "")
-    provider_kwargs: dict[str, str] = {"api_key": api_key}
-    if base_url:
-        provider_kwargs["base_url"] = base_url
-
-    return lx.ModelConfig(
+    base_url = os.environ.get("OPENAI_BASE_URL")
+    return OpenAILanguageModel(
         model_id=llm_model,
-        provider="openai",
-        provider_kwargs=provider_kwargs,
+        api_key=api_key,
+        base_url=base_url,
     )
 
 
@@ -255,7 +252,7 @@ def run_langextract_extraction(
     )
 
     try:
-        annotated_doc = lx.extract(combined_text, PROMPT_DESCRIPTION, examples, model)
+        annotated_doc = lx.extract(combined_text, PROMPT_DESCRIPTION, examples, model=model)
         raw_extractions = getattr(annotated_doc, "extractions", []) or []
     except Exception as e:
         logger.error("langextract_extraction_failed", company=company_name, error=str(e))

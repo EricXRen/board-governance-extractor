@@ -779,7 +779,8 @@ def run_extraction(
         pages = gov_pages or {}
         if not pages:
             logger.warning("langextract_backend_no_pages", company=company_name)
-        merged_directors = run_langextract_extraction(pages, company_name, provider_name, model_name)
+        raw_directors = run_langextract_extraction(pages, company_name, provider_name, model_name)
+        merged_directors = _deduplicate_directors([raw_directors])
         # summary_text already set from effective_chunks above; board summary uses pydantic path
 
     elif extraction_rounds == 2:
