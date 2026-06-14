@@ -20,6 +20,9 @@ This file is the authoritative codebase guide for Claude Code. Read it fully bef
 # Install all dependencies (including eval and dev extras)
 uv sync --extra eval --extra dev
 
+# Install LangExtract optional backend
+uv sync --extra langextract
+
 # Run the CLI
 uv run gov-extract --help
 uv run gov-extract extract examples/2025-lbg-annual-report.pdf --company "Lloyds Banking Group" --year 2025 --provider anthropic --model claude-sonnet-4-6 --output-dir ./outputs
@@ -67,7 +70,7 @@ board-governance-extractor/
 │   ├── config.py                      # Pydantic Settings v2
 │   ├── models/
 │   │   ├── document.py                # BoardGovernanceDocument (top-level model)
-│   │   ├── director.py                # Director + BiographicalDetails + BoardRoleDetails + AttendanceDetails
+│   │   ├── director.py                # Director + BiographicalDetails + BoardRoleDetails + AttendanceDetails + SourceReference
 │   │   ├── board_summary.py           # BoardSummary (aggregate board-level statistics)
 │   │   └── metadata.py                # CompanyMetadata
 │   ├── pdf/
@@ -84,9 +87,11 @@ board-governance-extractor/
 │   │   ├── prompts.py                 # All prompt templates (director + board summary + markdown rounds)
 │   │   ├── chunker.py                 # chunk_pages(pages, max_tokens) -> list[TextChunk]
 │   │   ├── extractor.py               # run_extraction(provider, chunks, ...) -> BoardGovernanceDocument
-│   │   └── validator.py               # validate_json(data) -> BoardGovernanceDocument
+│   │   ├── validator.py               # validate_json(data) -> BoardGovernanceDocument
+│   │   ├── langextract_examples.py    # Few-shot ExampleData for LangExtract backend
+│   │   └── langextract_extractor.py   # run_langextract_extraction(...) -> list[Director]
 │   ├── export/
-│   │   ├── excel_writer.py            # write_excel(doc, path) — five sheets
+│   │   ├── excel_writer.py            # write_excel(doc, path) — six sheets (Source References added when populated)
 │   │   └── json_writer.py             # write_json(doc, path)
 │   └── evaluation/
 │       ├── metrics.py                 # exact_match, fuzzy_match, date_match, numeric_error, list_f1, semantic_similarity
@@ -190,10 +195,17 @@ class AttendanceDetails(BaseModel):
     committee_attendance: list[CommitteeAttendance] = []
     attendance_notes: str | None = None
 
+class SourceReference(BaseModel):
+    page_number: int | None = None
+    char_start: int | None = None     # populated by LangExtract path only
+    char_end: int | None = None       # populated by LangExtract path only
+    quoted_text: str | None = None    # verbatim excerpt ≤ 200 chars
+
 class Director(BaseModel):
     biographical: BiographicalDetails
     board_role: BoardRoleDetails
     attendance: AttendanceDetails
+    source_ref: SourceReference | None = None   # optional; pydantic path populates page_number + quoted_text
 ```
 
 ### BoardSummary (`board_summary.py`)
@@ -387,6 +399,7 @@ Five sheets in this order:
 | `Biographical Details` | Name, age band, gender, affiliation, career summary |
 | `Committee Memberships` | Director × committee matrix — `C` (chair), `M` (member), `–` (not a member) |
 | `Meeting Attendance` | Board + per-committee attendance; attendance % with traffic-light colours |
+| `Source References` | Director → page + quoted text; sheet omitted when no source refs populated |
 
 **Formatting constants** (match reference file exactly):
 ```python
@@ -530,6 +543,7 @@ llm:
   reasoning_effort: null             # null = auto-detect; "low" | "medium" | "high" to override
   chunking: true                     # true = chunk pages; false = single pass over all pages
   extraction_rounds: 1               # 1 = direct structured; 2 = markdown then structured
+  extraction_backend: pydantic_schema  # pydantic_schema | langextract
   max_chunk_workers: 5               # parallel worker threads for chunked extraction
   max_retries: 5
   timeout_seconds: 120

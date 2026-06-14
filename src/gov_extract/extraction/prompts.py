@@ -28,6 +28,7 @@ CRITICAL INSTRUCTIONS:
 - For lists (other_positions, committee_memberships, etc.), return an empty list [] if nothing is stated.
 - For full_name, extract only the given name and surname — strip any pre-nominals (Sir, Lord, Dr) and post-nominals (CBE, OBE, FCA, etc.). Store post-nominals separately in the post_nominals field.
 - Return a JSON object `{{"directors": [...]}}` containing all Director objects. If no directors are found, return `{{"directors": []}}`.
+- For each director, populate `source_ref` with the `page_number` (if determinable from the page headers or footers in the text) and a `quoted_text` containing a verbatim excerpt of ≤ 200 characters from the source text that most clearly identifies this director's name and role. If you cannot determine the page number, set it to `null`. Leave `char_start` and `char_end` as `null` — they are populated by a different pipeline.
 
 The Director object schema is:
 ```json
@@ -127,6 +128,7 @@ CRITICAL INSTRUCTIONS:
 - For lists (other_directorships, other_positions, etc.), return [] if nothing is stated.
 - For full_name, use only the given name and surname — strip any pre-nominals and post-nominals.
 - Return a JSON object `{{"directors": [...]}}` containing all Director objects. If no directors are present, return `{{"directors": []}}`.
+- For each director, populate `source_ref.quoted_text` with a verbatim excerpt of ≤ 200 characters from the Markdown that most clearly identifies this director's name and role. Set `source_ref.page_number` if a page number is stated in the Markdown; otherwise `null`. Leave `char_start` and `char_end` as `null`.
 
 The Director object schema is:
 ```json

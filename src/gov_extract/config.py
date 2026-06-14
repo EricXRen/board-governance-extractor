@@ -30,7 +30,8 @@ class LLMConfig(BaseSettings):
     reasoning_effort: str | None = None  # "low" | "medium" | "high"; auto-detected if None
     chunking: bool = True                # True = chunk pages; False = single pass over all pages
     extraction_rounds: int = 1           # 1 = direct structured output; 2 = markdown then structured
-    max_chunk_workers: int = 5           # parallel threads for chunked extraction
+    extraction_backend: str = "pydantic_schema"  # "pydantic_schema" | "langextract"
+    max_chunk_workers: int = 5                   # parallel threads for chunked extraction
     max_retries: int = 5
     timeout_seconds: int = 120
 

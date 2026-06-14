@@ -13,6 +13,7 @@ from gov_extract.models.director import (
     BoardRoleDetails,
     CommitteeAttendance,
     Director,
+    SourceReference,
 )
 from gov_extract.models.director_election import DirectorElection, DirectorElectionSummary
 from gov_extract.models.document import BoardGovernanceDocument, Board
@@ -115,6 +116,47 @@ class TestDirectorModels:
     def test_extra_field_forbidden_biographical(self) -> None:
         with pytest.raises(ValidationError):
             BiographicalDetails(full_name="X", unknown_field="y")  # type: ignore[call-arg]
+
+
+class TestSourceReference:
+    def test_all_null(self) -> None:
+        ref = SourceReference()
+        assert ref.page_number is None
+        assert ref.char_start is None
+        assert ref.char_end is None
+        assert ref.quoted_text is None
+
+    def test_populated(self) -> None:
+        ref = SourceReference(page_number=42, quoted_text="Jane Smith — Non-Executive Director")
+        assert ref.page_number == 42
+        assert ref.quoted_text == "Jane Smith — Non-Executive Director"
+
+    def test_langextract_fields(self) -> None:
+        ref = SourceReference(page_number=10, char_start=500, char_end=600, quoted_text="test")
+        assert ref.char_start == 500
+        assert ref.char_end == 600
+
+    def test_extra_field_forbidden(self) -> None:
+        with pytest.raises(ValidationError):
+            SourceReference(page_number=1, unknown="x")  # type: ignore[call-arg]
+
+    def test_director_without_source_ref(self) -> None:
+        d = make_director()
+        assert d.source_ref is None
+
+    def test_director_with_source_ref(self) -> None:
+        ref = SourceReference(page_number=5, quoted_text="Jane Smith — NED")
+        d = make_director(source_ref=ref)
+        assert d.source_ref is not None
+        assert d.source_ref.page_number == 5
+        assert d.source_ref.quoted_text == "Jane Smith — NED"
+
+    def test_director_source_ref_round_trip(self) -> None:
+        ref = SourceReference(page_number=7, char_start=100, char_end=200, quoted_text="snippet")
+        d = make_director(source_ref=ref)
+        restored = Director.model_validate_json(d.model_dump_json())
+        assert restored.source_ref is not None
+        assert restored.source_ref.char_start == 100
 
 
 class TestBoardGovernanceDocument:

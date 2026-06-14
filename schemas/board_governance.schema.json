@@ -587,6 +587,17 @@
         },
         "attendance": {
           "$ref": "#/$defs/AttendanceDetails"
+        },
+        "source_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceReference"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -662,6 +673,62 @@
         }
       },
       "title": "DirectorElectionSummary",
+      "type": "object"
+    },
+    "SourceReference": {
+      "additionalProperties": false,
+      "description": "Source provenance for a director record.",
+      "properties": {
+        "page_number": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Number"
+        },
+        "char_start": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Char Start"
+        },
+        "char_end": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Char End"
+        },
+        "quoted_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quoted Text"
+        }
+      },
+      "title": "SourceReference",
       "type": "object"
     }
   },

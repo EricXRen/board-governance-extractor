@@ -141,6 +141,7 @@ def extract(
     from gov_extract.pdf.page_finder import find_governance_pages
 
     all_chunks = []
+    all_gov_pages: dict[int, str] = {}
     resolved_pdf_paths: list[str] = []
 
     for idx, input_path in enumerate(resolved_inputs, 1):
@@ -171,6 +172,7 @@ def extract(
         console.print(
             f"  {label}Governance pages: {len(gov_pages)} pages across {len(ranges)} range(s)"
         )
+        all_gov_pages.update(gov_pages)
 
         with console.status(f"{label}Chunking pages..."):
             chunks = chunk_pages(gov_pages, max_tokens=cfg.pdf.max_pages_per_chunk * 600)
@@ -204,6 +206,8 @@ def extract(
             extraction_rounds=cfg.llm.extraction_rounds,
             max_chunk_workers=cfg.llm.max_chunk_workers,
             markdown_output_path=markdown_out,
+            gov_pages=all_gov_pages,
+            extraction_backend=cfg.llm.extraction_backend,
         )
 
     console.print(f"  Directors extracted: [bold green]{len(doc.current_board.directors)}[/bold green]")

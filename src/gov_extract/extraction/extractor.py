@@ -699,6 +699,8 @@ def run_extraction(
     extraction_rounds: int = 1,
     max_chunk_workers: int = 5,
     markdown_output_path: Path | None = None,
+    gov_pages: dict[int, str] | None = None,
+    extraction_backend: str = "pydantic_schema",
 ) -> BoardGovernanceDocument:
     """Run the full extraction pipeline over all chunks.
 
@@ -733,12 +735,16 @@ def run_extraction(
         markdown_output_path: If provided and ``extraction_rounds == 2``, the
             combined round-1 Markdown is written to this path before the
             structured pass. Useful for debugging and prompt iteration.
+        gov_pages: Full page dict (page_number → text) for the governance section.
+            Required when ``extraction_backend='langextract'``.
+        extraction_backend: ``"pydantic_schema"`` (default) or ``"langextract"``.
 
     Returns:
         Validated BoardGovernanceDocument.
 
     Raises:
         ValueError: If extraction_rounds is not recognised.
+        RuntimeError: If extraction_backend is 'langextract' but the package is not installed.
     """
     if extraction_rounds not in (1, 2):
         raise ValueError(
@@ -753,6 +759,7 @@ def run_extraction(
         model=model_name,
         chunking=chunking,
         extraction_rounds=extraction_rounds,
+        extraction_backend=extraction_backend,
     )
 
     # Determine which input chunks to use for each LLM call.
@@ -763,10 +770,20 @@ def run_extraction(
     else:
         effective_chunks = chunks
 
-    summary_text: str = ""  # populated in each branch, used for board summary extraction
+    summary_text: str = "\n\n".join(c.text for c in effective_chunks)
     is_markdown_summary = False
 
-    if extraction_rounds == 2:
+    if extraction_backend == "langextract":
+        from gov_extract.extraction.langextract_extractor import run_langextract_extraction
+
+        pages = gov_pages or {}
+        if not pages:
+            logger.warning("langextract_backend_no_pages", company=company_name)
+        raw_directors = run_langextract_extraction(pages, company_name, provider_name, model_name)
+        merged_directors = _deduplicate_directors([raw_directors])
+        # summary_text already set from effective_chunks above; board summary uses pydantic path
+
+    elif extraction_rounds == 2:
         # Round 1: extract each (effective) chunk to Markdown — parallel when chunking=True.
         markdown_parts = _run_parallel(
             _extract_chunk_markdown,
@@ -809,7 +826,6 @@ def run_extraction(
         )
         # single_pass produces one chunk so dedup is a no-op, but it's harmless.
         merged_directors = _deduplicate_directors(all_director_lists)
-        summary_text = "\n\n".join(c.text for c in effective_chunks)
 
     merged_directors = _compute_attendance_pct(merged_directors)
 
