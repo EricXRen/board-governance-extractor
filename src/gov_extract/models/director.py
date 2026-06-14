@@ -5,6 +5,17 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict
 
 
+class SourceReference(BaseModel):
+    """Source provenance for a director record."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    page_number: int | None = None
+    char_start: int | None = None   # populated by LangExtract path only
+    char_end: int | None = None     # populated by LangExtract path only
+    quoted_text: str | None = None  # verbatim excerpt ≤ 200 chars
+
+
 class CommitteeAttendance(BaseModel):
     """Attendance record for a single committee."""
 
@@ -76,3 +87,4 @@ class Director(BaseModel):
     biographical: BiographicalDetails
     board_role: BoardRoleDetails
     attendance: AttendanceDetails
+    source_ref: SourceReference | None = None

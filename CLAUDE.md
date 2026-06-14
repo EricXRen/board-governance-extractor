@@ -67,7 +67,7 @@ board-governance-extractor/
 │   ├── config.py                      # Pydantic Settings v2
 │   ├── models/
 │   │   ├── document.py                # BoardGovernanceDocument (top-level model)
-│   │   ├── director.py                # Director + BiographicalDetails + BoardRoleDetails + AttendanceDetails
+│   │   ├── director.py                # Director + BiographicalDetails + BoardRoleDetails + AttendanceDetails + SourceReference
 │   │   ├── board_summary.py           # BoardSummary (aggregate board-level statistics)
 │   │   └── metadata.py                # CompanyMetadata
 │   ├── pdf/
@@ -86,7 +86,7 @@ board-governance-extractor/
 │   │   ├── extractor.py               # run_extraction(provider, chunks, ...) -> BoardGovernanceDocument
 │   │   └── validator.py               # validate_json(data) -> BoardGovernanceDocument
 │   ├── export/
-│   │   ├── excel_writer.py            # write_excel(doc, path) — five sheets
+│   │   ├── excel_writer.py            # write_excel(doc, path) — six sheets (Source References added when populated)
 │   │   └── json_writer.py             # write_json(doc, path)
 │   └── evaluation/
 │       ├── metrics.py                 # exact_match, fuzzy_match, date_match, numeric_error, list_f1, semantic_similarity
@@ -190,10 +190,17 @@ class AttendanceDetails(BaseModel):
     committee_attendance: list[CommitteeAttendance] = []
     attendance_notes: str | None = None
 
+class SourceReference(BaseModel):
+    page_number: int | None = None
+    char_start: int | None = None     # populated by LangExtract path only
+    char_end: int | None = None       # populated by LangExtract path only
+    quoted_text: str | None = None    # verbatim excerpt ≤ 200 chars
+
 class Director(BaseModel):
     biographical: BiographicalDetails
     board_role: BoardRoleDetails
     attendance: AttendanceDetails
+    source_ref: SourceReference | None = None   # optional; pydantic path populates page_number + quoted_text
 ```
 
 ### BoardSummary (`board_summary.py`)
@@ -387,6 +394,7 @@ Five sheets in this order:
 | `Biographical Details` | Name, age band, gender, affiliation, career summary |
 | `Committee Memberships` | Director × committee matrix — `C` (chair), `M` (member), `–` (not a member) |
 | `Meeting Attendance` | Board + per-committee attendance; attendance % with traffic-light colours |
+| `Source References` | Director → page + quoted text; sheet omitted when no source refs populated |
 
 **Formatting constants** (match reference file exactly):
 ```python

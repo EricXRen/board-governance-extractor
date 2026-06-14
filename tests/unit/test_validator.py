@@ -64,6 +64,24 @@ class TestValidateJson:
 
 
 class TestValidateJsonFile:
+    def test_source_ref_absent_is_backward_compatible(self) -> None:
+        """Documents without source_ref must still pass validation (additive, optional field)."""
+        data = _minimal_doc_dict()
+        data["current_board"]["directors"] = [
+            {
+                "biographical": {"full_name": "Jane Smith"},
+                "board_role": {
+                    "designation": "Non-Executive Director",
+                    "board_role": "NED",
+                    "independence_status": "Independent",
+                    "year_end_status": "Active",
+                },
+                "attendance": {},
+            }
+        ]
+        doc = validate_json(data)
+        assert doc.current_board.directors[0].source_ref is None
+
     def test_valid_file(self, sample_document: BoardGovernanceDocument) -> None:
         with tempfile.NamedTemporaryFile(suffix=".json", mode="w", delete=False) as f:
             json.dump(sample_document.model_dump(mode="json"), f)

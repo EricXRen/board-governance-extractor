@@ -383,6 +383,33 @@ def _write_meeting_attendance(wb: Workbook, doc: BoardGovernanceDocument) -> Non
     _add_footer(ws, len(doc.current_board.directors) + 1, len(headers), _footer_text(doc))
 
 
+def _write_source_references(wb: Workbook, doc: BoardGovernanceDocument) -> None:
+    """Write the Source References sheet — one row per director with a source_ref."""
+    directors_with_refs = [d for d in doc.current_board.directors if d.source_ref is not None]
+    if not directors_with_refs:
+        return
+
+    ws = wb.create_sheet("Source References")
+    headers = ["Director", "Page", "Char Start", "Char End", "Quoted Text"]
+    _write_header(ws, headers)
+
+    for i, director in enumerate(directors_with_refs, 1):
+        ref = director.source_ref
+        row = [
+            director.biographical.full_name,
+            ref.page_number,  # type: ignore[union-attr]
+            ref.char_start,   # type: ignore[union-attr]
+            ref.char_end,     # type: ignore[union-attr]
+            ref.quoted_text,  # type: ignore[union-attr]
+        ]
+        ws.append(row)
+        fill = _director_fill(director)
+        _apply_row_style(ws, i + 1, fill, alt=(i % 2 == 0))
+
+    _autofit_columns(ws, max_width=20)
+    ws.column_dimensions["E"].width = 60
+
+
 def _write_election_summary(wb: Workbook, election: DirectorElection, footer: str) -> None:
     """Write the Election Summary sheet — two-column metric/value table."""
     ws = wb.create_sheet("Election Summary")
@@ -501,6 +528,7 @@ def write_excel(doc: BoardGovernanceDocument, path: Path) -> Path:
     _write_biographical(wb, doc)
     _write_committee_memberships(wb, doc)
     _write_meeting_attendance(wb, doc)
+    _write_source_references(wb, doc)
 
     if doc.director_election is not None:
         footer = _footer_text(doc)
